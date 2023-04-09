@@ -1,0 +1,338 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Yard Control - About</title>
+    <link rel="shortcut icon" href="favicon.ico" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/dark-mode-switch.css">
+</head>
+<body class="ms-1">
+    <div class="container-fluid" px-0>
+        <!-- Navigation Header -->
+        <nav class="navbar navbar-expand-sm navbar-light bg-light border-bottom">
+            <!-- Navbar content -->
+            <div class="container-fluid">
+                <a class="navbar-brand fs-1" href="#">Yard Control</a>
+                <button class="navbar-toggler"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#navbarNavDropdown"
+                        aria-controls="navbarNavDropdown"
+                        aria-expanded="false"
+                        aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link fs-3" href="/index.html">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link fs-3" href="/info.html">Info</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link fs-3" href="/settings.html">Settings</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link fs-3 active" aria-current="page" href="/about.html">About</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- Dark Mode Switch -->
+            <div class="col d-flex">
+                <div class="form-check form-switch ms-auto">
+                    <div class="switch switch-info">
+                        <label class="form-check-label ms-3" for="darkSwitch">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="2vw" height="2vw" fill="currentColor" class="bi bi-brightness-high" viewBox="0 0 20 20">
+                                <path d="M8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z" />
+                            </svg>
+                        </label>
+                        <input class="form-check-input" type="checkbox" id="darkSwitch" />
+                    </div>
+                </div>
+            </div>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <script src="js/dark-mode-switch.min.js"></script>
+        </nav>
+        <!-- About Panel -->
+        <div class="mt-3 container-fluid" px-0>
+            <p>A web application providing a set of web pages to control a fiddley yard using a linear actuator, system info and application settings.</p>
+            <p>An additional telnet server (<a id="hrefTelnet">Telnet</a>) is available, providing a set of commands to control the stepper motor.</p>
+
+            <h4>HTML Pages</h4>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <td>Request</td>
+                        <td>Description</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><a href="/index.html">/index.html</a></td>
+                        <td>Returns the main (default) page.</td>
+                    </tr>
+                    <tr>
+                        <td><a href="/info.html">/info.html</a></td>
+                        <td>Returns the system info page.</td>
+                    </tr>
+                    <tr>
+                        <td><a href="/settings.html">/settings.html</a></td>
+                        <td>Returns the application settings page.</td>
+                    </tr>
+                    <tr>
+                        <td><a href="/about.html">/about.html</a></td>
+                        <td>Returns this about page.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p>The following REST Api's are supported:</p>
+
+            <h4>GET</h4>
+            <p>All GET requests return the data as a JSON string.</p>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <td>Request</td>
+                        <td>Description</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><a href="/appsettings.json">/appsettings.json</a></td>
+                        <td>Downloads the <i>appsettings.json</i> file.</td>
+                    </tr>
+                    <tr>
+                        <td><a href="/settings">/settings</a></td>
+                        <td>Returns all application settings.</td>
+                    </tr>
+                    <tr>
+                        <td><a href="/system">/system</a></td>
+                        <td>Returns the system info.</td>
+                    </tr>
+                    <tr>
+                        <td><a href="/server">/server</a></td>
+                        <td>Returns the server info.</td>
+                    </tr>
+                    <tr>
+                        <td><a href="/status">/status</a></td>
+                        <td>Returns the current stepper status.</td>
+                    </tr>
+                    <tr>
+                        <td><a href="/gpio">/gpio</a></td>
+                        <td>Returns the current status of selected GPIO pins.</td>
+                    </tr>
+                    <tr>
+                        <td><a href="/wifi">/wifi</a></td>
+                        <td>Returns the result of a wifi scan (ssid, max, channel, rssi, security, mode).</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4>POST</h4>
+            <p>POST requests allow settings upload and reboot.</p>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <td>Request</td>
+                        <td>Description</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><a href="#postPlus" id="postPlus" onclick="postPlus()">/plus</a></td>
+                        <td>Move a  single step forward.</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#postMinus" id="postMinus" onclick="postMinus()">/minus</a></td>
+                        <td>Move a single step backward.</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#postForward" id="postForward" onclick="postForward()">/forward</a></td>
+                        <td>Move a small step (0.1) forward.</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#postBackward" id="postBackward" onclick="postBackward()">/backward</a></td>
+                        <td>Move a small step (0.1) backward.</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#postCalibrate" id="postCalibrate" onclick="postCalibrate()">/calibrate</a></td>
+                        <td>Initiates a calibration routine.</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#postEnable" id="postEnable" onclick="postEnable()">/enable</a></td>
+                        <td>Enables the stepper motor.</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#postDisable" id="postDisable" onclick="postDisable()">/disable</a></td>
+                        <td>Disables the stepper motor.</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#postHome" id="postHome" onclick="postHome()">/home</a></td>
+                        <td>Move ro the home position.</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#postStop" id="postStop" onclick="postStop()">/stop</a></td>
+                        <td>Stops the stepper motor.</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#postReboot" id="postReboot" onclick="postReboot()">/reboot</a></td>
+                        <td>Reboots the machine.</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#postStep" id="postStep" onclick="postStep()">/step</a></td>
+                        <td>Move the number of steps (relative).</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#postMove" id="postMove" onclick="postMove()">/move</a></td>
+                        <td>Move the number of mm (relative).</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#postStep" id="postStep" onclick="postStep()">/stepto</a></td>
+                        <td>Move to absolute position (steps).</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#postMove" id="postMove" onclick="postMove()">/moveto</a></td>
+                        <td>Move to absolute position (mm).</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#postTrack" id="postTrack" onclick="postTrack()">/track</a></td>
+                        <td>Move to track number.</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#postSpeed" id="postSpeed" onclick="postSpeed()">/speed</a></td>
+                        <td>Sets the maximum speed (steps per second).</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#postMaxSpeed" id="postMaxSpeed" onclick="postMaxSpeed()">/maxspeed</a></td>
+                        <td>Sets the maximum speed (steps per second).</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#postAcceleration" id="postAcceleration" onclick="postAcceleration()">/acceleration</a></td>
+                        <td>Sets the acceleration (steps per second per second).</td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+    <!-- Toast Popup -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <strong class="me-auto">Yard Control</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body text-black-50" id="toastMessage">Hello, world!</div>
+        </div>
+    </div>
+    <!-- Standard Footer -->
+    <footer>
+        <hr />
+        <div class="row">
+            <div class="col">&nbsp;&nbsp;&nbsp;&nbsp;&copy;&nbsp;2023&nbsp;Dr.&nbsp;Peter&nbsp;Trimmel</div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
+    <!-- Custom Code -->
+    <script>
+        // Toast used by error messages from web requests.
+        var message = document.getElementById('toastMessage');
+        const toast = new bootstrap.Toast(document.getElementById('liveToast'));
+
+        // The base url and default headers for requests.
+        const host = window.location.protocol + "//" + window.location.host;
+
+        // The link to the telnet server.
+        const telnet = document.getElementById('hrefTelnet');
+
+        // Helper function to send POST request with no data.
+        async function postRequest(url) {
+            await fetch(host + url, { method: "POST" })
+                .then((response) => {
+                    if (!response.ok)
+                        throw new Error('POST ' + url + ' => ' + response.statusText);
+                })
+                .catch((error) => {
+                    message.innerText = error;
+                    toast.show();
+                });
+        }
+
+        function postPlus() {
+            postRequest("/plus");
+        }
+
+        function postMinus() {
+            postRequest("/minus");
+        }
+
+        function postForward() {
+            postRequest("/forward");
+        }
+
+        function postBackward() {
+            postRequest("/backward");
+        }
+
+        function postCalibrate() {
+            postRequest("/calibrate");
+        }
+
+        function postEnable() {
+            postRequest("/enable");
+        }
+        
+        function postDisable() {
+            postRequest("/disable");
+        }
+        
+        function postHome() {
+            postRequest("/home");
+        }
+        function postStop() {
+            postRequest("/stop");
+        }
+      
+        function postReboot() {
+            if (confirm("Do You really want to reboot the machine?")) {
+                postRequest("/reboot");
+            }
+        }
+
+        function postStep() {
+            alert("Posting a step command not supported from this page.");
+        }
+
+        function postMove() {
+            alert("Posting a move command not supported from this page.");
+        }
+
+        function postTrack() {
+            alert("Posting a track command not supported from this page.");
+        }
+
+        function postSpeed() {
+            alert("Posting a set speed command not supported from this page.");
+        }
+
+        function postMaxSpeed() {
+            alert("Posting a set maxspeed command not supported from this page.");
+        }
+
+        function postAcceleration() {
+            alert("Posting a set acceleration command not supported from this page.");
+        }
+
+        telnet.href = "telnet://" + window.location.host;
+    </script>
+</body>
+</html >

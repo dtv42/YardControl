@@ -1,0 +1,19 @@
+# run license header manager on .h files, whenever they're saved.
+[*.h]
+command = C:\Development\Projects\VS2022\LicenseHeaderManager\LicenseHeaderManager.Console\bin\Debug\LicenseHeaderManager.Console.exe
+arguments = -f {file} -l {solution_directory}\TestVisualMicro.licenseheader -c {solution_directory}\scripts\licenseheader.json
+
+# run license header manager on .cpp files, whenever they're saved.
+[*.cpp]
+command = C:\Development\Projects\VS2022\LicenseHeaderManager\LicenseHeaderManager.Console\bin\Debug\LicenseHeaderManager.Console.exe
+arguments = -f {file} -l {solution_directory}\TestVisualMicro.licenseheader -c {solution_directory}\scripts\licenseheader.json
+
+# run license header manager on .h files, whenever they're saved.
+[*.ino]
+command = C:\Development\Projects\VS2022\LicenseHeaderManager\LicenseHeaderManager.Console\bin\Debug\LicenseHeaderManager.Console.exe
+arguments = -f {file} -l {solution_directory}\TestVisualMicro.licenseheader -c {solution_directory}\scripts\licenseheader.json
+
+# run license header manager on .ps1 files, whenever they're saved.
+[*.ps1]
+command = C:\Development\Projects\VS2022\LicenseHeaderManager\LicenseHeaderManager.Console\bin\Debug\LicenseHeaderManager.Console.exe
+arguments = -f {file} -l {solution_directory}\TestVisualMicro.licenseheader -c {solution_directory}\scripts\licenseheader.json

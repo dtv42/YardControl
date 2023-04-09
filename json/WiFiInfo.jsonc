@@ -1,0 +1,14 @@
+// WiFiInfo.jsonc - JSON file to get the (recommended) size for a JsonDocument (see: https://arduinojson.org/v6/assistant).
+// Total (recommended)	384	Including some slack in case the strings change, and rounded to a power of two.
+{
+    "Version": "123.123.123",
+    "Mode": "123456",
+    "SSID": "12345678901234567890123456789012",
+    "Hostname": "12345678901234567890123456789012",
+    "Address": "123.123.123.123",
+    "Gateway": "123.123.123.123",
+    "Subnet": "123.123.123.123",
+    "DNS": "123.123.123.123",
+    "RSSI": 1234567890,
+    "MAC": "12:12:12:12:12:12"
+}

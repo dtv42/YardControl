@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Yard Control - Settings</title>
+    <link rel="shortcut icon" href="favicon.ico" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/dark-mode-switch.css">
+</head>
+<body>
+    <div class="container-fluid" px-0>
+        <!-- Navigation Header -->
+        <nav class="navbar navbar-expand-sm navbar-light bg-light border-bottom">
+            <!-- Navbar content -->
+            <div class="container-fluid">
+                <a class="navbar-brand fs-1" href="#">Yard Control</a>
+                <button class="navbar-toggler"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#navbarNavDropdown"
+                        aria-controls="navbarNavDropdown"
+                        aria-expanded="false"
+                        aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link fs-3" href="/index.html">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link fs-3" href="/info.html">Info</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link fs-3 active" aria-current="page" href="/settings.html">Settings</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link fs-3" href="/about.html">About</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- Dark Mode Switch -->
+            <div class="col d-flex">
+                <div class="form-check form-switch ms-auto">
+                    <div class="switch switch-info">
+                        <label class="form-check-label ms-3" for="darkSwitch">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="2vw" height="2vw" fill="currentColor" class="bi bi-brightness-high" viewBox="0 0 20 20">
+                                <path d="M8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z" />
+                            </svg>
+                        </label>
+                        <input class="form-check-input" type="checkbox" id="darkSwitch" />
+                    </div>
+                </div>
+            </div>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <script src="js/dark-mode-switch.min.js"></script>
+        </nav>
+        <!-- Settings Panel -->
+        <div class="spinner-border text-primary" role="status" id="spinnerSettings">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <h3>Yard Settings</h3>
+        <div class="container ps-1">
+            <table class="table table-striped" id="tableYard">
+                <tbody>
+                    <tr>
+                        <td class="col-2">Track&nbsp;0:</td>
+                        <td><span id="yardTrack0"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="col-2">Track&nbsp;1:</td>
+                        <td><span id="yardTrack1"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="col-2">Track&nbsp;2:</td>
+                        <td><span id="yardTrack2"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="col-2">Track&nbsp;3:</td>
+                        <td><span id="yardTrack3"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="col-2">Track&nbsp;4:</td>
+                        <td><span id="yardTrack4"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="col-2">Track&nbsp;5:</td>
+                        <td><span id="yardTrack5"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="col-2">Track&nbsp;6:</td>
+                        <td><span id="yardTrack6"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="col-2">Track&nbsp;7:</td>
+                        <td><span id="yardTrack7"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="col-2">Track&nbsp;8:</td>
+                        <td><span id="yardTrack8"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="col-2">Track&nbsp;9:</td>
+                        <td><span id="yardTrack9"></span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <h3>Actuator Settings</h3>
+        <div class="container ps-1">
+            <table class="table table-striped" id="tableActuator">
+                <tbody>
+                    <tr>
+                        <td class="col-2">Pin&nbsp;STOP:</td>
+                        <td><span id="actuatorPinSTOP"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="col-2">Pin&nbsp;LIMIT&nbsp;1:</td>
+                        <td><span id="actuatorPinLIMIT1"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="col-2">Pin&nbsp;LIMIT&nbsp;1:</td>
+                        <td><span id="actuatorPinLIMIT2"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="col-2">Led&nbsp;Moving:</td>
+                        <td><span id="actuatorLedMoving"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="col-2">Led&nbsp;Limits:</td>
+                        <td><span id="actuatorLedLimits"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="col-2">Move&nbsp;Speed:</td>
+                        <td><span id="actuatorMoveSpeed"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="col-2">Retract:</td>
+                        <td><span id="actuatorRetract"></span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <h3>Stepper Settings</h3>
+        <div class="container ps-1">
+            <table class="table table-striped" id="tableStepper">
+                <tbody>
+                    <tr>
+                        <td class="col-2">Pin&nbsp;PUL:</td>
+                        <td><span id="stepperPinPUL"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="col-2">Pin&nbsp;DIR:</td>
+                        <td><span id="stepperPinDIR"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="col-2">Pin&nbsp;ENA:</td>
+                        <td><span id="stepperPinENA"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="col-2">Microsteps:</td>
+                        <td><span id="stepperMicroSteps"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="col-2">Max&nbsp;Speed:</td>
+                        <td><span id="stepperMaxSpeed"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="col-2">Acceleration:</td>
+                        <td><span id="stepperAcceleration"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="col-2">Steps/Rotation:</td>
+                        <td><span id="stepperStepsPerRotation"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="col-2">Distance/Rotation:</td>
+                        <td><span id="stepperDistancePerRotation"></span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <h3>Http Settings</h3>
+        <div class="container ps-1">
+            <table class="table table-striped" id="tableHttp">
+                <tbody>
+                    <tr>
+                        <td class="col-2">Port:</td>
+                        <td><span id="httpPort"></span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <h3>Telnet Settings</h3>
+        <div class="container ps-1">
+            <table class="table table-striped" id="tableTelnet">
+                <tbody>
+                    <tr>
+                        <td class="col-2">Port:</td>
+                        <td><span id="telnetPort"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="col-2">Prompt:</td>
+                        <td><span id="telnetPrompt"></span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <h3>WiFi Settings</h3>
+        <div class="container ps-1">
+            <table class="table table-striped" id="tablesWiFi">
+                <tbody>
+                    <tr>
+                        <td class="col-2">DHCP:</td>
+                        <td><span id="wifiDHCP"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="col-2">SSID:</td>
+                        <td><span id="wifiSSID"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="col-2">Password:</td>
+                        <td><span id="wifiPassword"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="col-2">Hostname:</td>
+                        <td><span id="wifiHostname"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="col-2">Address:</td>
+                        <td><span id="wifiAddress"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="col-2">Gateway:</td>
+                        <td><span id="wifiGateway"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="col-2">Subnet:</td>
+                        <td><span id="wifiSubnet"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="col-2">DNS:</td>
+                        <td><span id="wifiDNS"></span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <h3>AP Settings</h3>
+        <div class="container ps-1">
+            <table class="table table-striped" id="tableAP">
+                <tbody>
+                    <tr>
+                        <td class="col-2">SSID:</td>
+                        <td><span id="apSSID"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="col-2">Password:</td>
+                        <td><span id="apPassword"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="col-2">Hostname:</td>
+                        <td><span id="apHostname"></span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <hr />
+        <form id="formDownload">
+            <label for="getSettingsFile">Download the application settings file:</label>
+            <input type="submit" class="btn btn-outline-secondary" id="getSettingsFile" value="AppSettings">
+            <div class="spinner-border text-primary ms-3 p-3 float-end" role="status" id="spinnerDownload" style="display:none">
+                <span class="visually-hidden">Waiting...</span>
+            </div>
+        </form>
+        <hr />
+        <form id="formUpload">
+            <label for="file">Select the application settings file to upload:</label>
+            <input type="file" class="btn btn-outline-secondary" id="file" accept=".json">
+            <button type="submit" class="btn btn-outline-secondary">Upload</button>
+            <div class="spinner-border text-primary ms-3 p-3 float-end" role="status" id="spinnerUpload" style="display:none">
+                <span class="visually-hidden">Waiting...</span>
+            </div>
+        </form>
+    </div>
+    <!-- Toast Popup -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <strong class="me-auto">Yard Control</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body text-black-50" id="toastMessage">Hello, world!</div>
+        </div>
+    </div>
+    <!-- Standard Footer -->
+    <footer>
+        <hr />
+        <div class="row">
+            <div class="col">&nbsp;&nbsp;&nbsp;&nbsp;&copy;&nbsp;2023&nbsp;Dr.&nbsp;Peter&nbsp;Trimmel</div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
+    <!-- Custom Code -->
+    <script>
+        // The base url and default headers for requests.
+        const host = window.location.protocol + "//" + window.location.host;
+        const headers = { "Content-Type": "application/x-python" };
+
+        // Toast used by error messages from web requests.
+        var message = document.getElementById('toastMessage');
+        const toast = new bootstrap.Toast(document.getElementById('liveToast'));
+
+        // Various settings data fields.
+        const yardTrack0                 = document.getElementById('yardTrack0');
+        const yardTrack1                 = document.getElementById('yardTrack1');
+        const yardTrack2                 = document.getElementById('yardTrack2');
+        const yardTrack3                 = document.getElementById('yardTrack3');
+        const yardTrack4                 = document.getElementById('yardTrack4');
+        const yardTrack5                 = document.getElementById('yardTrack5');
+        const yardTrack6                 = document.getElementById('yardTrack6');
+        const yardTrack7                 = document.getElementById('yardTrack7');
+        const yardTrack8                 = document.getElementById('yardTrack8');
+        const yardTrack9                 = document.getElementById('yardTrack9');
+
+        const actuatorPinSTOP            = document.getElementById('actuatorPinSTOP');
+        const actuatorPinLIMIT1          = document.getElementById('actuatorPinLIMIT1');
+        const actuatorPinLIMIT2          = document.getElementById('actuatorPinLIMIT2');
+        const actuatorLedMoving          = document.getElementById('actuatorLedMoving');
+        const actuatorLedLimits          = document.getElementById('actuatorLedLimits');
+        const actuatorMoveSpeed          = document.getElementById('actuatorMoveSpeed');
+        const actuatorRetract            = document.getElementById('actuatorRetract');
+
+        const stepperPinPUL              = document.getElementById('stepperPinPUL');
+        const stepperPinDIR              = document.getElementById('stepperPinDIR');
+        const stepperPinENA              = document.getElementById('stepperPinENA');
+        const stepperMicroSteps          = document.getElementById('stepperMicroSteps');
+        const stepperMaxSpeed            = document.getElementById('stepperMaxSpeed');
+        const stepperAcceleration        = document.getElementById('stepperAcceleration');
+        const stepperStepsPerRotation    = document.getElementById('stepperStepsPerRotation');
+        const stepperDistancePerRotation = document.getElementById('stepperDistancePerRotation');
+
+        const httpPort = document.getElementById('httpPort');
+
+        const telnetPort   = document.getElementById('telnetPort');
+        const telnetPrompt = document.getElementById('telnetPrompt');
+
+        const wifiDHCP     = document.getElementById('wifiDHCP');
+        const wifiSSID     = document.getElementById('wifiSSID');
+        const wifiPassword = document.getElementById('wifiPassword');
+        const wifiHostname = document.getElementById('wifiHostname');
+        const wifiAddress  = document.getElementById('wifiAddress');
+        const wifiGateway  = document.getElementById('wifiGateway');
+        const wifiSubnet   = document.getElementById('wifiSubnet');
+        const wifiDNS      = document.getElementById('wifiDNS');
+
+        const apSSID     = document.getElementById('apSSID');
+        const apPassword = document.getElementById('apPassword');
+        const apHostname = document.getElementById('apHostname');
+
+        // Get the settings info and update the data fields.
+        async function getSettings() {
+            await fetch(host + "/settings")
+                .then((response) => {
+                    if (!response.ok)
+                        throw new Error('GET /settings => ' + response.statusText);
+                    return response.json();
+                })
+                .then((json) => {
+                    yardTrack0.textContent = json.Yard.Tracks[0];
+                    yardTrack1.textContent = json.Yard.Tracks[1];
+                    yardTrack2.textContent = json.Yard.Tracks[2];
+                    yardTrack3.textContent = json.Yard.Tracks[3];
+                    yardTrack4.textContent = json.Yard.Tracks[4];
+                    yardTrack5.textContent = json.Yard.Tracks[5];
+                    yardTrack6.textContent = json.Yard.Tracks[6];
+                    yardTrack7.textContent = json.Yard.Tracks[7];
+                    yardTrack8.textContent = json.Yard.Tracks[8];
+                    yardTrack9.textContent = json.Yard.Tracks[9];
+
+                    actuatorPinSTOP.textContent   = json.Actuator.SwitchStop;
+                    actuatorPinLIMIT1.textContent = json.Actuator.SwitchLimit1;
+                    actuatorPinLIMIT2.textContent = json.Actuator.SwitchLimit2;
+                    actuatorLedMoving.textContent = json.Actuator.LedLimit;
+                    actuatorLedLimits.textContent = json.Actuator.LedStop;
+                    actuatorMoveSpeed.textContent = json.Actuator.MoveSpeed;
+                    actuatorRetract.textContent   = json.Actuator.Retract;
+
+                    stepperPinPUL.textContent              = json.Stepper.PinPUL;
+                    stepperPinDIR.textContent              = json.Stepper.PinDIR;
+                    stepperPinENA.textContent              = json.Stepper.PinENA;
+                    stepperMicroSteps.textContent          = json.Stepper.MicroSteps;
+                    stepperMaxSpeed.textContent            = json.Stepper.MaxSpeed;
+                    stepperAcceleration.textContent        = json.Stepper.Acceleration;
+                    stepperStepsPerRotation.textContent    = json.Stepper.StepsPerRotation;
+                    stepperDistancePerRotation.textContent = json.Stepper.DistancePerRotation;
+
+                    httpPort.textContent = json.Http.Port;
+
+                    telnetPort.textContent   = json.Telnet.Port;
+                    telnetPrompt.textContent = json.Telnet.Prompt;
+
+                    wifiDHCP.textContent     = json.WiFi.DHCP;
+                    wifiSSID.textContent     = json.WiFi.SSID;
+                    wifiPassword.textContent = json.WiFi.Password;
+                    wifiHostname.textContent = json.WiFi.Hostname;
+                    wifiAddress.textContent  = json.WiFi.Address;
+                    wifiGateway.textContent  = json.WiFi.Gateway;
+                    wifiSubnet.textContent   = json.WiFi.Subnet; 
+                    wifiDNS.textContent      = json.WiFi.DNS;
+
+                    apSSID.textContent       = json.AP.SSID;
+                    apPassword.textContent   = json.AP.Password;
+                    apHostname.textContent   = json.AP.Hostname;
+                })
+                .catch((error) => {
+                    message.innerText = error;
+                    toast.show();
+                })
+                .finally(() => {
+                    document.getElementById('spinnerSettings').style.display = 'none';
+                });
+        }
+
+        // Download the appsettings.json file.
+        const formDownload = document.getElementById('formDownload');
+        const formUpload = document.getElementById('formUpload');
+        const spinnerDownload = document.getElementById('spinnerDownload');
+        const spinnerUpload = document.getElementById('spinnerUpload');
+        const input = document.getElementById('file');
+
+        formDownload.addEventListener('submit', function (event) {
+            event.preventDefault();
+            spinnerDownload.style.display = 'inline';
+
+            fetch(host + "/appsettings.json", { method: "GET" })
+                .then(response => {
+                    if (!response.ok)
+                        throw new Error('GET /appsettings.json => ' + response.statusText);
+                    return response.blob();
+                })
+                .then((blob) => {
+                    if (blob != null) {
+                        var url = window.URL.createObjectURL(blob);
+                        var a = document.createElement('a');
+                        a.href = url;
+                        a.download = "appsettings.json";
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                    }
+                })
+                .catch((error) => {
+                    message.innerText = error;
+                    toast.show();
+                })
+                .finally(() => {
+                    spinnerDownload.style.display = 'none';
+                });
+        });
+
+        // Upload the appsettings.json file.
+        formUpload.addEventListener('submit', function (event) {
+            event.preventDefault();
+            var file = input.files[0];
+
+            if (file) {
+                spinnerUpload.style.display = 'inline';
+                fetch(host + "/appsettings.json", { method: "POST", body: file })
+                    .then(response => {
+                        if (!response.ok)
+                            throw new Error('POST /appsettings.json => ' + response.statusText);
+                        return response;
+                    })
+                    .catch((error) => {
+                        message.innerText = error;
+                        toast.show();
+                    })
+                    .finally(() => {
+                        spinnerUpload.style.display = 'none';
+                    });
+            } else {
+                message.innerText = 'No application settings file chosen!';
+                toast.show();
+            }
+        });
+
+        getSettings();
+
+    </script>
+</body>
+</html >

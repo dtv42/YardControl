@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Yard Control - Info</title>
+    <link rel="shortcut icon" href="favicon.ico" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/dark-mode-switch.css">
+</head>
+<body>
+    <div class="container-fluid" px-0>
+        <!-- Navigation Header -->
+        <nav class="navbar navbar-expand-sm navbar-light bg-light border-bottom">
+            <!-- Navbar content -->
+            <div class="container-fluid">
+                <a class="navbar-brand fs-1" href="#">Yard Control</a>
+                <button class="navbar-toggler"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#navbarNavDropdown"
+                        aria-controls="navbarNavDropdown"
+                        aria-expanded="false"
+                        aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link fs-3" href="/index.html">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link fs-3 active" aria-current="page" href="/info.html">Info</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link fs-3" href="/settings.html">Settings</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link fs-3" href="/about.html">About</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- Dark Mode Switch -->
+            <div class="col d-flex">
+                <div class="form-check form-switch ms-auto">
+                    <div class="switch switch-info">
+                        <label class="form-check-label ms-3" for="darkSwitch">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="2vw" height="2vw" fill="currentColor" class="bi bi-brightness-high" viewBox="0 0 20 20">
+                                <path d="M8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z" />
+                            </svg>
+                        </label>
+                        <input class="form-check-input" type="checkbox" id="darkSwitch" />
+                    </div>
+                </div>
+            </div>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <script src="js/dark-mode-switch.min.js"></script>
+        </nav>
+        <!-- Info Panel -->
+        <h3>System Info</h3>
+        <div class="mt-3 container ps-1">
+            <div class="spinner-border text-primary" role="status" id="spinnerInfo">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <table class="table table-striped">
+                <tbody>
+                    <tr>
+                        <td class="col-2">Time:</td>
+                        <td><span id="systemTime"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="ps-5">Software:</td>
+                        <td><span id="software"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="ps-5">Board:</td>
+                        <td><span id="boardInfo"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="ps-5">Board&nbsp;ID:</td>
+                        <td><span id="boardID"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="ps-5">Temperature&nbsp;[°C]:</td>
+                        <td><span id="boardTemp"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="ps-5">Cpu&nbsp;Freqency&nbsp;[Mhz]:</td>
+                        <td><span id="cpuFreqMHz"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="ps-5">Heapsize&nbsp;[kB]:</td>
+                        <td><span id="heapSize"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="ps-5">Free&nbsp;Heap&nbsp;[kB]:</td>
+                        <td><span id="freeHeap"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="ps-5">Used&nbsp;Heap&nbsp;[kB]:</td>
+                        <td><span id="usedHeap"></span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"><h5>Network:</h5></td>
+                    </tr>
+                    <tr>
+                        <td class="ps-5">Version:</td>
+                        <td><span id="networkVersion"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="ps-5">Mode:</td>
+                        <td><span id="networkMode"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="ps-5">SSID:</td>
+                        <td><span id="networkSSID"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="ps-5">IP&nbsp;Address:</td>
+                        <td><span id="networkAddress"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="ps-5">Subnet&nbsp;Mask:</td>
+                        <td><span id="networkSubnet"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="ps-5">Gateway&nbsp;Address:</td>
+                        <td><span id="networkGateway"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="ps-5">DNS&nbsp;Address:</td>
+                        <td><span id="networkDNS"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="ps-5">RSSI&nbsp;[dBm]:</td>
+                        <td><span id="networkRSSI"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="ps-5">MAC&nbsp;Address:</td>
+                        <td><span id="networkMAC"></span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"><h5>TCP&nbsp;Server:</h5></td>
+                    </tr>
+                    <tr>
+                        <td class="ps-5">Address:</td>
+                        <td><span id="serverAddress"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="ps-5">Hostname:</td>
+                        <td><span id="serverName"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="ps-5">HTTP&nbsp;Port:</td>
+                        <td><span id="serverPort"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="ps-5">Telnet&nbsp;Port:</td>
+                        <td><span id="serverTelnet"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="ps-5">Prompt:</td>
+                        <td><span id="serverPrompt"></span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- Toast Popup -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <strong class="me-auto">Yard Control</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body text-black-50" id="toastMessage">Hello, world!</div>
+        </div>
+    </div>
+    <!-- Standard Footer -->
+    <footer>
+        <hr />
+        <div class="row">
+            <div class="col">&nbsp;&nbsp;&nbsp;&nbsp;&copy;&nbsp;2023&nbsp;Dr.&nbsp;Peter&nbsp;Trimmel</div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
+    <!-- Custom Code -->
+    <script>
+        // The base url for requests.
+        const host = window.location.protocol + "//" + window.location.host;
+
+        // Toast used by error messages from web requests.
+        var message = document.getElementById('toastMessage');
+        const toast = new bootstrap.Toast(document.getElementById('liveToast'));
+
+        // Various system data fields.
+        const systemTime = document.getElementById('systemTime');
+        const software   = document.getElementById('software');
+        const boardInfo  = document.getElementById('boardInfo');
+        const boardID    = document.getElementById('boardID');
+        const boardTemp  = document.getElementById('boardTemp');
+        const cpuFreqMHz = document.getElementById('cpuFreqMHz');
+        const heapSize   = document.getElementById('heapSize');
+        const freeHeap   = document.getElementById('freeHeap');
+        const usedHeap   = document.getElementById('usedHeap');
+
+        const networkVersion = document.getElementById('networkVersion');
+        const networkMode    = document.getElementById('networkMode');
+        const networkSSID    = document.getElementById('networkSSID');
+        const networkAddress = document.getElementById('networkAddress');
+        const networkSubnet  = document.getElementById('networkSubnet');
+        const networkGateway = document.getElementById('networkGateway');
+        const networkDNS     = document.getElementById('networkDNS');
+        const networkRSSI    = document.getElementById('networkRSSI');
+        const networkMAC     = document.getElementById('networkMAC');
+
+        const serverAddress = document.getElementById('serverAddress');
+        const serverName    = document.getElementById('serverName');
+        const serverPort    = document.getElementById('serverPort');
+        const serverTelnet  = document.getElementById('serverTelnet');
+        const serverPrompt  = document.getElementById('serverPrompt');
+
+        // Get the system info and update the data fields.
+        async function getSystem() {
+            await fetch(host + "/system")
+                .then((response) => {
+                    if (!response.ok)
+                        throw new Error('GET /system => ' + response.statusText);
+                    return response.json();
+                })
+                .then((json) => {
+                    systemTime.textContent = json.SystemTime
+                    software.textContent   = json.Software
+                    boardInfo.textContent  = json.BoardInfo
+                    boardID.textContent    = json.BoardID
+                    boardTemp.textContent  = json.BoardTemp.toFixed(2);
+                    cpuFreqMHz.textContent = json.CpuFreqMHz.toFixed(2);
+                    heapSize.textContent   = json.HeapSize
+                    freeHeap.textContent   = json.FreeHeap
+                    usedHeap.textContent   = json.UsedHeap
+                })
+                .catch((error) => {
+                    message.innerText = error;
+                    toast.show();
+                })
+                .finally(() => {
+                    document.getElementById('spinnerInfo').style.display = 'none';
+                });
+        }
+
+        // Get the wifi info and update the data fields.
+        async function getWiFi() {
+            await fetch(host + "/wifi")
+                .then((response) => {
+                    if (!response.ok)
+                        throw new Error('GET /wifi => ' + response.statusText);
+                    return response.json();
+                })
+                .then((json) => {
+                    networkVersion.textContent = json.Version
+                    networkMode   .textContent = json.Mode
+                    networkSSID.textContent    = json.SSID
+                    networkAddress.textContent = json.Address
+                    networkSubnet.textContent  = json.Subnet
+                    networkGateway.textContent = json.Gateway
+                    networkDNS.textContent     = json.DNS
+                    networkRSSI.textContent    = json.RSSI
+                    networkMAC.textContent     = json.MAC
+                })
+                .catch((error) => {
+                    message.innerText = error;
+                    toast.show();
+                })
+                .finally(() => {
+                    document.getElementById('spinnerInfo').style.display = 'none';
+                });
+        }
+
+        // Get the server info and update the data fields.
+        async function getServer() {
+            await fetch(host + "/server")
+                .then((response) => {
+                    if (!response.ok)
+                        throw new Error('GET /server => ' + response.statusText);
+                    return response.json();
+                })
+                .then((json) => {
+                    serverAddress.textContent = json.Address
+                    serverName.textContent    = json.Name
+                    serverPort.textContent    = json.Port
+                    serverTelnet.textContent  = json.Telnet
+                    serverPrompt.textContent  = json.Prompt
+                })
+                .catch((error) => {
+                    message.innerText = error;
+                    toast.show();
+                })
+                .finally(() => {
+                    document.getElementById('spinnerInfo').style.display = 'none';
+                });
+        }
+
+        getSystem();
+        getWiFi();
+        getServer();
+
+    </script>
+</body>
+</html >

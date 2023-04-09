@@ -1,0 +1,44 @@
+// GpioPins.jsonc - JSON file to get the (recommended) size for a JsonDocument (see: https://arduinojson.org/v6/assistant).
+// Total (recommended)	768	Including some slack in case the strings change, and rounded to a power of two.
+{
+    "PinPUL": {
+        "Pin": 12,
+        "Mode": "12345678901234",
+        "Status": "1234567"
+    },
+    "PinDIR": {
+        "Pin": 12,
+        "Mode": "12345678901234",
+        "Status": "1234567"
+    },
+    "PinENA": {
+        "Pin": 12,
+        "Mode": "12345678901234",
+        "Status": "1234567"
+    },
+    "LedLimit": {
+        "Pin": 12,
+        "Mode": "12345678901234",
+        "Status": "1234567"
+    },
+    "LedStop": {
+        "Pin": 12,
+        "Mode": "12345678901234",
+        "Status": "1234567"
+    },
+    "SwitchStop": {
+        "Pin": 12,
+        "Mode": "12345678901234",
+        "Status": "LOW"
+    },
+    "SwitchLimit1": {
+        "Pin": 12,
+        "Mode": "12345678901234",
+        "Status": "1234567"
+    },
+    "SwitchLimit2": {
+        "Pin": 12,
+        "Mode": "12345678901234",
+        "Status": "1234567"
+    }
+}

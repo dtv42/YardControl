@@ -1,0 +1,61 @@
+// ArduinoJson (https://arduinojson.org/v6/assistant).
+// Total (recommended)	1536	Including some slack in case the strings change, and rounded to a power of two.
+{
+    "Yard": {
+        "Tracks": [
+            1234567890,
+            1234567890,
+            1234567890,
+            1234567890,
+            1234567890,
+            1234567890,
+            1234567890,
+            1234567890,
+            1234567890,
+            1234567890
+        ]
+    },
+    "Actuator": {
+        "LedRunning": 12,
+        "LedLimit": 12,
+        "LedStop": 12,
+        "SwitchStop": 12,
+        "SwitchLimit1": 12,
+        "SwitchLimit2": 12,
+        "MoveSpeed": 1234567890,
+        "Retract": 1234567890
+    },
+    "Stepper": {
+        "PinPUL": 12,
+        "PinDIR": 12,
+        "PinENA": 12,
+        "MicroSteps": 12,
+        "MaxSpeed": 0.1234567890,
+        "Acceleration": 0.1234567890,
+        "StepsPerRotation": 1234567890,
+        "DistancePerRotation": 0.1234567890,
+        "MinPulseWidth": 1234567890
+    },
+    "Http": {
+        "Port": 12345
+    },
+    "Telnet": {
+        "Port": 12345,
+        "Prompt": "1"
+    },
+    "WiFi": {
+        "DHCP": true,
+        "SSID": "12345678901234567890123456789012",
+        "Password": "12345678901234567890123456789012",
+        "Hostname": "12345678901234567890123456789012",
+        "Address": "123.123.123.123",
+        "Gateway": "123.123.123.123",
+        "Subnet": "123.123.123.123",
+        "DNS": "123.123.123.123"
+    },
+    "AP": {
+        "SSID": "12345678901234567890123456789012",
+        "Password": "12345678901234567890123456789012",
+        "Hostname": "12345678901234567890123456789012"
+    }
+}

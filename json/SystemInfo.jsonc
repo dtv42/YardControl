@@ -1,0 +1,13 @@
+// SystemInfo.jsonc - JSON file to get the (recommended) size for a JsonDocument (see: https://arduinojson.org/v6/assistant).
+// Total (recommended)	384	Including some slack in case the strings change, and rounded to a power of two.
+{
+    "SystemTime": "123456789012345678901234",
+    "Software": "12345678901234567890123456789012",
+    "BoardInfo": "12345678901234567890123456789012",
+    "BoardID": "123456789012345",
+    "BoardTemp": 0.1234567890,
+    "CpuFreqMHz": 1234567890,
+    "HeapSize": 1234567890,
+    "FreeHeap": 1234567890,
+    "UsedHeap": 1234567890
+}

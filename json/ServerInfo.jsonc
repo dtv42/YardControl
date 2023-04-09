@@ -1,0 +1,10 @@
+// ServerInfo.jsonc - JSON file to get the (recommended) size for a JsonDocument (see: https://arduinojson.org/v6/assistant).
+// Total (recommended)	192	Including some slack in case the strings change, and rounded to a power of two.
+{
+    "Address": "123.123.123.123",
+    "Name": "12345678901234567890123456789012",
+    "Mode": "123456",
+    "Port": 12345,
+    "Telnet": 12345,
+    "Prompt": "1"
+}

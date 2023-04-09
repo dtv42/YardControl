@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Yard Control - Home</title>
+    <link rel="shortcut icon" href="favicon.ico" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/dark-mode-switch.css">
+    <style>
+        .btn-xl {
+            padding: 10px 20px;
+            font-size: 20px;
+            border-radius: 9px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <!-- Navigation Header -->
+        <nav class="navbar navbar-expand-sm navbar-light bg-light border-bottom">
+            <!-- Navbar content -->
+            <div class="container-fluid">
+                <a class="navbar-brand fs-1" href="#">Yard Control</a>
+                <button class="navbar-toggler"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#navbarNavDropdown"
+                        aria-controls="navbarNavDropdown"
+                        aria-expanded="false"
+                        aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link fs-3 active" aria-current="page" href="/index.html">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link fs-3" href="/info.html">Info</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link fs-3" href="/settings.html">Settings</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link fs-3" href="/about.html">About</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- Dark Mode Switch -->
+            <div class="col d-flex">
+                <div class="form-check form-switch ms-auto">
+                    <div class="switch switch-info">
+                        <label class="form-check-label ms-3" for="darkSwitch">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="2vw" height="2vw" fill="currentColor" class="bi bi-brightness-high" viewBox="0 0 20 20">
+                                <path d="M8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z" />
+                            </svg>
+                        </label>
+                        <input class="form-check-input" type="checkbox" id="darkSwitch" />
+                    </div>
+                </div>
+            </div>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <script src="js/dark-mode-switch.min.js"></script>
+        </nav>
+        <!-- Main Panel -->
+        <div class="container-fluid p-5 text-center">
+            <div class="spinner-border text-primary" role="status" id="spinnerStatus">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <div class="row mb-2">
+                <div class="col-lg-5 mx-auto">
+                    <h1 class="font-weight-bold">Yard Control</h1>
+                    <p class="text-muted">Select the track number or move forward or backward.</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12 mb-4">
+                    <div class="bg-white p-1 rounded shadow-sm">
+                        <div class="container d-flex align-items-center justify-content-center">
+                            <div class="bg-light rounded shadow-sm border border-dark mb-2 p-2 text-start font-monospace">
+                                <h5 id="line1">123456789012345678901234567</h5>
+                                <h5 id="line2">123456789012345678901234567</h5>
+                            </div>
+                        </div>
+                        <button class="btn btn-dark   btn-xl m-1" onclick="track(1)" title="Select track 1"><i class="bi bi-1-square"></i></button>
+                        <button class="btn btn-dark   btn-xl m-1" onclick="track(2)" title="Select track 2"><i class="bi bi-2-square"></i></button>
+                        <button class="btn btn-dark   btn-xl m-1" onclick="track(3)" title="Select track 3"><i class="bi bi-3-square"></i></button>
+                        <button class="btn btn-danger btn-xl m-1" onclick="stop()"   title="Stop immediately"><i class="bi bi-sign-stop"></i></button>
+                    </div>
+                    <div class="bg-white p-1 rounded shadow-sm">
+                        <button class="btn btn-dark      btn-xl m-1" onclick="track(4)" title="Select track 4"><i class="bi bi-4-square"></i></button>
+                        <button class="btn btn-dark      btn-xl m-1" onclick="track(5)" title="Select track 5"><i class="bi bi-5-square"></i></button>
+                        <button class="btn btn-dark      btn-xl m-1" onclick="track(6)" title="Select track 6"><i class="bi bi-6-square"></i></button>
+                        <button class="btn btn-secondary btn-xl m-1" onclick="move(10)" title="Move forward 10 mm"><i class="bi bi-arrow-down-square"></i></button>
+                    </div>
+                    <div class="bg-white p-1 rounded shadow-sm">
+                        <button class="btn btn-dark      btn-xl m-1" onclick="track(7)"  title="Select track 7"><i class="bi bi-7-square"></i></button>
+                        <button class="btn btn-dark      btn-xl m-1" onclick="track(8)"  title="Select track 8"><i class="bi bi-8-square"></i></button>
+                        <button class="btn btn-dark      btn-xl m-1" onclick="track(9)"  title="Select track 9"><i class="bi bi-9-square"></i></button>
+                        <button class="btn btn-secondary btn-xl m-1" onclick="move(-10)" title="Move backward 10 mm"><i class="bi bi-arrow-up-square"></i></button>
+                    </div>
+                    <div class="bg-white p-1 rounded shadow-sm">
+                        <button class="btn btn-dark      btn-xl m-1" onclick="move(1)"  title="Move forward 1 mm"><i class="bi bi-plus-square"></i></button>
+                        <button class="btn btn-dark      btn-xl m-1" onclick="track(0)" title="Select track 0"><i class="bi bi-0-square"></i></button>
+                        <button class="btn btn-dark      btn-xl m-1" onclick="move(-1)" title="Move backward 1 mm"><i class="bi bi-dash-square"></i></button>
+                        <button class="btn btn-secondary btn-xl m-1" onclick="home()"   title="Move home"><i class="bi bi-chevron-bar-contract"></i></button>
+                    </div>
+                    <div class="bg-white p-1 rounded shadow-sm font-monospace">
+                        <h5><i id="led1" class="bi bi-circle-fill" style="color:lightgray"></i>&nbsp;Connected&nbsp;&nbsp;<i id="led2" class="bi bi-circle-fill" style="color:lightgray"></i>&nbsp;Running&nbsp;&nbsp;<i id="led3" class="bi bi-circle-fill" style="color:lightgray"></i>&nbsp;Limits</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-3 ms-1 text-left">
+            <p>Last changed at <span id="textTimestamp">00:00:00</span> UTC.</p>
+            <p><input class="form-check-input" type="checkbox" id="autoUpdateSwitch" />&nbsp;&nbsp;Auto&nbsp;Update</p>
+        </div>
+    </div>
+    <!-- Toast Popup -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <strong class="me-auto">Yard Control</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body text-black-50" id="toastMessage">Hello, world!</div>
+        </div>
+    </div>
+    <!-- Standard Footer -->
+    <footer>
+        <hr />
+        <div class="row">
+            <div class="col">&nbsp;&nbsp;&nbsp;&nbsp;&copy;&nbsp;2023&nbsp;Dr.&nbsp;Peter&nbsp;Trimmel</div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
+    <!-- Custom Code -->
+    <script>
+        // Toast used by error messages from web requests.
+        var message = document.getElementById('toastMessage');
+        const toast = new bootstrap.Toast(document.getElementById('liveToast'));
+
+        // The base url and default headers for requests.
+        const host = window.location.protocol + "//" + window.location.host;
+        const headers = { "Content-Type": "application/json; charset = utf-8" };
+
+        // Various elements.
+        const line1 = document.getElementById('line1');
+        const line2 = document.getElementById('line2');
+        const led1  = document.getElementById('led1');
+        const led2  = document.getElementById('led2');
+        const led3  = document.getElementById('led3');
+
+        // The auto update timer.
+        var interval;
+
+        // Clear the interval timer on unload.
+        onunload = event => {
+            stopAutoUpdate();
+            clearInterval(interval);
+        };
+
+        // The autoupdate switch.
+        const autoUpdateSwitch = document.getElementById('autoUpdateSwitch');
+
+        // The interval timer callback updating the sensor data.
+        function autoUpdate() {
+            if (autoUpdateSwitch.checked) {
+                getStatus();
+            }
+        }
+
+        // Start auto update and set the update button color.
+        async function startAutoUpdate() {
+            if (!autoUpdateSwitch.checked) {
+                autoUpdateSwitch.checked = true;
+            }
+        }
+
+        // Stop auto update and set the update button color.
+        async function stopAutoUpdate() {
+            if (autoUpdateSwitch.checked) {
+                autoUpdateSwitch.checked = false;
+            }
+        }
+
+        // Helper function to send POST request with no data.
+        async function postRequest(url) {
+            await fetch(host + url, { method: "POST" })
+                .then((response) => {
+                    if (!response.ok)
+                        throw new Error('POST ' + url + ' => ' + response.statusText);
+                    else
+                        IsConnected = true;
+                })
+                .catch((error) => {
+                    message.innerText = "Error: Unable to POST " + url;
+                    toast.show();
+                    IsConnected = false;
+                });
+        }
+
+        function track(t) {
+            postRequest("/track?number=" + t);
+            updateDisplay();
+        }
+        
+        // Stop the moving motor.
+        function stop() {
+            postRequest("/stop");
+            updateDisplay();
+        }
+
+        // Move.
+        function move(value) {
+            postRequest("/move?value=" + value);
+            updateDisplay();
+        }
+
+        // Move to position 0 or start calibration.
+        function home() {
+            if (IsCalibrated) {
+                postRequest("/home");
+            }
+            else {
+                if (confirm("Not yet calibrated - Do You want to start calibration?")) {
+                    postRequest("/calibrate");
+                }
+                else {
+                    postRequest("/home");
+                }
+            }
+            updateDisplay();
+        }
+
+        // Stop the moving motor.
+        function stop() {
+            postRequest("/stop");
+            updateDisplay();
+        }
+
+        // Various status data.
+        IsCalibrated = false;
+        IsCalibrating = false;
+        IsEnabled = false;
+        IsRunning = false;
+        IsLimited = false;
+        Steps = 0;
+        Target = 0;
+        StepsToGo = 0;
+        Position = 0.0;
+        Speed = 0.0;
+        MaxSpeed = 0.0;
+        Acceleration = 0.0;
+        IsConnected = false;
+
+        // Get the actuator status.
+        async function getStatus() {
+            await fetch(host + "/status")
+                .then((response) => {
+                    if (!response.ok)
+                        throw new Error('GET /status => ' + response.statusText);
+                    return response.json();
+                })
+                .then((json) => {
+                    IsCalibrated  = json.IsCalibrated; 
+                    IsCalibrating = json.IsCalibrating;
+                    IsEnabled     = json.IsEnabled;    
+                    IsRunning     = json.IsRunning;  
+                    IsLimited     = json.IsLimited;  
+                    Steps         = json.Steps;        
+                    Target        = json.Target;       
+                    StepsToGo     = json.StepsToGo;    
+                    Position      = json.Position;     
+                    Speed         = json.Speed;         
+                    MaxSpeed      = json.MaxSpeed;      
+                    Acceleration  = json.Acceleration;  
+                    IsConnected = true;
+                })
+                .catch((error) => {
+                    message.innerText = error;
+                    toast.show();
+                    IsConnected = false;
+                })
+                .finally(() => {
+                    document.getElementById('spinnerStatus').style.display = 'none';
+                });
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            text1 = "Moving to new position...  ";
+            text3 = "Stopped...                 ";
+            text2 = "Position: " + Position.toFixed(2).padEnd(17, ' ');
+
+            html1 = text1.replaceAll(" ", "&nbsp;");
+            html2 = text2.replaceAll(" ", "&nbsp;");
+            html3 = text3.replaceAll(" ", "&nbsp;");
+
+            if (IsRunning) {
+                line1.innerHTML = html1;
+                line2.innerHTML = html2;
+            }
+            else {
+                line1.innerHTML = html3;
+                line2.innerHTML = html2;
+            }
+
+            led1.style.color = IsConnected ? 'orange' : 'lightgray';
+            led2.style.color = IsRunning ? 'yellowgreen' : 'lightgray';
+            led3.style.color = IsLimited ? 'red' : 'lightgray';
+            textTimestamp.innerText = new Date(Date.now()).toUTCString();
+        }
+
+        interval = setInterval(autoUpdate, 1000);
+        startAutoUpdate();
+    </script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+// ActuatorInfo.jsonc - JSON file to get the (recommended) size for a JsonDocument (see: https://arduinojson.org/v6/assistant).
+// Total (recommended)	192	Including some slack in case the strings change, and rounded to a power of two.
+{
+    "IsCalibrated": 12345,
+    "IsCalibrating": 12345,
+    "IsEnabled": 12345,
+    "IsRunning": 12345,
+    "IsLimited": 12345,
+    "Steps": 1234567890,
+    "Target": 1234567890,
+    "StepsToGo": 1234567890,
+    "Position": 0.1234567890,
+    "Speed": 0.1234567890,
+    "MaxSpeed": 0.1234567890,
+    "Acceleration": 0.1234567890
+}
