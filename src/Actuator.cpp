@@ -1,14 +1,13 @@
-// --------------------------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Actuator.cpp" company="DTV-Online">
-//   Copyright(c) 2023 Dr. Peter Trimmel. All rights reserved.
+//   Copyright (c) 2023 Dr. Peter Trimmel. All rights reserved.
 // </copyright>
 // <license>
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
-// <project name="data">
-// <created>Friday, 31st March 2023 15:11:36</created>
-// <author>Peter Trimmel email="peter.trimmel@live.com"</author>
-// <modified>Saturday, 8th April 2023 09:59:00 author="Peter Trimmel"</modified>
+// <created>9-4-2023 7:45 PM</created>
+// <modified>10-4-2023 11:33 AM</modified>
+// <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 #include <Arduino.h>
 
@@ -96,6 +95,7 @@ void LinearActuator::stop()
 {
     _isStopped = true;
     _stepper.disableOutputs();
+    _stepper.setSpeed(0);
     _stepper.moveTo(_stepper.currentPosition());
 }
 
@@ -105,6 +105,7 @@ void LinearActuator::stop()
 void LinearActuator::release()
 {
     _isStopped = false;
+    _stepper.setSpeed(0);
     _stepper.enableOutputs();
 }
 
@@ -119,37 +120,23 @@ void LinearActuator::switchOn(uint8_t pin)
         _isCalibrating = false;
         _isCalibrated = false;
         _stepper.disableOutputs();
+        _stepper.setSpeed(0);
         _stepper.moveTo(_stepper.currentPosition());
     }
     else if (pin == Settings.Actuator.SwitchLimit1)
     {
         digitalWrite(Settings.Actuator.LedLimit, HIGH);
-        _stepper.moveTo(_stepper.currentPosition());
         _stepper.moveRelative(Settings.Actuator.Retract);
-        _stepper.setMaxSpeed(Settings.Actuator.MoveSpeed);
-        _stepper.runSpeed();
-
-        if (_isCalibrating)
-        {
-            _stepper.setCurrentPosition(0);
-            _stepper.move(0);
-            _isCalibrated = true;
-            _isCalibrating = false;
-        }
+        _stepper.setSpeed(Settings.Actuator.MoveSpeed);
     }
     else if (pin == Settings.Actuator.SwitchLimit2)
     {
         digitalWrite(Settings.Actuator.LedLimit, HIGH);
-        _stepper.moveTo(_stepper.currentPosition());
         _stepper.moveRelative(-Settings.Actuator.Retract);
-        _stepper.setMaxSpeed(Settings.Actuator.MoveSpeed);
+        _stepper.setSpeed(Settings.Actuator.MoveSpeed);
         _stepper.runSpeed();
-
-        if (_isCalibrating)
-        {
-            _isCalibrated = false;
-            _isCalibrating = false;
-        }
+        _stepper.setCurrentPosition(0);
+        _stepper.setSpeed(0);
     }
 }
 
@@ -165,10 +152,29 @@ void LinearActuator::switchOff(uint8_t pin)
     else if (pin == Settings.Actuator.SwitchLimit1)
     {
         digitalWrite(Settings.Actuator.LedLimit, LOW);
+
+        _stepper.setSpeed(0);
+        _stepper.move(0);
+
+        if (_isCalibrating)
+        {
+            _stepper.setCurrentPosition(0);
+            _isCalibrated = true;
+            _isCalibrating = false;
+        }
     }
     else if (pin == Settings.Actuator.SwitchLimit2)
     {
         digitalWrite(Settings.Actuator.LedLimit, LOW);
+
+        _stepper.setSpeed(0);
+        _stepper.move(0);
+
+        if (_isCalibrating)
+        {
+            _isCalibrated = false;
+            _isCalibrating = false;
+        }
     }
 }
 

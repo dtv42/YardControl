@@ -1,18 +1,14 @@
 // --------------------------------------------------------------------------------------------------------------------
 // <copyright file="PicoW.h" company="DTV-Online">
-//   Copyright(c) 2023 Dr. Peter Trimmel. All rights reserved.
+//   Copyright (c) 2023 Dr. Peter Trimmel. All rights reserved.
 // </copyright>
 // <license>
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
-// <version></version>
-// <project name="YardControl">
-// <created>Wednesday, 5th April 2023 11:22:16</created>
-// <author>Peter Trimmel email="peter.trimmel@live.com"</author>
-// <modified>Friday, 7th April 2023 10:10:29 author="Peter Trimmel"</modified>
+// <created>9-4-2023 7:49 PM</created>
+// <modified>10-4-2023 10:29 AM</modified>
+// <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
-#pragma once
-
 #define CRLF "\r\n"
 
 /// <summary>

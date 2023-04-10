@@ -18,6 +18,24 @@
     <None Include="src\arduino folders read me.txt">
       <Filter>Misc Files</Filter>
     </None>
+    <None Include="scripts\licenseheader.json">
+      <Filter>Misc Files</Filter>
+    </None>
+    <None Include="scripts\version.json">
+      <Filter>Misc Files</Filter>
+    </None>
+    <None Include="scripts\version.ps1">
+      <Filter>Misc Files</Filter>
+    </None>
+    <None Include=".onsaveconfig">
+      <Filter>Misc Files</Filter>
+    </None>
+    <None Include="README.md">
+      <Filter>Misc Files</Filter>
+    </None>
+    <None Include="YardControl.sln.licenseheader">
+      <Filter>Misc Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="YardControl.ino" />
@@ -113,5 +131,10 @@
     <ClInclude Include="src\Wireless.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="LICENSE.txt">
+      <Filter>Misc Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>

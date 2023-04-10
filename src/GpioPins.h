@@ -1,18 +1,14 @@
 // --------------------------------------------------------------------------------------------------------------------
 // <copyright file="GpioPins.h" company="DTV-Online">
-//   Copyright(c) 2023 Dr. Peter Trimmel. All rights reserved.
+//   Copyright (c) 2023 Dr. Peter Trimmel. All rights reserved.
 // </copyright>
 // <license>
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
-// <version></version>
-// <project name="YardControl">
-// <created>Tuesday, 4th April 2023 12:02:49</created>
-// <author>Peter Trimmel email="peter.trimmel@live.com"</author>
-// <modified>Saturday, 8th April 2023 06:56:43 author="Peter Trimmel"</modified>
+// <created>9-4-2023 7:45 PM</created>
+// <modified>10-4-2023 10:29 AM</modified>
+// <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
-#pragma once
-
 #include <Arduino.h>
 
 #define ARDIUNOJSON_TAB "    "

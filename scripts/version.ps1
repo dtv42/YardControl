@@ -3,8 +3,8 @@
   Company: "DTV-Online"
   Copyright(c) 2023 Dr. Peter Trimmel. All rights reserved.
   Licensed under the MIT license. See the LICENSE file in the project root for more information.
-  Created: 8-4-2023 6:17 PM
-  Modified: 9-4-2023 7:36 PM
+  Created: 9-4-2023 7:45 PM
+  Modified: 10-4-2023 11:00 AM
   Author: Peter Trimmel
 -------------------------------------------------------------------------------------------------------------------- #>
 $path = "..\\src\\version.h"

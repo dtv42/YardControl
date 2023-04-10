@@ -1,17 +1,14 @@
 // --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Actuator.h" company="DTV-Online">
-//   Copyright(c) 2023 Dr. Peter Trimmel. All rights reserved.
+//   Copyright (c) 2023 Dr. Peter Trimmel. All rights reserved.
 // </copyright>
 // <license>
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
-// <project name="data">
-// <created>Friday, 31st March 2023 15:11:27</created>
-// <author>Peter Trimmel email="peter.trimmel@live.com"</author>
-// <modified>Saturday, 8th April 2023 09:58:11 author="Peter Trimmel"</modified>
+// <created>9-4-2023 7:45 PM</created>
+// <modified>10-4-2023 10:29 AM</modified>
+// <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
-#pragma once
-
 #include <Arduino.h>
 #include <InputDebounce.h>
 #include <AccelStepperWithDistance.h>

@@ -1,17 +1,14 @@
 // --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Commands.h" company="DTV-Online">
-//   Copyright(c) 2023 Dr. Peter Trimmel. All rights reserved.
+//   Copyright (c) 2023 Dr. Peter Trimmel. All rights reserved.
 // </copyright>
 // <license>
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
-// <project name="YardControl">
-// <created>Friday, 17th March 2023 09:13:31</created>
-// <author>Peter Trimmel email="peter.trimmel@live.com"</author>
-// <modified>Thursday, 6th April 2023 13:36:55 author="Peter Trimmel"</modified>
+// <created>9-4-2023 7:45 PM</created>
+// <modified>10-4-2023 10:29 AM</modified>
+// <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
-#pragma once
-
 #include <Arduino.h>
 #include <functional>
 #include <map>

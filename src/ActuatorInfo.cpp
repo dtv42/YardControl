@@ -1,14 +1,13 @@
 // --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ActuatorInfo.cpp" company="DTV-Online">
-//   Copyright(c) 2023 Dr. Peter Trimmel. All rights reserved.
+//   Copyright (c) 2023 Dr. Peter Trimmel. All rights reserved.
 // </copyright>
 // <license>
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
-// <project name="TestActuator">
-// <created>Saturday, 18th March 2023 07:15:18</created>
-// <author>Peter Trimmel email="peter.trimmel@live.com"</author>
-// <modified>Saturday, 8th April 2023 07:20:35 author="Peter Trimmel"</modified>
+// <created>9-4-2023 7:45 PM</created>
+// <modified>10-4-2023 10:29 AM</modified>
+// <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 #include "AppSettings.h"
 #include "ActuatorInfo.h"

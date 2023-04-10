@@ -21,13 +21,14 @@
                 ".cxx",
                 ".h",
                 ".hpp",
-                ".ino"
+                ".ino",
+                ".jsonc"
             ],
             "lineComment": "//",
             "beginComment": "/*",
             "endComment": "*/",
-            "beginRegion": "",
-            "endRegion": "",
+            "beginRegion": "#pragma region",
+            "endRegion": "#pragma endregion",
             "skipExpression": ""
         },
         {
