@@ -1,4 +1,4 @@
-// --------------------------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Commands.h" company="DTV-Online">
 //   Copyright (c) 2023 Dr. Peter Trimmel. All rights reserved.
 // </copyright>
@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>10-4-2023 10:29 AM</modified>
+// <modified>11-4-2023 10:02 AM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 #include <Arduino.h>
@@ -14,7 +14,7 @@
 #include <map>
 
 // The supported callbacks (void, long, float, and String).
-typedef void(*VoidCommandCallback)();
+typedef void (*VoidCommandCallback)();
 typedef void (*LongCommandCallback)(long value);
 typedef void (*FloatCommandCallback)(float value);
 typedef void (*StringCommandCallback)(String value);
@@ -26,8 +26,6 @@ class BaseCommand
 {
 public:
     BaseCommand() {}
-    BaseCommand(String name, String description, VoidCommandCallback func = nullptr)
-        : BaseCommand(name, "", description, func) {}
     BaseCommand(String name, String shortcut, String description, VoidCommandCallback func = nullptr)
     {
         Name = name;
@@ -49,8 +47,6 @@ class LongCommand
 {
 public:
     LongCommand() {}
-    LongCommand(String name, String description, LongCommandCallback func = nullptr)
-        : LongCommand(name, "", description, func) {}
     LongCommand(String name, String shortcut, String description, LongCommandCallback func = nullptr)
     {
         Name = name;
@@ -73,8 +69,6 @@ class FloatCommand
 {
 public:
     FloatCommand() {}
-    FloatCommand(String name, String description, FloatCommandCallback func = nullptr)
-        : FloatCommand(name, "", description, func) {}
     FloatCommand(String name, String shortcut, String description, FloatCommandCallback func = nullptr)
     {
         Name = name;

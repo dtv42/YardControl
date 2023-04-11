@@ -13,8 +13,7 @@
 
 #include "AppSettings.h"
 #include "ServerInfo.h"
-
-#define CRLF "\r\n"
+#include "Defines.h"
 
 extern AppSettings Settings;
 

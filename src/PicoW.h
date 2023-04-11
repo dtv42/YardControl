@@ -9,7 +9,7 @@
 // <modified>10-4-2023 10:29 AM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
-#define CRLF "\r\n"
+#include "Defines.h"
 
 /// <summary>
 /// A printable string representation of the Raspberry Pi Pico W pins (from Raspberry Pi Pico W Datasheet).

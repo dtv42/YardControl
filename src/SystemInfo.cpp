@@ -13,8 +13,7 @@
 
 #include "SystemInfo.h"
 #include "Version.h"
-
-#define CRLF "\r\n"
+#include "Defines.h"
 
 /// <summary>
 ///  Using the global RP2040 instance to get the actual data.

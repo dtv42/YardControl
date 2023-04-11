@@ -6,18 +6,9 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:44 PM</created>
-// <modified>10-4-2023 11:38 AM</modified>
+// <modified>11-4-2023 9:45 AM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
-#if !(defined(ARDUINO_RASPBERRY_PI_PICO_W))
-#error For RASPBERRY_PI_PICO_W only
-#endif
-
-// Disable all traces when set to 0.
-#define ARDUINOTRACE_ENABLE 1
-
-// Define the serial speed for the Serial port.
-#define SERIAL_SPEED 115200
 
 #pragma region Includes
 
@@ -38,6 +29,7 @@
 #include "src/Wireless.h"
 #include "src/Commands.h"
 #include "src/Actuator.h"
+#include "src/Defines.h"
 
 #pragma endregion
 
@@ -1007,47 +999,47 @@ void setup()
     Commands.init(error, nop);
 
     // Base Commands (no shortcut).
-    Commands.add(BaseCommand("pico",     "Show Pico W pin layout.",              pico));
-    Commands.add(BaseCommand("wifi",     "Shows the WiFi information.",          wifi));
-    Commands.add(BaseCommand("server",   "Shows the server information.",        server));
-    Commands.add(BaseCommand("system",   "Shows the system information.",        system));
-    Commands.add(BaseCommand("settings", "Shows the settings information.",      settings));
-    Commands.add(BaseCommand("reboot",   "Reboots the RP2040.",                  reboot));
-    Commands.add(BaseCommand("reset",    "Resets the current position to zero.", reset));
+    Commands.add(BaseCommand("pico",          "",  "Show Pico W pin layout.",                      pico));
+    Commands.add(BaseCommand("wifi",          "",  "Shows the WiFi information.",                  wifi));
+    Commands.add(BaseCommand("server",        "",  "Shows the server information.",                server));
+    Commands.add(BaseCommand("system",        "",  "Shows the system information.",                system));
+    Commands.add(BaseCommand("settings",      "",  "Shows the settings information.",              settings));
+    Commands.add(BaseCommand("reboot",        "",  "Reboots the RP2040.",                          reboot));
+    Commands.add(BaseCommand("reset",         "",  "Resets the current position to zero.",         reset));
 
-    Commands.add(BaseCommand("speed",        "Gets the current speed (steps/(sec*sec)).", speed));
-    Commands.add(BaseCommand("maxspeed",     "Gets the maximum speed (steps/sec).",       maxspeed));
-    Commands.add(BaseCommand("acceleration", "Gets the acceleration (steps/(sec*sec)).",  acceleration));
+    Commands.add(BaseCommand("speed",         "",  "Gets the current speed (steps/(sec*sec)).",    speed));
+    Commands.add(BaseCommand("maxspeed",      "",  "Gets the maximum speed (steps/sec).",          maxspeed));
+    Commands.add(BaseCommand("acceleration",  "",  "Gets the acceleration (steps/(sec*sec)).",     acceleration));
 
     // Base Commands (with shortcut).
-    Commands.add(BaseCommand("status",    "s", "Shows the current state of the motor driver.", status));
-    Commands.add(BaseCommand("position",  "p", "Shows the current position.",                  position));
-    Commands.add(BaseCommand("plus",      "+", "Moves a step forward.",                        plus));
-    Commands.add(BaseCommand("minus",     "-", "Moves a step backward.",                       minus));
-    Commands.add(BaseCommand("forward",   "f", "Moves a 0.1 mm distance forward.",             forward));
-    Commands.add(BaseCommand("backward",  "b", "Moves a 0.1 mm distance backward.",            backward));
-    Commands.add(BaseCommand("calibrate", "c", "Run a calibration sequence.",                  calibrate));
-    Commands.add(BaseCommand("enable",    "e", "Enabling the output (after disable).",         enable));
-    Commands.add(BaseCommand("disable",   "d", "Stops the motor by disabling the output.",     disable));
-    Commands.add(BaseCommand("release",   "r", "Release the stopped motor.",                   release));
-    Commands.add(BaseCommand("stop",      "x", "Stops the running motor (decelerating).",      stop));
-    Commands.add(BaseCommand("home",      "h", "Moves to home position (position = 0).",       home));
-    Commands.add(BaseCommand("gpio",      "g", "Shows the GPIO input and output pin values.",  gpio));
-    Commands.add(BaseCommand("help",      "?", "Shows this help information.",                 help));
-    Commands.add(BaseCommand("quit",      "q", "Terminates the program.",                      quit));
-    Commands.add(BaseCommand("json",      "j", "Toggle JSON output.",                          json));
+    Commands.add(BaseCommand("status",        "s", "Shows the current state of the motor driver.", status));
+    Commands.add(BaseCommand("position",      "p", "Shows the current position.",                  position));
+    Commands.add(BaseCommand("plus",          "+", "Moves a step forward.",                        plus));
+    Commands.add(BaseCommand("minus",         "-", "Moves a step backward.",                       minus));
+    Commands.add(BaseCommand("forward",       "f", "Moves a 0.1 mm distance forward.",             forward));
+    Commands.add(BaseCommand("backward",      "b", "Moves a 0.1 mm distance backward.",            backward));
+    Commands.add(BaseCommand("calibrate",     "c", "Run a calibration sequence.",                  calibrate));
+    Commands.add(BaseCommand("enable",        "e", "Enabling the output (after disable).",         enable));
+    Commands.add(BaseCommand("disable",       "d", "Stops the motor by disabling the output.",     disable));
+    Commands.add(BaseCommand("release",       "r", "Release the stopped motor.",                   release));
+    Commands.add(BaseCommand("stop",          "x", "Stops the running motor (decelerating).",      stop));
+    Commands.add(BaseCommand("home",          "h", "Moves to home position (position = 0).",       home));
+    Commands.add(BaseCommand("gpio",          "g", "Shows the GPIO input and output pin values.",  gpio));
+    Commands.add(BaseCommand("help",          "?", "Shows this help information.",                 help));
+    Commands.add(BaseCommand("quit",          "q", "Terminates the program.",                      quit));
+    Commands.add(BaseCommand("json",          "j", "Toggle JSON output.",                          json));
 
     // Argument Commands (no shortcut).
-    Commands.add(FloatCommand("speed",        "Sets the current speed. (steps/sec).",     speed));
-    Commands.add(FloatCommand("maxspeed",     "Sets the maximum speed. (steps/sec).",     maxspeed));
-    Commands.add(FloatCommand("acceleration", "Sets the acceleration (steps/(sec*sec)).", acceleration));
+    Commands.add(FloatCommand("speed",        "",  "Sets the current speed. (steps/sec).",         speed));
+    Commands.add(FloatCommand("maxspeed",     "",  "Sets the maximum speed. (steps/sec).",         maxspeed));
+    Commands.add(FloatCommand("acceleration", "",  "Sets the acceleration (steps/(sec*sec)).",     acceleration));
 
     // Argument Commands (with shortcut).
-    Commands.add(FloatCommand("moveto", "a", "Moves to absolute position (mm).",      moveAbsoluteDistance));
-    Commands.add(FloatCommand("move",   "r", "Moves the number of mm (relative).",    moveRelativeDistance));    
-    Commands.add(LongCommand("stepto",  "m", "Moves to absolute position (steps).",   moveAbsolute));
-    Commands.add(LongCommand("step",    "s", "Moves the number of steps (relative).", moveRelative));
-    Commands.add(LongCommand("track",   "t", "Moves to track number.",                moveToTrack));
+    Commands.add(FloatCommand("moveto",       "a", "Moves to absolute position (mm).",             moveAbsoluteDistance));
+    Commands.add(FloatCommand("move",         "r", "Moves the number of mm (relative).",           moveRelativeDistance));    
+    Commands.add(LongCommand("stepto",        "m", "Moves to absolute position (steps).",          moveAbsolute));
+    Commands.add(LongCommand("step",          "s", "Moves the number of steps (relative).",        moveRelative));
+    Commands.add(LongCommand("track",         "t", "Moves to track number.",                       moveToTrack));
 
 #pragma endregion
 

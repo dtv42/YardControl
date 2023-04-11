@@ -12,8 +12,7 @@
 #include "AppSettings.h"
 #include "ActuatorInfo.h"
 #include "Actuator.h"
-
-#define CRLF "\r\n"
+#include "Defines.h"
 
 /// <summary>
 /// Used for initialization of the actuator info.

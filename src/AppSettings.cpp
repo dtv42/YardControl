@@ -12,8 +12,7 @@
 #include <StringSplitter.h>
 
 #include "AppSettings.h"
-
-#define CRLF "\r\n"
+#include "Defines.h"
 
 /// <summary>
 /// Used for printing error messages when reading or writing the settings file.

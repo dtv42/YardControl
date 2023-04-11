@@ -11,13 +11,12 @@
 // --------------------------------------------------------------------------------------------------------------------
 #include "AppSettings.h"
 #include "GpioPins.h"
+#include "Defines.h"
 
 /// <summary>
 /// Used for initialization of the Gpio pins info.
 /// </summary>
 extern AppSettings Settings;
-
-#define CRLF "\r\n"
 
 /// <summary>
 /// Helper function to return a string representation of the pin number.
