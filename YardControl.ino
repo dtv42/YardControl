@@ -20,7 +20,7 @@
 #include <map>
 
 #include "src/AppSettings.h"
-#include "src/GpioPins.h"
+#include "src/PicoPins.h"
 #include "src/WiFiInfo.h"
 #include "src/SystemInfo.h"
 #include "src/ServerInfo.h"
@@ -231,7 +231,6 @@ void getInfo()
         }
         else if (info == "gpio")
         {
-            Pins.update();
             json = Pins.toJsonString();
         }
         else
@@ -607,7 +606,6 @@ void home()
 void gpio()
 {
     TRACE();
-    Pins.update();
     Commands.JsonOutput ? Telnet.print(Pins.toJsonString()) : Telnet.print(Pins.toString());
 }
 
@@ -921,9 +919,26 @@ void setup()
 
 #pragma endregion
 
+#pragma region Initialize Gpio
+
+    Pins.add(Settings.Stepper.PinPUL, OUTPUT, "PUL");
+    Pins.add(Settings.Stepper.PinDIR, OUTPUT, "DIR");
+    Pins.add(Settings.Stepper.PinENA, OUTPUT, "ENA");
+
+    Pins.add(Settings.Actuator.LedRunning, OUTPUT_12MA, "Running");
+    Pins.add(Settings.Actuator.LedLimit,   OUTPUT_12MA, "Limit");
+    Pins.add(Settings.Actuator.LedStop,    OUTPUT_12MA, "Stop");
+
+    Pins.add(Settings.Actuator.SwitchStop,   INPUT_PULLUP, "Stop");
+    Pins.add(Settings.Actuator.SwitchLimit1, INPUT_PULLUP, "Limit1");
+    Pins.add(Settings.Actuator.SwitchLimit2, INPUT_PULLUP, "Limit2");
+
+    Serial.print(Pins.toString());
+
+#pragma endregion
+
 #pragma region Initialize Actuator
 
-    Pins.init();
     Actuator.init();
     ActuatorInfo actuatorInfo;
     Serial.print(actuatorInfo.toString());

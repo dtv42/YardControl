@@ -13,6 +13,18 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>xml;json;txt;rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Data Files">
+      <UniqueIdentifier>{48f89140-93da-43c7-8aa4-26c92f17c9fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data Files\www">
+      <UniqueIdentifier>{a1f2ead2-e184-4095-8418-5be2bde355b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data Files\www\css">
+      <UniqueIdentifier>{5eaa0ce6-8820-44bf-83a6-1b813603b828}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data Files\www\js">
+      <UniqueIdentifier>{8c4f1b06-8051-4c73-bcb3-ed39de74a866}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\arduino folders read me.txt">
@@ -36,6 +48,27 @@
     <None Include="YardControl.sln.licenseheader">
       <Filter>Misc Files</Filter>
     </None>
+    <None Include="data\appsettings.json">
+      <Filter>Data Files</Filter>
+    </None>
+    <None Include="data\www\about.html">
+      <Filter>Data Files\www</Filter>
+    </None>
+    <None Include="data\www\index.html">
+      <Filter>Data Files\www</Filter>
+    </None>
+    <None Include="data\www\info.html">
+      <Filter>Data Files\www</Filter>
+    </None>
+    <None Include="data\www\settings.html">
+      <Filter>Data Files\www</Filter>
+    </None>
+    <None Include="data\www\css\dark-mode-switch.css">
+      <Filter>Data Files\www\css</Filter>
+    </None>
+    <None Include="data\www\js\dark-mode-switch.min.js">
+      <Filter>Data Files\www\js</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="YardControl.ino" />
@@ -52,9 +85,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\EscapeCodes.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GpioPins.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ServerInfo.cpp">
@@ -78,6 +108,9 @@
     <ClCompile Include="src\Wireless.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\PicoPins.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="__vm\.YardControl.vsarduino.h">
@@ -99,12 +132,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\EscapeCodes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GpioPins.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\PicoW.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\ServerInfo.h">
@@ -134,10 +161,18 @@
     <ClInclude Include="src\Defines.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\PicoPins.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="LICENSE.txt">
       <Filter>Misc Files</Filter>
     </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="data\www\favicon.ico">
+      <Filter>Data Files\www</Filter>
+    </Image>
   </ItemGroup>
 </Project>
