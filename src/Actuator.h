@@ -1,4 +1,4 @@
-// --------------------------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Actuator.h" company="DTV-Online">
 //   Copyright (c) 2023 Dr. Peter Trimmel. All rights reserved.
 // </copyright>
@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>10-4-2023 10:29 AM</modified>
+// <modified>12-4-2023 6:55 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 #include <Arduino.h>
@@ -23,13 +23,15 @@ class LinearActuator
 private:
     AccelStepperWithDistance _stepper;          // The stepper instance (AccelStepper).
 
+    InputDebounce _stepperAlarm;                // Stepper alarm input .
     InputDebounce _switchStop;                  // Emergency stop switch input.
     InputDebounce _switchLimit1;                // Limit switch 1 (calibration).
     InputDebounce _switchLimit2;                // Limit switch 2 (end of actuator).
 
     bool _isCalibrating = false;                // Flag indicating that the calibration is running.
-    bool _isCalibrated  = false;                // Flag indicating that the calibrationwas successful.
-    bool _isStopped     = false;
+    bool _isCalibrated  = false;                // Flag indicating that the calibration was successful.
+    bool _isInLimit = false;                    // Flag indicating that the stepper has hit a limit switch.
+    bool _isAlarmOn = false;                    // Flag indicating that the stepper alarm singal has been turned on.
 
 public : 
     static constexpr const float ACTUATOR_LENGTH = 500.0; // The linear acutator length in mm.
@@ -47,7 +49,8 @@ public :
 
     bool  isEnabled();                          // True if the stepper is enabled.
     bool  isRunning();                          // True if the stepper is running.
-    bool  isStopped();                          // True if the stepper has been stopped.
+    bool  isInLimit();                          // True if the stepper has hit a limit switch.
+    bool  isAlarmOn();                          // True if the stepper alarm signal is on.
     bool  isCalibrating();                      // True if calibrating.
     bool  isCalibrated();                       // True if calibration was succesful.
 
@@ -64,6 +67,9 @@ public :
     void init();                                // Initialize the stepper instance.
     void stop();                                // Stop moving (resetting target position).
     void release();                             // Release stopped motor (clearing flag).
+
+    void alarmOn(uint8_t pin);                  // Alarm callback routine (on event).
+    void alarmOff(uint8_t pin);                 // Alarm callback routine (off event).
 
     void switchOn(uint8_t pin);                 // Switch callback routine (on event).
     void switchOff(uint8_t pin);                // Switch callback routine (off event).

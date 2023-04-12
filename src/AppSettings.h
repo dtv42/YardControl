@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>10-4-2023 11:38 AM</modified>
+// <modified>12-4-2023 7:59 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 #include <array>
@@ -60,13 +60,13 @@ public:
         StaticJsonDocument<128> _doc;           // The Json document representing the settings.
 
     public:
-        uint8_t  SwitchStop   = 6;              // The emergency stop input pin number.
-        uint8_t  SwitchLimit1 = 7;              // The limit 1 input pin number (limit1).
-        uint8_t  SwitchLimit2 = 8;              // The limit 2 input pin number (limit2).
+        uint8_t  SwitchStop   = 7;              // The emergency stop input pin number.
+        uint8_t  SwitchLimit1 = 8;              // The limit 1 input pin number (limit1).
+        uint8_t  SwitchLimit2 = 9;              // The limit 2 input pin number (limit2).
 
-        uint8_t  LedRunning   = 3;              // Led output pin number (is running).
-        uint8_t  LedLimit     = 4;              // Led output pin number (limit 1 hit).
-        uint8_t  LedStop      = 5;              // Led output pin number (limit 2 hit).
+        uint8_t  LedRunning   = 4;              // Led output pin number (is running).
+        uint8_t  LedInLimit   = 5;              // Led output pin number (limit hit).
+        uint8_t  LedAlarmOn   = 6;              // Led output pin number (alarm on).
 
         float    MoveSpeed    = 100;            // Calibration speed to move toward limit.
         uint16_t Retract      = 1600;           // Retract distance when limit is hit (steps).
@@ -85,6 +85,7 @@ public:
         uint8_t  PinPUL              = 0;       // The output pin number for driver PUL input (step).
         uint8_t  PinDIR              = 1;       // The output pin number for driver DIR input (direction).
         uint8_t  PinENA              = 2;       // The output pin number for driver ENA input (enable).
+        uint8_t  PinALM              = 3;       // The input pin number for driver ALM output (alarm).
         uint8_t  MicroSteps          = 1;       // The multiplication factor for steps (max. 32).
         float    MaxSpeed            = 1000.0;  // The desired maximum speed in steps per second. Must be > 0.
         float    Acceleration        = 50.0;    // The acceleration in steps per second per second. Must be > 0.0.

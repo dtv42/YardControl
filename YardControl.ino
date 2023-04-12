@@ -855,13 +855,35 @@ void nop()
 
 #pragma endregion
 
-#pragma region Switch Callbacks
+#pragma region Input Callbacks
+
+/// <summary>
+/// Callback triggered when the stepper alarm output goes HIGH.
+/// </summary>
+/// <param name="pin">The input pin number.</param>
+void alarmOnCallback(uint8_t pin)
+{
+    TRACE();
+    DUMP(pin);
+    Actuator.alarmOn(pin);
+}
+
+/// <summary>
+/// Callback triggered when the stepper alarm output goes LOW.
+/// </summary>
+/// <param name="pin">The input pin number.</param>
+void alarmOffCallback(uint8_t pin)
+{
+    TRACE();
+    DUMP(pin);
+    Actuator.alarmOff(pin);
+}
 
 /// <summary>
 /// Callback triggered when the (debounced) switch is closed.
 /// </summary>
 /// <param name="pin">The input pin number.</param>
-void pressedCallback(uint8_t pin)
+void switchOnCallback(uint8_t pin)
 {
     TRACE();
     DUMP(pin);
@@ -872,7 +894,7 @@ void pressedCallback(uint8_t pin)
 /// Callback triggered when the (debounced) switch is opened.
 /// </summary>
 /// <param name="pin">The input pin number.</param>
-void releasedCallback(uint8_t pin)
+void switchOffCallback(uint8_t pin)
 {
     TRACE();
     DUMP(pin);
@@ -925,9 +947,11 @@ void setup()
     Pins.add(Settings.Stepper.PinDIR, OUTPUT, "DIR");
     Pins.add(Settings.Stepper.PinENA, OUTPUT, "ENA");
 
-    Pins.add(Settings.Actuator.LedRunning, OUTPUT_12MA, "Running");
-    Pins.add(Settings.Actuator.LedLimit,   OUTPUT_12MA, "Limit");
-    Pins.add(Settings.Actuator.LedStop,    OUTPUT_12MA, "Stop");
+    Pins.add(Settings.Stepper.PinALM, INPUT_PULLUP, "ALM");
+
+    Pins.add(Settings.Actuator.LedRunning, OUTPUT, "Running");
+    Pins.add(Settings.Actuator.LedInLimit, OUTPUT, "Limit");
+    Pins.add(Settings.Actuator.LedAlarmOn, OUTPUT, "Alarm");
 
     Pins.add(Settings.Actuator.SwitchStop,   INPUT_PULLUP, "Stop");
     Pins.add(Settings.Actuator.SwitchLimit1, INPUT_PULLUP, "Limit1");

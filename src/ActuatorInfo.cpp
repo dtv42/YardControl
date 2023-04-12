@@ -1,4 +1,4 @@
-// --------------------------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ActuatorInfo.cpp" company="DTV-Online">
 //   Copyright (c) 2023 Dr. Peter Trimmel. All rights reserved.
 // </copyright>
@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>10-4-2023 10:29 AM</modified>
+// <modified>12-4-2023 6:54 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 #include "AppSettings.h"
@@ -24,19 +24,20 @@ extern LinearActuator Actuator;
 /// </summary>
 ActuatorInfo::ActuatorInfo()
 {
-    IsCalibrated    = Actuator.isCalibrated();          // Flag indicating the calibration has been completed.
-    IsCalibrating   = Actuator.isCalibrating();         // Flag indicating the calibration routine is running.
-    IsEnabled       = Actuator.isEnabled();             // Flag indicating the motor is enabled.
-    IsRunning       = Actuator.isRunning();             // Flag indicating that the motor is running.
-    IsStopped       = Actuator.isStopped();             // Flag indicating that the motor hase been stopped. have been hit.
-    Steps           = Actuator.getSteps();              // The current motor position in steps.
-    Target          = Actuator.getTarget();             // The target position in steps. Positive is clockwise from the 0 position.
-    StepsToGo       = Actuator.getStepsToGo();          // The remaining steps from the current position to the target position.
-    Position        = Actuator.getPosition();           // The current motor position in mm.
-    Length          = LinearActuator::ACTUATOR_LENGTH;  // The length of the linear actuator in mm.
-    Speed           = Actuator.getSpeed();              // The current speed in steps per second.
-    MaxSpeed        = Actuator.getMaxSpeed();           // The currently configured maximum speed.
-    Acceleration    = Actuator.getAcceleration();       // The currently configured acceleration/deceleration.
+    IsCalibrated  = Actuator.isCalibrated();          // Flag indicating the calibration has been completed.
+    IsCalibrating = Actuator.isCalibrating();         // Flag indicating the calibration routine is running.
+    IsEnabled     = Actuator.isEnabled();             // Flag indicating the stepper motor is enabled.
+    IsRunning     = Actuator.isRunning();             // Flag indicating that stepper motor is moving.
+    IsInLimit     = Actuator.isInLimit();             // Flag indicating that a limit switch has been hit.
+    IsAlarmOn     = Actuator.isAlarmOn();             // Flag indicating that the stepper alarm has been turned on.
+    Steps         = Actuator.getSteps();              // The current motor position in steps.
+    Target        = Actuator.getTarget();             // The target position in steps. Positive is clockwise from the 0 position.
+    StepsToGo     = Actuator.getStepsToGo();          // The remaining steps from the current position to the target position.
+    Position      = Actuator.getPosition();           // The current motor position in mm.
+    Length        = LinearActuator::ACTUATOR_LENGTH;  // The length of the linear actuator in mm.
+    Speed         = Actuator.getSpeed();              // The current speed in steps per second.
+    MaxSpeed      = Actuator.getMaxSpeed();           // The currently configured maximum speed.
+    Acceleration  = Actuator.getAcceleration();       // The currently configured acceleration/deceleration.
 }
 
 /// <summary>
@@ -52,7 +53,8 @@ String ActuatorInfo::toJsonString()
     _doc["IsCalibrating"]   = IsCalibrating;
     _doc["IsEnabled"]       = IsEnabled;
     _doc["IsRunning"]       = IsRunning;
-    _doc["IsStopped"]       = IsStopped;
+    _doc["IsInLimit"]       = IsInLimit;
+    _doc["IsAlarmOn"]       = IsAlarmOn;
     _doc["Steps"]           = Steps;
     _doc["Target"]          = Target;
     _doc["StepsToGo"]       = StepsToGo;
@@ -77,7 +79,8 @@ String ActuatorInfo::toString()
                   "    IsCalibrating: " + IsCalibrating + CRLF +
                   "    IsEnabled:     " + IsEnabled + CRLF +
                   "    IsRunning:     " + IsRunning + CRLF +
-                  "    IsStopped:     " + IsStopped + CRLF +
+                  "    IsInLimit:     " + IsInLimit + CRLF +
+                  "    IsAlarmOn:     " + IsAlarmOn + CRLF +
                   "    Steps:         " + Steps + CRLF +
                   "    Target:        " + Target + CRLF +
                   "    StepsToGo:     " + StepsToGo + CRLF +

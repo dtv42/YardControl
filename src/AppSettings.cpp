@@ -1,4 +1,4 @@
-// --------------------------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="AppSettings.cpp" company="DTV-Online">
 //   Copyright (c) 2023 Dr. Peter Trimmel. All rights reserved.
 // </copyright>
@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>10-4-2023 10:29 AM</modified>
+// <modified>12-4-2023 6:53 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 #include <StringSplitter.h>
@@ -129,8 +129,8 @@ void AppSettings::ActuatorSettings::fromJson(JsonObject json)
         SwitchStop   = json["SwitchStop"]   | SwitchStop;
 
         LedRunning = json["LedRunning"] | LedRunning;
-        LedLimit   = json["LedLimit"]   | LedLimit;
-        LedStop    = json["LedStop"]    | LedStop;
+        LedInLimit = json["LedInLimit"] | LedInLimit;
+        LedAlarmOn = json["LedAlarmOn"] | LedAlarmOn;
 
         MoveSpeed = json["MoveSpeed"] | MoveSpeed;
         Retract   = json["Retract"]   | Retract;
@@ -149,8 +149,8 @@ JsonObject AppSettings::ActuatorSettings::toJson()
     _doc["SwitchStop"]   = SwitchStop;
 
     _doc["LedRunning"] = LedRunning;
-    _doc["LedLimit"]   = LedLimit;
-    _doc["LedStop"]    = LedStop;
+    _doc["LedInLimit"] = LedInLimit;
+    _doc["LedAlarmOn"] = LedAlarmOn;
 
     _doc["MoveSpeed"] = MoveSpeed;
     _doc["Retract"]   = Retract;
@@ -169,8 +169,8 @@ String AppSettings::ActuatorSettings::toString()
                   "    SwitchLimit1: " + SwitchLimit2 + CRLF +
                   "    SwitchStop:   " + SwitchStop   + CRLF +
                   "    LedRunning:   " + LedRunning   + CRLF +
-                  "    LedLimit:     " + LedLimit     + CRLF +
-                  "    LedStop:      " + LedStop      + CRLF +
+                  "    LedInLimit:   " + LedInLimit   + CRLF +
+                  "    LedAlarmOn:   " + LedAlarmOn   + CRLF +
                   "    MoveSpeed:    " + MoveSpeed    + CRLF +
                   "    Retract:      " + Retract      + CRLF;
 }
@@ -186,6 +186,7 @@ void AppSettings::StepperSettings::fromJson(JsonObject json)
         PinPUL              = json["PinPUL"]              | PinPUL;
         PinDIR              = json["PinDIR"]              | PinDIR;
         PinENA              = json["PinENA"]              | PinENA;
+        PinALM              = json["PinALM"]              | PinALM;
         MicroSteps          = json["MicroSteps"]          | MicroSteps;
         MaxSpeed            = json["MaxSpeed"]            | MaxSpeed;
         Acceleration        = json["Acceleration"]        | Acceleration;
@@ -205,6 +206,7 @@ JsonObject AppSettings::StepperSettings::toJson()
     _doc["PinPUL"]              = PinPUL;
     _doc["PinDIR"]              = PinDIR;
     _doc["PinENA"]              = PinENA;
+    _doc["PinALM"]              = PinALM;
     _doc["MicroSteps"]          = MicroSteps; 
     _doc["MaxSpeed"]            = MaxSpeed; 
     _doc["Acceleration"]        = Acceleration; 
@@ -225,6 +227,7 @@ String AppSettings::StepperSettings::toString()
                   "    PinPUL:              " + PinPUL              + CRLF +
                   "    PinDIR:              " + PinDIR              + CRLF +
                   "    PinENA:              " + PinENA              + CRLF +
+                  "    PinALM:              " + PinALM              + CRLF +
                   "    MicroSteps:          " + MicroSteps          + CRLF +
                   "    MaxSpeed:            " + MaxSpeed            + CRLF +
                   "    Acceleration:        " + Acceleration        + CRLF +

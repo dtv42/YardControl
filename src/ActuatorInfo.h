@@ -1,4 +1,4 @@
-// --------------------------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ActuatorInfo.h" company="DTV-Online">
 //   Copyright (c) 2023 Dr. Peter Trimmel. All rights reserved.
 // </copyright>
@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>10-4-2023 10:29 AM</modified>
+// <modified>12-4-2023 6:54 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 #include <Arduino.h>
@@ -32,7 +32,8 @@ public:
     bool  IsCalibrating;    // Flag indicating the calibration routine is running.
     bool  IsEnabled;        // Flag indicating if motor is enabled.
     bool  IsRunning;        // Flag indicating if motor is running.
-    bool  IsStopped;        // Flag indicating that the motor has been stopped.
+    bool  IsInLimit;        // Flag indicating that a limit switch has turned on.
+    bool  IsAlarmOn;        // Flag indicating that the stepper driver alarm has been turned on.
     long  Steps;            // The current motor position in steps.
     long  Target;           // The target position in steps. Positive is clockwise from the 0 position.
     long  StepsToGo;        // The remaining steps from the current position to the target position.

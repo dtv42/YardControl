@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>10-4-2023 11:33 AM</modified>
+// <modified>12-4-2023 6:56 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 #include <Arduino.h>
@@ -25,8 +25,11 @@ extern AppSettings Settings;
 extern TelnetServer Telnet;
 extern CommandsClass Commands;
 
-extern void pressedCallback(uint8_t pin);
-extern void releasedCallback(uint8_t pin);
+extern void alarmOnCallback(uint8_t pin);
+extern void switchOnCallback(uint8_t pin);
+
+extern void alarmOffCallback(uint8_t pin);
+extern void switchOffCallback(uint8_t pin);
 
 /// <summary>
 /// Initialize the stepper instance. Register global callbacks, and setup debounce switches.
@@ -43,9 +46,10 @@ void LinearActuator::init()
     _stepper.setMinPulseWidth(Settings.Stepper.MinPulseWidth);
     _stepper.setPinsInverted(false, false, true);
 
-    _switchStop.registerCallbacks(pressedCallback, releasedCallback, NULL, NULL);
-    _switchLimit1.registerCallbacks(pressedCallback, releasedCallback, NULL, NULL);
-    _switchLimit2.registerCallbacks(pressedCallback, releasedCallback, NULL, NULL);
+    _stepperAlarm.registerCallbacks(alarmOnCallback,  alarmOffCallback,  NULL, NULL);
+    _switchStop.registerCallbacks  (switchOnCallback, switchOffCallback, NULL, NULL);
+    _switchLimit1.registerCallbacks(switchOnCallback, switchOffCallback, NULL, NULL);
+    _switchLimit2.registerCallbacks(switchOnCallback, switchOffCallback, NULL, NULL);
 
     _switchStop.setup  (Settings.Actuator.SwitchStop,   SWITCH_DEBOUNCE_DELAY, InputDebounce::PIM_INT_PULL_UP_RES);
     _switchLimit1.setup(Settings.Actuator.SwitchLimit1, SWITCH_DEBOUNCE_DELAY, InputDebounce::PIM_INT_PULL_UP_RES);
@@ -64,7 +68,8 @@ long  LinearActuator::getStepsToGo()                    { return _stepper.distan
 float LinearActuator::getPosition()                     { return _stepper.getCurrentPositionDistance(); }
 bool  LinearActuator::isEnabled()                       { return digitalRead(Settings.Stepper.PinENA) == LOW; }
 bool  LinearActuator::isRunning()                       { return _stepper.isRunning(); }
-bool  LinearActuator::isStopped()                       { return _isStopped; }
+bool  LinearActuator::isInLimit()                       { return _isInLimit; }
+bool  LinearActuator::isAlarmOn()                       { return _isAlarmOn; }
 bool  LinearActuator::isCalibrating()                   { return _isCalibrating; }
 bool  LinearActuator::isCalibrated()                    { return _isCalibrated; }
 void  LinearActuator::enable()                          { _stepper.enableOutputs(); }
@@ -83,7 +88,8 @@ void  LinearActuator::moveRelativeDistance(float value) { _stepper.moveRelative(
 void LinearActuator::run()
 {
     digitalWrite(Settings.Actuator.LedRunning, _stepper.isRunning() ? HIGH : LOW);
-    digitalWrite(Settings.Actuator.LedStop, _isStopped ? HIGH : LOW);
+    digitalWrite(Settings.Actuator.LedInLimit, _isInLimit ? HIGH : LOW);
+    digitalWrite(Settings.Actuator.LedAlarmOn, _isAlarmOn ? HIGH : LOW);
     _isCalibrating ? _stepper.runSpeed() : _stepper.run();
 }
 
@@ -93,7 +99,6 @@ void LinearActuator::run()
 /// </summary>
 void LinearActuator::stop()
 {
-    _isStopped = true;
     _stepper.disableOutputs();
     _stepper.setSpeed(0);
     _stepper.moveTo(_stepper.currentPosition());
@@ -104,8 +109,27 @@ void LinearActuator::stop()
 /// </summary>
 void LinearActuator::release()
 {
-    _isStopped = false;
     _stepper.setSpeed(0);
+    _stepper.enableOutputs();
+}
+
+/// <summary>
+/// Callback routine for the stepper alarm on event (over voltage or over current).
+/// </summary>
+void LinearActuator::alarmOn(uint8_t pin)
+{
+    _isAlarmOn = true;
+    _stepper.disableOutputs();
+    _stepper.setSpeed(0);
+    _stepper.moveTo(_stepper.currentPosition());
+}
+
+/// <summary>
+/// Callback routine for the stepper alarm off event.
+/// </summary>
+void LinearActuator::alarmOff(uint8_t pin)
+{
+    _isAlarmOn = false;
     _stepper.enableOutputs();
 }
 
@@ -116,7 +140,6 @@ void LinearActuator::switchOn(uint8_t pin)
 {
     if (pin == Settings.Actuator.SwitchStop)
     {
-        _isStopped = true;
         _isCalibrating = false;
         _isCalibrated = false;
         _stepper.disableOutputs();
@@ -125,13 +148,13 @@ void LinearActuator::switchOn(uint8_t pin)
     }
     else if (pin == Settings.Actuator.SwitchLimit1)
     {
-        digitalWrite(Settings.Actuator.LedLimit, HIGH);
+        _isInLimit = true;
         _stepper.moveRelative(Settings.Actuator.Retract);
         _stepper.setSpeed(Settings.Actuator.MoveSpeed);
     }
     else if (pin == Settings.Actuator.SwitchLimit2)
     {
-        digitalWrite(Settings.Actuator.LedLimit, HIGH);
+        _isInLimit = true;
         _stepper.moveRelative(-Settings.Actuator.Retract);
         _stepper.setSpeed(Settings.Actuator.MoveSpeed);
         _stepper.runSpeed();
@@ -151,8 +174,7 @@ void LinearActuator::switchOff(uint8_t pin)
     }
     else if (pin == Settings.Actuator.SwitchLimit1)
     {
-        digitalWrite(Settings.Actuator.LedLimit, LOW);
-
+        _isInLimit = false;
         _stepper.setSpeed(0);
         _stepper.move(0);
 
@@ -165,8 +187,7 @@ void LinearActuator::switchOff(uint8_t pin)
     }
     else if (pin == Settings.Actuator.SwitchLimit2)
     {
-        digitalWrite(Settings.Actuator.LedLimit, LOW);
-
+        _isInLimit = false;
         _stepper.setSpeed(0);
         _stepper.move(0);
 
