@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>12-4-2023 6:53 PM</modified>
+// <modified>13-4-2023 1:42 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 #include <StringSplitter.h>
@@ -134,6 +134,7 @@ void AppSettings::ActuatorSettings::fromJson(JsonObject json)
 
         MoveSpeed = json["MoveSpeed"] | MoveSpeed;
         Retract   = json["Retract"]   | Retract;
+        Length    = json["Length"]    | Length;
     }
 }
 
@@ -154,6 +155,7 @@ JsonObject AppSettings::ActuatorSettings::toJson()
 
     _doc["MoveSpeed"] = MoveSpeed;
     _doc["Retract"]   = Retract;
+    _doc["Length"]    = Length;
 
     return _doc.as<JsonObject>();
 }
@@ -172,7 +174,8 @@ String AppSettings::ActuatorSettings::toString()
                   "    LedInLimit:   " + LedInLimit   + CRLF +
                   "    LedAlarmOn:   " + LedAlarmOn   + CRLF +
                   "    MoveSpeed:    " + MoveSpeed    + CRLF +
-                  "    Retract:      " + Retract      + CRLF;
+                  "    Retract:      " + Retract      + CRLF +
+                  "    Length:       " + Length       + CRLF;
 }
 
 /// <summary>

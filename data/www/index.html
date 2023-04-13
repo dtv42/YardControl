@@ -6,6 +6,7 @@
     <link rel="shortcut icon" href="favicon.ico" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/custom-input-switch.css">
     <link rel="stylesheet" href="css/dark-mode-switch.css">
     <style>
         .btn-xl {
@@ -72,6 +73,10 @@
             <div class="row mb-2">
                 <div class="col-lg-5 mx-auto">
                     <h1 class="font-weight-bold">Yard Control</h1>
+                    <div class="form-check form-switch d-flex justify-content-center">
+                        <input class="form-check-input" type="checkbox" id="onoffSwitch" onclick="onoff()" />
+                        <label class="form-check-label ms-3" for="onoffSwitch" id="onoffLabel">Disabled</label>
+                    </div>
                     <p class="text-muted">Select the track number or move forward or backward.</p>
                 </div>
             </div>
@@ -108,7 +113,7 @@
                         <button class="btn btn-secondary btn-xl m-1" onclick="home()"   title="Move home"><i class="bi bi-chevron-bar-contract"></i></button>
                     </div>
                     <div class="bg-white p-1 rounded shadow-sm font-monospace">
-                        <h5><i id="led1" class="bi bi-circle-fill" style="color:lightgray"></i>&nbsp;Connected&nbsp;&nbsp;<i id="led2" class="bi bi-circle-fill" style="color:lightgray"></i>&nbsp;Running&nbsp;&nbsp;<i id="led3" class="bi bi-circle-fill" style="color:lightgray"></i>&nbsp;Limits</h5>
+                        <h5><i id="led1" class="bi bi-circle-fill" style="color:lightgray"></i>&nbsp;Online&nbsp;&nbsp;<i id="led2" class="bi bi-circle-fill" style="color:lightgray"></i>&nbsp;Running&nbsp;&nbsp;<i id="led3" class="bi bi-circle-fill" style="color:lightgray"></i>&nbsp;Limits&nbsp;&nbsp;<i id="led4" class="bi bi-circle-fill" style="color:lightgray"></i>&nbsp;Alarm</h5>
                     </div>
                 </div>
             </div>
@@ -149,11 +154,15 @@
         const headers = { "Content-Type": "application/json; charset = utf-8" };
 
         // Various elements.
+        const onoffSwitch = document.getElementById('onoffSwitch');
+        const onoffLabel = document.getElementById('onoffLabel');
+
         const line1 = document.getElementById('line1');
         const line2 = document.getElementById('line2');
         const led1  = document.getElementById('led1');
         const led2  = document.getElementById('led2');
         const led3  = document.getElementById('led3');
+        const led4  = document.getElementById('led4');
 
         // The auto update timer.
         var interval;
@@ -174,18 +183,14 @@
             }
         }
 
-        // Start auto update and set the update button color.
+        // Start auto update.
         async function startAutoUpdate() {
-            if (!autoUpdateSwitch.checked) {
-                autoUpdateSwitch.checked = true;
-            }
+            autoUpdateSwitch.checked = true;
         }
 
-        // Stop auto update and set the update button color.
+        // Stop auto update.
         async function stopAutoUpdate() {
-            if (autoUpdateSwitch.checked) {
-                autoUpdateSwitch.checked = false;
-            }
+            autoUpdateSwitch.checked = false;
         }
 
         // Helper function to send POST request with no data.
@@ -195,18 +200,33 @@
                     if (!response.ok)
                         throw new Error('POST ' + url + ' => ' + response.statusText);
                     else
-                        IsConnected = true;
+                        Online = true;
                 })
                 .catch((error) => {
                     message.innerText = "Error: Unable to POST " + url;
                     toast.show();
-                    IsConnected = false;
+                    Online = false;
                 });
         }
 
-        function track(t) {
-            postRequest("/track?number=" + t);
+        function onoff() {
+            if (onoffSwitch.checked) {
+                postRequest("/enable");
+            } else {
+                postRequest("/disable");
+            }
             updateDisplay();
+        }
+
+        function track(t) {
+            if (!Enabled) {
+                message.innerText = "Yard Control not enabled!";
+                toast.show();
+            }
+            else {
+                postRequest("/track?number=" + t);
+                updateDisplay();
+            }
         }
         
         // Stop the moving motor.
@@ -217,38 +237,46 @@
 
         // Move.
         function move(value) {
-            postRequest("/move?value=" + value);
-            updateDisplay();
+            if (!Enabled) {
+                message.innerText = "Yard Control not enabled!";
+                toast.show();
+            }
+            else {
+                postRequest("/move?value=" + value);
+                updateDisplay();
+            }
         }
 
         // Move to position 0 or start calibration.
         function home() {
-            if (IsCalibrated) {
-                postRequest("/home");
+            if (!Enabled) {
+                message.innerText = "Yard Control not enabled!";
+                toast.show();
             }
             else {
-                if (confirm("Not yet calibrated - Do You want to start calibration?")) {
-                    postRequest("/calibrate");
-                }
-                else {
+                if (Calibrated) {
                     postRequest("/home");
                 }
+                else {
+                    if (confirm("Not yet calibrated - Do You want to start calibration?")) {
+                        postRequest("/calibrate");
+                    }
+                    else {
+                        postRequest("/home");
+                    }
+                }
             }
-            updateDisplay();
-        }
-
-        // Stop the moving motor.
-        function stop() {
-            postRequest("/stop");
             updateDisplay();
         }
 
         // Various status data.
-        IsCalibrated = false;
-        IsCalibrating = false;
-        IsEnabled = false;
-        IsRunning = false;
-        IsLimited = false;
+        Calibrating = false;
+        Calibrated = false;
+        Enabled = false;
+        Running = false;
+        Limited = false;
+        AlarmOn = false;
+        Online = false;
         Steps = 0;
         Target = 0;
         StepsToGo = 0;
@@ -256,7 +284,6 @@
         Speed = 0.0;
         MaxSpeed = 0.0;
         Acceleration = 0.0;
-        IsConnected = false;
 
         // Get the actuator status.
         async function getStatus() {
@@ -267,11 +294,12 @@
                     return response.json();
                 })
                 .then((json) => {
-                    IsCalibrated  = json.IsCalibrated; 
-                    IsCalibrating = json.IsCalibrating;
-                    IsEnabled     = json.IsEnabled;    
-                    IsRunning     = json.IsRunning;  
-                    IsLimited     = json.IsLimited;  
+                    Calibrated    = json.IsCalibrated; 
+                    Calibrating   = json.IsCalibrating;
+                    Enabled       = json.IsEnabled;    
+                    Running       = json.IsRunning;  
+                    Limited       = json.InLimited;  
+                    AlarmOn       = json.AlarmOn;
                     Steps         = json.Steps;        
                     Target        = json.Target;       
                     StepsToGo     = json.StepsToGo;    
@@ -279,12 +307,12 @@
                     Speed         = json.Speed;         
                     MaxSpeed      = json.MaxSpeed;      
                     Acceleration  = json.Acceleration;  
-                    IsConnected = true;
+                    Online        = true;
                 })
                 .catch((error) => {
                     message.innerText = error;
                     toast.show();
-                    IsConnected = false;
+                    Online = false;
                 })
                 .finally(() => {
                     document.getElementById('spinnerStatus').style.display = 'none';
@@ -301,7 +329,7 @@
             html2 = text2.replaceAll(" ", "&nbsp;");
             html3 = text3.replaceAll(" ", "&nbsp;");
 
-            if (IsRunning) {
+            if (Running) {
                 line1.innerHTML = html1;
                 line2.innerHTML = html2;
             }
@@ -310,9 +338,24 @@
                 line2.innerHTML = html2;
             }
 
-            led1.style.color = IsConnected ? 'orange' : 'lightgray';
-            led2.style.color = IsRunning ? 'yellowgreen' : 'lightgray';
-            led3.style.color = IsLimited ? 'red' : 'lightgray';
+            if (Enabled) {
+                if (!onoffSwitch.checked) {
+                    onoffSwitch.checked = true;
+                    onoffLabel.textContent = "Enabled";
+                }
+            }
+            else {
+                if (onoffSwitch.checked) {
+                    onoffSwitch.checked = false;
+                    onoffLabel.textContent = "Disabled";
+                }
+            }
+
+            led1.style.color = Online  ? 'yellow'      : 'darkgray';
+            led2.style.color = Running ? 'yellowgreen' : 'darkgray';
+            led3.style.color = Limited ? 'orange'      : 'darkgray';
+            led4.style.color = AlarmOn ? 'red'         : 'darkgray';
+
             textTimestamp.innerText = new Date(Date.now()).toUTCString();
         }
 

@@ -5,6 +5,7 @@
     <title>Yard Control - Settings</title>
     <link rel="shortcut icon" href="favicon.ico" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/custom-input-switch.css">
     <link rel="stylesheet" href="css/dark-mode-switch.css">
 </head>
 <body>
@@ -120,16 +121,20 @@
                         <td><span id="actuatorPinLIMIT1"></span></td>
                     </tr>
                     <tr>
-                        <td class="col-2">Pin&nbsp;LIMIT&nbsp;1:</td>
+                        <td class="col-2">Pin&nbsp;LIMIT&nbsp;2:</td>
                         <td><span id="actuatorPinLIMIT2"></span></td>
                     </tr>
                     <tr>
-                        <td class="col-2">Led&nbsp;Moving:</td>
-                        <td><span id="actuatorLedMoving"></span></td>
+                        <td class="col-2">Led&nbsp;Running:</td>
+                        <td><span id="actuatorLedRunning"></span></td>
                     </tr>
                     <tr>
-                        <td class="col-2">Led&nbsp;Limits:</td>
-                        <td><span id="actuatorLedLimits"></span></td>
+                        <td class="col-2">Led&nbsp;In&nbsp;Limit:</td>
+                        <td><span id="actuatorLedInLimit"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="col-2">Led&nbsp;Alarm&nbsp;On:</td>
+                        <td><span id="actuatorLedAlarmOn"></span></td>
                     </tr>
                     <tr>
                         <td class="col-2">Move&nbsp;Speed:</td>
@@ -138,6 +143,10 @@
                     <tr>
                         <td class="col-2">Retract:</td>
                         <td><span id="actuatorRetract"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="col-2">Length:</td>
+                        <td><span id="actuatorLength"></span></td>
                     </tr>
                 </tbody>
             </table>
@@ -157,6 +166,10 @@
                     <tr>
                         <td class="col-2">Pin&nbsp;ENA:</td>
                         <td><span id="stepperPinENA"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="col-2">Pin&nbsp;ALM:</td>
+                        <td><span id="stepperPinALM"></span></td>
                     </tr>
                     <tr>
                         <td class="col-2">Microsteps:</td>
@@ -328,14 +341,17 @@
         const actuatorPinSTOP            = document.getElementById('actuatorPinSTOP');
         const actuatorPinLIMIT1          = document.getElementById('actuatorPinLIMIT1');
         const actuatorPinLIMIT2          = document.getElementById('actuatorPinLIMIT2');
-        const actuatorLedMoving          = document.getElementById('actuatorLedMoving');
-        const actuatorLedLimits          = document.getElementById('actuatorLedLimits');
+        const actuatorLedRunning         = document.getElementById('actuatorLedRunning');
+        const actuatorLedInLimit         = document.getElementById('actuatorLedInLimit');
+        const actuatorLedAlarmOn         = document.getElementById('actuatorLedAlarmOn');
         const actuatorMoveSpeed          = document.getElementById('actuatorMoveSpeed');
         const actuatorRetract            = document.getElementById('actuatorRetract');
+        const actuatorLength             = document.getElementById('actuatorLength');
 
         const stepperPinPUL              = document.getElementById('stepperPinPUL');
         const stepperPinDIR              = document.getElementById('stepperPinDIR');
         const stepperPinENA              = document.getElementById('stepperPinENA');
+        const stepperPinALM              = document.getElementById('stepperPinALM');
         const stepperMicroSteps          = document.getElementById('stepperMicroSteps');
         const stepperMaxSpeed            = document.getElementById('stepperMaxSpeed');
         const stepperAcceleration        = document.getElementById('stepperAcceleration');
@@ -380,17 +396,20 @@
                     yardTrack8.textContent = json.Yard.Tracks[8];
                     yardTrack9.textContent = json.Yard.Tracks[9];
 
-                    actuatorPinSTOP.textContent   = json.Actuator.SwitchStop;
-                    actuatorPinLIMIT1.textContent = json.Actuator.SwitchLimit1;
-                    actuatorPinLIMIT2.textContent = json.Actuator.SwitchLimit2;
-                    actuatorLedMoving.textContent = json.Actuator.LedLimit;
-                    actuatorLedLimits.textContent = json.Actuator.LedStop;
-                    actuatorMoveSpeed.textContent = json.Actuator.MoveSpeed;
-                    actuatorRetract.textContent   = json.Actuator.Retract;
+                    actuatorPinSTOP.textContent    = json.Actuator.SwitchStop;
+                    actuatorPinLIMIT1.textContent  = json.Actuator.SwitchLimit1;
+                    actuatorPinLIMIT2.textContent  = json.Actuator.SwitchLimit2;
+                    actuatorLedRunning.textContent = json.Actuator.LedRunning;
+                    actuatorLedInLimit.textContent = json.Actuator.LedInLimit;
+                    actuatorLedAlarmOn.textContent = json.Actuator.LedAlarmOn;
+                    actuatorMoveSpeed.textContent  = json.Actuator.MoveSpeed;
+                    actuatorRetract.textContent    = json.Actuator.Retract;
+                    actuatorLength.textContent     = json.Actuator.Length;
 
                     stepperPinPUL.textContent              = json.Stepper.PinPUL;
                     stepperPinDIR.textContent              = json.Stepper.PinDIR;
                     stepperPinENA.textContent              = json.Stepper.PinENA;
+                    stepperPinALM.textContent              = json.Stepper.PinALM;
                     stepperMicroSteps.textContent          = json.Stepper.MicroSteps;
                     stepperMaxSpeed.textContent            = json.Stepper.MaxSpeed;
                     stepperAcceleration.textContent        = json.Stepper.Acceleration;

@@ -38,7 +38,6 @@ public:
     long  Target;           // The target position in steps. Positive is clockwise from the 0 position.
     long  StepsToGo;        // The remaining steps from the current position to the target position.
     float Position;         // The current motor position in mm.
-    float Length;           // The length of the linear actuator in mm.
     float Speed;            // The current speed in steps per second.
     float MaxSpeed;         // The currently configured maximum speed.
     float Acceleration;     // The currently configured acceleration/deceleration.

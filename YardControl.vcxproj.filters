@@ -69,6 +69,9 @@
     <None Include="data\www\js\dark-mode-switch.min.js">
       <Filter>Data Files\www\js</Filter>
     </None>
+    <None Include="data\www\css\custom-input-switch.css">
+      <Filter>Data Files\www\css</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="YardControl.ino" />

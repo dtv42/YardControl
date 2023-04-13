@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>12-4-2023 6:54 PM</modified>
+// <modified>13-4-2023 1:46 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 #include "AppSettings.h"
@@ -34,7 +34,6 @@ ActuatorInfo::ActuatorInfo()
     Target        = Actuator.getTarget();             // The target position in steps. Positive is clockwise from the 0 position.
     StepsToGo     = Actuator.getStepsToGo();          // The remaining steps from the current position to the target position.
     Position      = Actuator.getPosition();           // The current motor position in mm.
-    Length        = LinearActuator::ACTUATOR_LENGTH;  // The length of the linear actuator in mm.
     Speed         = Actuator.getSpeed();              // The current speed in steps per second.
     MaxSpeed      = Actuator.getMaxSpeed();           // The currently configured maximum speed.
     Acceleration  = Actuator.getAcceleration();       // The currently configured acceleration/deceleration.
@@ -59,7 +58,6 @@ String ActuatorInfo::toJsonString()
     _doc["Target"]          = Target;
     _doc["StepsToGo"]       = StepsToGo;
     _doc["Position"]        = Position;
-    _doc["Length"]          = Length;
     _doc["Speed"]           = Speed;
     _doc["MaxSpeed"]        = MaxSpeed;
     _doc["Acceleration"]    = Acceleration;
@@ -75,19 +73,18 @@ String ActuatorInfo::toJsonString()
 String ActuatorInfo::toString()
 {
     return String("Actuator Info:") + CRLF +
-                  "    IsCalibrated:  " + IsCalibrated + CRLF +
+                  "    IsCalibrated:  " + IsCalibrated  + CRLF +
                   "    IsCalibrating: " + IsCalibrating + CRLF +
-                  "    IsEnabled:     " + IsEnabled + CRLF +
-                  "    IsRunning:     " + IsRunning + CRLF +
-                  "    IsInLimit:     " + IsInLimit + CRLF +
-                  "    IsAlarmOn:     " + IsAlarmOn + CRLF +
-                  "    Steps:         " + Steps + CRLF +
-                  "    Target:        " + Target + CRLF +
-                  "    StepsToGo:     " + StepsToGo + CRLF +
-                  "    Position:      " + Position + CRLF +
-                  "    Length:        " + Length + CRLF +
-                  "    Speed:         " + Speed + CRLF +
-                  "    MaxSpeed:      " + MaxSpeed + CRLF +
-                  "    Acceleration:  " + Acceleration + CRLF +
+                  "    IsEnabled:     " + IsEnabled     + CRLF +
+                  "    IsRunning:     " + IsRunning     + CRLF +
+                  "    IsInLimit:     " + IsInLimit     + CRLF +
+                  "    IsAlarmOn:     " + IsAlarmOn     + CRLF +
+                  "    Steps:         " + Steps         + CRLF +
+                  "    Target:        " + Target        + CRLF +
+                  "    StepsToGo:     " + StepsToGo     + CRLF +
+                  "    Position:      " + Position      + CRLF +
+                  "    Speed:         " + Speed         + CRLF +
+                  "    MaxSpeed:      " + MaxSpeed      + CRLF +
+                  "    Acceleration:  " + Acceleration  + CRLF +
         CRLF;
 }

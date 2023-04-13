@@ -1086,13 +1086,14 @@ void setup()
 
     // Web server setup - GET file
     HttpServer.on("/", getRoot);
-    HttpServer.on("/about.html",                 getFile);
-    HttpServer.on("/index.html",                 getFile);
-    HttpServer.on("/info.html",                  getFile);
-    HttpServer.on("/settings.html",              getFile);
-    HttpServer.on("/favicon.ico",                getFile);
-    HttpServer.on("/css/dark-mode-switch.css",   getFile);
-    HttpServer.on("/js/dark-mode-switch.min.js", getFile);
+    HttpServer.on("/about.html",                  getFile);
+    HttpServer.on("/index.html",                  getFile);
+    HttpServer.on("/info.html",                   getFile);
+    HttpServer.on("/settings.html",               getFile);
+    HttpServer.on("/favicon.ico",                 getFile);
+    HttpServer.on("/css/custom-input-switch.css", getFile);
+    HttpServer.on("/css/dark-mode-switch.css",    getFile);
+    HttpServer.on("/js/dark-mode-switch.min.js",  getFile);
 
     // Download the application settings.
     HttpServer.on("/appsettings.json", getAppSettings);

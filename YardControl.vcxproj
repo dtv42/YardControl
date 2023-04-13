@@ -102,6 +102,7 @@
     <None Include=".onsaveconfig" />
     <None Include="data\appsettings.json" />
     <None Include="data\www\about.html" />
+    <None Include="data\www\css\custom-input-switch.css" />
     <None Include="data\www\css\dark-mode-switch.css" />
     <None Include="data\www\index.html" />
     <None Include="data\www\info.html" />

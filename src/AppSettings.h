@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>12-4-2023 7:59 PM</modified>
+// <modified>13-4-2023 1:43 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 #include <array>
@@ -70,6 +70,7 @@ public:
 
         float    MoveSpeed    = 100;            // Calibration speed to move toward limit.
         uint16_t Retract      = 1600;           // Retract distance when limit is hit (steps).
+        float    Length       = 500.0;          // Length of the linear actuator (mm).
 
         void fromJson(JsonObject json);         // Update from JSON representation.
         JsonObject toJson();                    // Get a JSON representation.

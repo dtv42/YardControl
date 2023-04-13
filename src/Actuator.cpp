@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>12-4-2023 6:56 PM</modified>
+// <modified>13-4-2023 1:36 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 #include <Arduino.h>
@@ -32,7 +32,8 @@ extern void alarmOffCallback(uint8_t pin);
 extern void switchOffCallback(uint8_t pin);
 
 /// <summary>
-/// Initialize the stepper instance. Register global callbacks, and setup debounce switches.
+/// Initialize the stepper instance using the application settings. 
+/// Register global callbacks, and setup debounce switches. Finally enable the outputs.
 /// </summary>
 void LinearActuator::init()
 {
@@ -54,6 +55,8 @@ void LinearActuator::init()
     _switchStop.setup  (Settings.Actuator.SwitchStop,   SWITCH_DEBOUNCE_DELAY, InputDebounce::PIM_INT_PULL_UP_RES);
     _switchLimit1.setup(Settings.Actuator.SwitchLimit1, SWITCH_DEBOUNCE_DELAY, InputDebounce::PIM_INT_PULL_UP_RES);
     _switchLimit2.setup(Settings.Actuator.SwitchLimit2, SWITCH_DEBOUNCE_DELAY, InputDebounce::PIM_INT_PULL_UP_RES);
+
+    _stepper.enableOutputs();
 }
 
 float LinearActuator::getSpeed()                        { return _stepper.speed(); }
