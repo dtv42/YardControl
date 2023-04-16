@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:44 PM</created>
-// <modified>11-4-2023 9:45 AM</modified>
+// <modified>16-4-2023 1:31 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -16,6 +16,7 @@
 #include <LittleFS.h>
 #include <WebServer.h>
 #include <Blinkenlight.h>
+#include <InputDebounce.h>
 
 #include <map>
 
@@ -59,6 +60,12 @@ TelnetServer Telnet;
 
 // Create the (global) commands instance.
 CommandsClass Commands;
+
+// Create debounced inputs.
+InputDebounce StepperAlarm;                 // Stepper alarm input .
+InputDebounce SwitchStop;                   // Emergency stop switch input.
+InputDebounce SwitchLimit1;                 // Limit switch 1 (calibration).
+InputDebounce SwitchLimit2;                 // Limit switch 2 (end of actuator).
 
 #pragma endregion
 
@@ -961,6 +968,20 @@ void setup()
 
 #pragma endregion
 
+#pragma region Initialize Inputs
+
+    StepperAlarm.setup(Settings.Stepper.PinALM);
+    SwitchStop.  setup(Settings.Actuator.SwitchStop);
+    SwitchLimit1.setup(Settings.Actuator.SwitchLimit1);
+    SwitchLimit2.setup(Settings.Actuator.SwitchLimit2);
+
+    StepperAlarm.registerCallbacks(alarmOnCallback, alarmOffCallback, NULL, NULL);
+    SwitchStop.registerCallbacks(switchOnCallback, switchOffCallback, NULL, NULL);
+    SwitchLimit1.registerCallbacks(switchOnCallback, switchOffCallback, NULL, NULL);
+    SwitchLimit2.registerCallbacks(switchOnCallback, switchOffCallback, NULL, NULL);
+
+#pragma endregion
+
 #pragma region Initialize Actuator
 
     Actuator.init();
@@ -1179,9 +1200,15 @@ void setup()
 /// </summary>
 void loop()
 {
+    unsigned long now = millis();
+
     Led.update();
     Telnet.loop();
     Actuator.run();
+    StepperAlarm.process(now);
+    SwitchStop.process(now);
+    SwitchLimit1.process(now);
+    SwitchLimit2.process(now);
     HttpServer.handleClient();
 }
 

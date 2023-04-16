@@ -6,30 +6,24 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>13-4-2023 1:36 PM</modified>
+// <modified>16-4-2023 2:01 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 #include <Arduino.h>
+
+#include <ArduinoTrace.h>
 
 #include "Actuator.h"
 #include "Commands.h"
 #include "AppSettings.h"
 #include "TelnetServer.h"
 
-// Define the input switch debounce delay [ms].
-#define SWITCH_DEBOUNCE_DELAY 10
 #define CALIBRATION_TARGET -100
 
 // Externals (globals) and callback routines.
 extern AppSettings Settings;
 extern TelnetServer Telnet;
 extern CommandsClass Commands;
-
-extern void alarmOnCallback(uint8_t pin);
-extern void switchOnCallback(uint8_t pin);
-
-extern void alarmOffCallback(uint8_t pin);
-extern void switchOffCallback(uint8_t pin);
 
 /// <summary>
 /// Initialize the stepper instance using the application settings. 
@@ -46,15 +40,6 @@ void LinearActuator::init()
     _stepper.setDistancePerRotation(Settings.Stepper.DistancePerRotation);
     _stepper.setMinPulseWidth(Settings.Stepper.MinPulseWidth);
     _stepper.setPinsInverted(false, false, true);
-
-    _stepperAlarm.registerCallbacks(alarmOnCallback,  alarmOffCallback,  NULL, NULL);
-    _switchStop.registerCallbacks  (switchOnCallback, switchOffCallback, NULL, NULL);
-    _switchLimit1.registerCallbacks(switchOnCallback, switchOffCallback, NULL, NULL);
-    _switchLimit2.registerCallbacks(switchOnCallback, switchOffCallback, NULL, NULL);
-
-    _switchStop.setup  (Settings.Actuator.SwitchStop,   SWITCH_DEBOUNCE_DELAY, InputDebounce::PIM_INT_PULL_UP_RES);
-    _switchLimit1.setup(Settings.Actuator.SwitchLimit1, SWITCH_DEBOUNCE_DELAY, InputDebounce::PIM_INT_PULL_UP_RES);
-    _switchLimit2.setup(Settings.Actuator.SwitchLimit2, SWITCH_DEBOUNCE_DELAY, InputDebounce::PIM_INT_PULL_UP_RES);
 
     _stepper.enableOutputs();
 }

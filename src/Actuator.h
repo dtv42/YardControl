@@ -6,11 +6,10 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>12-4-2023 6:55 PM</modified>
+// <modified>16-4-2023 2:24 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 #include <Arduino.h>
-#include <InputDebounce.h>
 #include <AccelStepperWithDistance.h>
 
 /// <summary>
@@ -22,11 +21,6 @@ class LinearActuator
 {
 private:
     AccelStepperWithDistance _stepper;          // The stepper instance (AccelStepper).
-
-    InputDebounce _stepperAlarm;                // Stepper alarm input .
-    InputDebounce _switchStop;                  // Emergency stop switch input.
-    InputDebounce _switchLimit1;                // Limit switch 1 (calibration).
-    InputDebounce _switchLimit2;                // Limit switch 2 (end of actuator).
 
     bool _isCalibrating = false;                // Flag indicating that the calibration is running.
     bool _isCalibrated  = false;                // Flag indicating that the calibration was successful.
