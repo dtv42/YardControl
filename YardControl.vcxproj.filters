@@ -114,6 +114,9 @@
     <ClCompile Include="src\PicoPins.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\GpioInputs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="__vm\.YardControl.vsarduino.h">
@@ -165,6 +168,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\PicoPins.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GpioInputs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

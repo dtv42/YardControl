@@ -6,19 +6,16 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>11-4-2023 9:03 AM</modified>
+// <modified>17-4-2023 8:51 AM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
-#include <Arduino.h>
+#include "Defines.h"
+#include <ArduinoTrace.h>
 #include <StringSplitter.h>
 
 #include "TelnetServer.h"
 #include "Commands.h"
-#include "Defines.h"
 
-/// <summary>
-/// Telnet server to print the command results.
-/// </summary>
 extern TelnetServer Telnet;
 
 /// <summary>

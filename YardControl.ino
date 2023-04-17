@@ -12,6 +12,8 @@
 
 #pragma region Includes
 
+#include "src/Defines.h"
+
 #include <ArduinoTrace.h>
 #include <LittleFS.h>
 #include <WebServer.h>
@@ -27,10 +29,10 @@
 #include "src/ServerInfo.h"
 #include "src/TelnetServer.h"
 #include "src/ActuatorInfo.h"
+#include "src/GpioInputs.h"
 #include "src/Wireless.h"
 #include "src/Commands.h"
 #include "src/Actuator.h"
-#include "src/Defines.h"
 
 #pragma endregion
 
@@ -61,11 +63,8 @@ TelnetServer Telnet;
 // Create the (global) commands instance.
 CommandsClass Commands;
 
-// Create debounced inputs.
-InputDebounce StepperAlarm;                 // Stepper alarm input .
-InputDebounce SwitchStop;                   // Emergency stop switch input.
-InputDebounce SwitchLimit1;                 // Limit switch 1 (calibration).
-InputDebounce SwitchLimit2;                 // Limit switch 2 (end of actuator).
+// Create all (debounced) GPIO inputs.
+GpioInputs Inputs;
 
 #pragma endregion
 
@@ -862,54 +861,6 @@ void nop()
 
 #pragma endregion
 
-#pragma region Input Callbacks
-
-/// <summary>
-/// Callback triggered when the stepper alarm output goes HIGH.
-/// </summary>
-/// <param name="pin">The input pin number.</param>
-void alarmOnCallback(uint8_t pin)
-{
-    TRACE();
-    DUMP(pin);
-    Actuator.alarmOn(pin);
-}
-
-/// <summary>
-/// Callback triggered when the stepper alarm output goes LOW.
-/// </summary>
-/// <param name="pin">The input pin number.</param>
-void alarmOffCallback(uint8_t pin)
-{
-    TRACE();
-    DUMP(pin);
-    Actuator.alarmOff(pin);
-}
-
-/// <summary>
-/// Callback triggered when the (debounced) switch is closed.
-/// </summary>
-/// <param name="pin">The input pin number.</param>
-void switchOnCallback(uint8_t pin)
-{
-    TRACE();
-    DUMP(pin);
-    Actuator.switchOn(pin);
-}
-
-/// <summary>
-/// Callback triggered when the (debounced) switch is opened.
-/// </summary>
-/// <param name="pin">The input pin number.</param>
-void switchOffCallback(uint8_t pin)
-{
-    TRACE();
-    DUMP(pin);
-    Actuator.switchOff(pin);
-}
-
-#pragma endregion
-
 #pragma region Setup
 
 /// <summary>
@@ -970,15 +921,7 @@ void setup()
 
 #pragma region Initialize Inputs
 
-    StepperAlarm.setup(Settings.Stepper.PinALM);
-    SwitchStop.  setup(Settings.Actuator.SwitchStop);
-    SwitchLimit1.setup(Settings.Actuator.SwitchLimit1);
-    SwitchLimit2.setup(Settings.Actuator.SwitchLimit2);
-
-    StepperAlarm.registerCallbacks(alarmOnCallback, alarmOffCallback, NULL, NULL);
-    SwitchStop.registerCallbacks(switchOnCallback, switchOffCallback, NULL, NULL);
-    SwitchLimit1.registerCallbacks(switchOnCallback, switchOffCallback, NULL, NULL);
-    SwitchLimit2.registerCallbacks(switchOnCallback, switchOffCallback, NULL, NULL);
+    Inputs.init();
 
 #pragma endregion
 
@@ -1200,15 +1143,10 @@ void setup()
 /// </summary>
 void loop()
 {
-    unsigned long now = millis();
-
     Led.update();
+    Inputs.run();
     Telnet.loop();
     Actuator.run();
-    StepperAlarm.process(now);
-    SwitchStop.process(now);
-    SwitchLimit1.process(now);
-    SwitchLimit2.process(now);
     HttpServer.handleClient();
 }
 
