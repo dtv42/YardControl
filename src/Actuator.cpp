@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>16-4-2023 2:01 PM</modified>
+// <modified>19-4-2023 5:48 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 #include <Arduino.h>
@@ -17,8 +17,6 @@
 #include "Commands.h"
 #include "AppSettings.h"
 #include "TelnetServer.h"
-
-#define CALIBRATION_TARGET -100
 
 // Externals (globals) and callback routines.
 extern AppSettings Settings;
@@ -139,15 +137,14 @@ void LinearActuator::switchOn(uint8_t pin)
         _isInLimit = true;
         _stepper.moveRelative(Settings.Actuator.Retract);
         _stepper.setSpeed(Settings.Actuator.MoveSpeed);
+        _stepper.runToPosition();
     }
     else if (pin == Settings.Actuator.SwitchLimit2)
     {
         _isInLimit = true;
         _stepper.moveRelative(-Settings.Actuator.Retract);
         _stepper.setSpeed(Settings.Actuator.MoveSpeed);
-        _stepper.runSpeed();
-        _stepper.setCurrentPosition(0);
-        _stepper.setSpeed(0);
+        _stepper.runToPosition();
     }
 }
 
@@ -188,10 +185,11 @@ void LinearActuator::switchOff(uint8_t pin)
 }
 
 /// <summary>
-/// Start the calibration routine by moving to a negative position.
+/// Start the calibration routine by moving to the maximum negative position (actuator length).
 /// </summary>
 void LinearActuator::calibrate()
 {
-    _stepper.moveToDistance(CALIBRATION_TARGET);
+    _stepper.moveToDistance(_stepper.getCurrentPositionDistance() - Settings.Actuator.Length);
+    _stepper.setSpeed(Settings.Actuator.MoveSpeed);
     _isCalibrating = true;
 }

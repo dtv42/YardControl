@@ -84,9 +84,6 @@
     <ClCompile Include="src\AppSettings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Commands.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\EscapeCodes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -115,6 +112,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\GpioInputs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CommandClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CommandFunctions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

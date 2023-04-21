@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:44 PM</created>
-// <modified>16-4-2023 1:31 PM</modified>
+// <modified>21-4-2023 3:42 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -14,13 +14,10 @@
 
 #include "src/Defines.h"
 
-#include <ArduinoTrace.h>
 #include <LittleFS.h>
 #include <WebServer.h>
 #include <Blinkenlight.h>
 #include <InputDebounce.h>
-
-#include <map>
 
 #include "src/AppSettings.h"
 #include "src/PicoPins.h"
@@ -51,6 +48,9 @@ AppSettings Settings;
 // The global input and output pins.
 GpioPins Pins;
 
+// Create all (debounced) GPIO inputs.
+GpioInputs Inputs;
+
 // Create the (global) actuator.
 LinearActuator Actuator;
 
@@ -62,9 +62,6 @@ TelnetServer Telnet;
 
 // Create the (global) commands instance.
 CommandsClass Commands;
-
-// Create all (debounced) GPIO inputs.
-GpioInputs Inputs;
 
 #pragma endregion
 
@@ -155,8 +152,6 @@ void receiveFile(String path, String content)
 /// </summary>
 void getRoot()
 {
-    TRACE();
-
     if (HttpServer.method() != HTTP_GET)
     {
         HttpServer.send(405, "text/plain", "Method Not Allowed");
@@ -172,9 +167,6 @@ void getRoot()
 /// </summary>
 void getFile()
 {
-    TRACE();
-    DUMP(HttpServer.uri());
-
     if (HttpServer.method() != HTTP_GET)
     {
         HttpServer.send(405, "text/plain", "Method Not Allowed");
@@ -190,7 +182,6 @@ void getFile()
 /// </summary>
 void getAppSettings()
 {
-    TRACE();
     sendFile(HttpServer.uri());
 }
 
@@ -199,9 +190,6 @@ void getAppSettings()
 /// </summary>
 void getInfo()
 {
-    TRACE();
-    DUMP(HttpServer.uri());
-
     if (HttpServer.method() != HTTP_GET)
     {
         HttpServer.send(405, "text/plain", "Method Not Allowed");
@@ -254,9 +242,6 @@ void getInfo()
 /// </summary>
 void postBaseCommand()
 {
-    TRACE();
-    DUMP(HttpServer.uri());
-
     if (HttpServer.method() != HTTP_POST)
     {
         HttpServer.send(405, "text/plain", "Method Not Allowed");
@@ -267,7 +252,7 @@ void postBaseCommand()
 
         if (Commands.isValidBaseCommand(command))
         {
-            Commands.run(command);
+            Commands.parse(command);
             HttpServer.send(200, "text/plain", "OK");
         }
         else
@@ -282,9 +267,6 @@ void postBaseCommand()
 /// </summary>
 void postIntegerCommand()
 {
-    TRACE();
-    DUMP(HttpServer.uri());
-
     if (HttpServer.method() != HTTP_POST)
     {
         HttpServer.send(405, "text/plain", "Method Not Allowed");
@@ -312,7 +294,7 @@ void postIntegerCommand()
                 if (Commands.isValidLongCommand(command))
                 {
                     command += " " + arg;
-                    Commands.run(command);
+                    Commands.parse(command);
                     HttpServer.send(200, "text/plain", "OK");
                 }
                 else
@@ -333,9 +315,6 @@ void postIntegerCommand()
 /// </summary>
 void postFloatCommand()
 {
-    TRACE();
-    DUMP(HttpServer.uri());
-
     if (HttpServer.method() != HTTP_POST)
     {
         HttpServer.send(405, "text/plain", "Method Not Allowed");
@@ -363,7 +342,7 @@ void postFloatCommand()
                 if (Commands.isValidFloatCommand(command))
                 {
                     command += " " + arg;
-                    Commands.run(command);
+                    Commands.parse(command);
                     HttpServer.send(200, "text/plain", "OK");
                 }
                 else
@@ -384,8 +363,6 @@ void postFloatCommand()
 /// </summary>
 void postSettings()
 {
-    TRACE();
-
     int n = HttpServer.args();
 
     if (n != 1)
@@ -404,8 +381,6 @@ void postSettings()
 /// </summary>
 void postReboot()
 {
-    TRACE();
-
     // We don't want to wait for a telnet response - rebooting immediately.
     Telnet.print("Rebooting...");
     Telnet.disconnectClient();
@@ -417,8 +392,6 @@ void postReboot()
 /// </summary>
 void notFound()
 {
-    TRACE();
-
     sendFile("/www/about.html");
 }
 
@@ -432,9 +405,6 @@ void notFound()
 /// <param name="ip">The IP address of the telnet client.</param>
 void onTelnetConnect(String ip)
 {
-    TRACE();
-    DUMP(ip);
-
     Telnet.println(HEADER);
     Telnet.println(COPYRIGHT);
     Telnet.println();
@@ -448,8 +418,6 @@ void onTelnetConnect(String ip)
 /// <param name="ip">The IP address of the telnet client.</param>
 void onTelnetDisconnect(String ip)
 {
-    TRACE();
-    DUMP(ip);
 }
 
 /// <summary>
@@ -458,8 +426,6 @@ void onTelnetDisconnect(String ip)
 /// <param name="ip">The IP address of the telnet client.</param>
 void onTelnetReconnect(String ip)
 {
-    TRACE();
-    DUMP(ip);
 }
 
 /// <summary>
@@ -468,8 +434,6 @@ void onTelnetReconnect(String ip)
 /// <param name="ip">The IP address of the telnet client.</param>
 void onTelnetConnectionAttempt(String ip)
 {
-    TRACE();
-    DUMP(ip);
 }
 
 /// <summary>
@@ -478,385 +442,8 @@ void onTelnetConnectionAttempt(String ip)
 /// <param name="str">The input string.</param>
 void onTelnetInput(String str)
 {
-    TRACE();
-    DUMP(str);
-    Commands.run(str);
+    Commands.parse(str);
     Telnet.print(Settings.Telnet.Prompt);
-}
-
-#pragma endregion
-
-#pragma region Command Callbacks
-
-/// <summary>
-/// Print the actuator info.
-/// </summary>
-void status()
-{
-    TRACE();
-    ActuatorInfo info;
-    Commands.JsonOutput ? Telnet.print(info.toJsonString()) : Telnet.print(info.toString());
-}
-
-/// <summary>
-/// Print the current position.
-/// </summary>
-void position()
-{
-    TRACE();
-    Telnet.println(String("position: ") + Actuator.getPosition());
-}
-
-/// <summary>
-/// Move a single step forward (relative).
-/// </summary>
-void plus()
-{
-    TRACE();
-    Actuator.moveRelative(1);
-}
-
-/// <summary>
-/// Move a single step backward (relative).
-/// </summary>
-void minus()
-{
-    TRACE();
-    Actuator.moveRelative(-1);
-}
-
-/// <summary>
-/// Move a small distance [mm] forward (relative).
-/// </summary>
-void forward()
-{
-    TRACE();
-    Actuator.moveRelativeDistance(0.1);
-}
-
-/// <summary>
-/// Move a small distance [mm] backward (relative).
-/// </summary>
-void backward()
-{
-    TRACE();
-    Actuator.moveRelativeDistance(-0.1);
-}
-
-/// <summary>
-/// Run the calibration routine.
-/// </summary>
-void calibrate()
-{
-    TRACE();
-    Actuator.calibrate();
-}
-
-/// <summary>
-/// Enable the stepper motor outputs.
-/// </summary>
-void enable()
-{
-    TRACE();
-    Actuator.enable();
-}
-
-/// <summary>
-/// Disable the stepper motor outputs.
-/// </summary>
-void disable()
-{
-    TRACE();
-    Actuator.disable();
-}
-
-/// <summary>
-/// Stop the stepper motor (immediately).
-/// </summary>
-void stop()
-{
-    TRACE();
-    Actuator.stop();
-}
-
-/// <summary>
-/// Release the stepper motor from stop.
-/// </summary>
-void release()
-{
-    TRACE();
-    Actuator.release();
-}
-
-/// <summary>
-/// Reset the stepper motor position.
-/// </summary>
-void reset()
-{
-    TRACE();
-    Actuator.reset();
-}
-
-/// <summary>
-/// Move to home (zero).
-/// </summary>
-void home()
-{
-    TRACE();
-    Actuator.home();
-}
-
-/// <summary>
-/// Print the GPIO pin states.
-/// </summary>
-void gpio()
-{
-    TRACE();
-    Commands.JsonOutput ? Telnet.print(Pins.toJsonString()) : Telnet.print(Pins.toString());
-}
-
-/// <summary>
-/// Print the current speed [steps per second].
-/// </summary>
-void speed()
-{
-    TRACE();
-    Telnet.print(Actuator.getSpeed());
-}
-
-/// <summary>
-/// Print the maximum speed [steps per second].
-/// </summary>
-void maxspeed()
-{
-    TRACE();
-    Telnet.print(Actuator.getMaxSpeed());
-}
-
-/// <summary>
-/// Print the acceleration [steps per second per second].
-/// </summary>
-void acceleration()
-{
-    TRACE();
-    Telnet.print(Actuator.getAcceleration());
-}
-
-/// <summary>
-/// Toggle the json flag (output format).
-/// </summary>
-void json()
-{
-    TRACE();
-    Commands.JsonOutput = !Commands.JsonOutput;
-}
-
-// Number command functions (callbacks).
-
-/// <summary>
-/// Move to absolute distance [mm].
-/// </summary>
-/// <param name="value">The position to be moved to.</param>
-void moveAbsoluteDistance(float value)
-{
-    TRACE();
-    DUMP(value);
-    Actuator.moveAbsoluteDistance(value);
-}
-
-/// <summary>
-/// Move a relative distance [mm].
-/// </summary>
-/// <param name="value">The distance to be moved.</param>
-void moveRelativeDistance(float value)
-{
-    TRACE();
-    DUMP(value);
-    Actuator.moveRelativeDistance(value);
-}
-
-/// <summary>
-/// Move to absolute distance [steps].
-/// </summary>
-/// <param name="value">The position to be moved to.</param>
-void moveAbsolute(long value)
-{
-    TRACE();
-    DUMP(value);
-    Actuator.moveAbsolute(value);
-}
-
-/// <summary>
-/// Move a relative distance [steps].
-/// </summary>
-/// <param name="value">The steps to be moved.</param>
-void moveRelative(long value)
-{
-    TRACE();
-    DUMP(value);
-    Actuator.moveRelative(value);
-}
-
-/// <summary>
-/// Move to specified track.
-/// </summary>
-/// <param name="value">The track number.</param>
-void moveToTrack(long value)
-{
-    TRACE();
-    DUMP(value);
-
-    if (value >= 0 && value < Settings.Yard.Tracks.size())
-        Actuator.moveAbsolute(Settings.Yard.Tracks[value]);
-}
-
-/// <summary>
-/// Set the current speed [steps per second].
-/// </summary>
-/// <param name="value">The new speed value.</param>
-void speed(float value)
-{
-    TRACE();
-    DUMP(value);
-    Actuator.setSpeed(value);
-}
-
-/// <summary>
-/// Set the maximum speed [steps per second].
-/// </summary>
-/// <param name="value">The new maximum speed value.</param>
-void maxspeed(float value)
-{
-    TRACE();
-    DUMP(value);
-    Actuator.setMaxSpeed(value);
-}
-
-/// <summary>
-/// Set the acceleration [steps per second per second].
-/// </summary>
-/// <param name="value">The new acceleration value.</param>
-void acceleration(float value)
-{
-    TRACE();
-    DUMP(value);
-    Actuator.setAcceleration(value);
-}
-
-// Basic command functions (callbacks).
-
-/// <summary>
-/// Print the Pico W pin layout.
-/// </summary>
-void pico()
-{
-    TRACE();
-    Telnet.print(PICO_W_GPIO);
-}
-
-/// <summary>
-/// Print the WiFi status information.
-/// </summary>
-void wifi()
-{
-    TRACE();
-    WiFiInfo info;
-    Commands.JsonOutput ? Telnet.print(info.toJsonString()) : Telnet.print(info.toString());
-}
-
-/// <summary>
-/// Print the system information.
-/// </summary>
-void system()
-{
-    TRACE();
-    SystemInfo info;
-    Commands.JsonOutput ? Telnet.print(info.toJsonString()) : Telnet.print(info.toString());
-}
-
-/// <summary>
-/// Print the server (Http, Telnet) info.
-/// </summary>
-void server()
-{
-    TRACE();
-    ServerInfo info;
-    Commands.JsonOutput ? Telnet.print(info.toJsonString()) : Telnet.print(info.toString());
-}
-
-/// <summary>
-/// Print the application settings.
-/// </summary>
-void settings()
-{
-    TRACE();
-    Commands.JsonOutput ? Telnet.print(Settings.toJsonString()) : Telnet.print(Settings.toString());
-}
-
-/// <summary>
-/// Reboot the system. This waits for a response (Telnet) for confirmation.
-/// </summary>
-void reboot()
-{
-    TRACE();
-
-    if (Commands.WaitForResponse)
-    {
-        Telnet.print("Rebooting...");
-        Telnet.disconnectClient();
-        rp2040.reboot();
-    }
-    else
-    {
-        Telnet.print("Do You really want to reboot (Y/N)? ");
-        Commands.WaitForResponse = true;
-    }
-}
-
-/// <summary>
-/// Prints the command help.
-/// </summary>
-void help()
-{
-    TRACE();
-    Telnet.print(Commands.help());
-}
-
-/// <summary>
-/// Quits the Telnet session. This waits for a response (Telnet) for confirmation.
-/// </summary>
-void quit()
-{
-    TRACE();
-
-    if (Commands.WaitForResponse)
-    {
-        Telnet.print("Bye...");
-        Telnet.disconnectClient();
-    }
-    else
-    {
-        Telnet.print("Do You really want to quit (Y/N)? ");
-        Commands.WaitForResponse = true;
-    }
-}
-
-/// <summary>
-/// Prints an error message.
-/// </summary>
-/// <param name="description">The error message to be displayed.</param>
-void error(String description)
-{
-    TRACE();
-    Telnet.println(description);
-}
-
-/// <summary>
-/// Does nothing.
-/// </summary>
-void nop()
-{
-    TRACE();
 }
 
 #pragma endregion
@@ -993,56 +580,6 @@ void setup()
         while (true)
             Led.update();
     }
-
-#pragma endregion
-
-#pragma region Initialize Commands
-
-    Serial.println("Initializing commands");
-    Commands.init(error, nop);
-
-    // Base Commands (no shortcut).
-    Commands.add(BaseCommand("pico",          "",  "Show Pico W pin layout.",                      pico));
-    Commands.add(BaseCommand("wifi",          "",  "Shows the WiFi information.",                  wifi));
-    Commands.add(BaseCommand("server",        "",  "Shows the server information.",                server));
-    Commands.add(BaseCommand("system",        "",  "Shows the system information.",                system));
-    Commands.add(BaseCommand("settings",      "",  "Shows the settings information.",              settings));
-    Commands.add(BaseCommand("reboot",        "",  "Reboots the RP2040.",                          reboot));
-    Commands.add(BaseCommand("reset",         "",  "Resets the current position to zero.",         reset));
-
-    Commands.add(BaseCommand("speed",         "",  "Gets the current speed (steps/(sec*sec)).",    speed));
-    Commands.add(BaseCommand("maxspeed",      "",  "Gets the maximum speed (steps/sec).",          maxspeed));
-    Commands.add(BaseCommand("acceleration",  "",  "Gets the acceleration (steps/(sec*sec)).",     acceleration));
-
-    // Base Commands (with shortcut).
-    Commands.add(BaseCommand("status",        "s", "Shows the current state of the motor driver.", status));
-    Commands.add(BaseCommand("position",      "p", "Shows the current position.",                  position));
-    Commands.add(BaseCommand("plus",          "+", "Moves a step forward.",                        plus));
-    Commands.add(BaseCommand("minus",         "-", "Moves a step backward.",                       minus));
-    Commands.add(BaseCommand("forward",       "f", "Moves a 0.1 mm distance forward.",             forward));
-    Commands.add(BaseCommand("backward",      "b", "Moves a 0.1 mm distance backward.",            backward));
-    Commands.add(BaseCommand("calibrate",     "c", "Run a calibration sequence.",                  calibrate));
-    Commands.add(BaseCommand("enable",        "e", "Enabling the output (after disable).",         enable));
-    Commands.add(BaseCommand("disable",       "d", "Stops the motor by disabling the output.",     disable));
-    Commands.add(BaseCommand("release",       "r", "Release the stopped motor.",                   release));
-    Commands.add(BaseCommand("stop",          "x", "Stops the running motor (decelerating).",      stop));
-    Commands.add(BaseCommand("home",          "h", "Moves to home position (position = 0).",       home));
-    Commands.add(BaseCommand("gpio",          "g", "Shows the GPIO input and output pin values.",  gpio));
-    Commands.add(BaseCommand("help",          "?", "Shows this help information.",                 help));
-    Commands.add(BaseCommand("quit",          "q", "Terminates the program.",                      quit));
-    Commands.add(BaseCommand("json",          "j", "Toggle JSON output.",                          json));
-
-    // Argument Commands (no shortcut).
-    Commands.add(FloatCommand("speed",        "",  "Sets the current speed. (steps/sec).",         speed));
-    Commands.add(FloatCommand("maxspeed",     "",  "Sets the maximum speed. (steps/sec).",         maxspeed));
-    Commands.add(FloatCommand("acceleration", "",  "Sets the acceleration (steps/(sec*sec)).",     acceleration));
-
-    // Argument Commands (with shortcut).
-    Commands.add(FloatCommand("moveto",       "a", "Moves to absolute position (mm).",             moveAbsoluteDistance));
-    Commands.add(FloatCommand("move",         "r", "Moves the number of mm (relative).",           moveRelativeDistance));    
-    Commands.add(LongCommand("stepto",        "m", "Moves to absolute position (steps).",          moveAbsolute));
-    Commands.add(LongCommand("step",          "s", "Moves the number of steps (relative).",        moveRelative));
-    Commands.add(LongCommand("track",         "t", "Moves to track number.",                       moveToTrack));
 
 #pragma endregion
 
