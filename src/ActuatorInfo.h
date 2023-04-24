@@ -9,6 +9,8 @@
 // <modified>12-4-2023 6:54 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
+#pragma once
+
 #include <Arduino.h>
 
 #include "AccelStepperWithDistance.h"

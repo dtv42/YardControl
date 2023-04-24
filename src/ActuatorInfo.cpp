@@ -12,7 +12,6 @@
 #include "AppSettings.h"
 #include "ActuatorInfo.h"
 #include "Actuator.h"
-#include "Defines.h"
 
 /// <summary>
 /// Used for initialization of the actuator info.
@@ -72,19 +71,19 @@ String ActuatorInfo::toJsonString()
 /// <returns>The printable string.</returns>
 String ActuatorInfo::toString()
 {
-    return String("Actuator Info:") + CRLF +
-                  "    IsCalibrated:  " + IsCalibrated  + CRLF +
-                  "    IsCalibrating: " + IsCalibrating + CRLF +
-                  "    IsEnabled:     " + IsEnabled     + CRLF +
-                  "    IsRunning:     " + IsRunning     + CRLF +
-                  "    IsInLimit:     " + IsInLimit     + CRLF +
-                  "    IsAlarmOn:     " + IsAlarmOn     + CRLF +
-                  "    Steps:         " + Steps         + CRLF +
-                  "    Target:        " + Target        + CRLF +
-                  "    StepsToGo:     " + StepsToGo     + CRLF +
-                  "    Position:      " + Position      + CRLF +
-                  "    Speed:         " + Speed         + CRLF +
-                  "    MaxSpeed:      " + MaxSpeed      + CRLF +
-                  "    Acceleration:  " + Acceleration  + CRLF +
-        CRLF;
+    return String("Actuator Info:") + "\r\n" +
+                  "    IsCalibrated:  " + IsCalibrated  + "\r\n" +
+                  "    IsCalibrating: " + IsCalibrating + "\r\n" +
+                  "    IsEnabled:     " + IsEnabled     + "\r\n" +
+                  "    IsRunning:     " + IsRunning     + "\r\n" +
+                  "    IsInLimit:     " + IsInLimit     + "\r\n" +
+                  "    IsAlarmOn:     " + IsAlarmOn     + "\r\n" +
+                  "    Steps:         " + Steps         + "\r\n" +
+                  "    Target:        " + Target        + "\r\n" +
+                  "    StepsToGo:     " + StepsToGo     + "\r\n" +
+                  "    Position:      " + Position      + "\r\n" +
+                  "    Speed:         " + Speed         + "\r\n" +
+                  "    MaxSpeed:      " + MaxSpeed      + "\r\n" +
+                  "    Acceleration:  " + Acceleration  + "\r\n" +
+        "\r\n";
 }

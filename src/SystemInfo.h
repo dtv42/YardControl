@@ -9,6 +9,8 @@
 // <modified>10-4-2023 10:29 AM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
+#pragma once
+
 #include <Arduino.h>
 
 #define ARDIUNOJSON_TAB "    "

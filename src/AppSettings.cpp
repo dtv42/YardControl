@@ -12,7 +12,6 @@
 #include <StringSplitter.h>
 
 #include "AppSettings.h"
-#include "Defines.h"
 
 /// <summary>
 /// Used for printing error messages when reading or writing the settings file.
@@ -103,17 +102,17 @@ JsonObject AppSettings::YardSettings::toJson()
 /// <returns>The printable string.</returns>
 String AppSettings::YardSettings::toString()
 {
-    return String("Yard:") + CRLF +
-                  "    Track 0: " + Tracks[0] + CRLF +
-                  "    Track 1: " + Tracks[1] + CRLF +
-                  "    Track 2: " + Tracks[2] + CRLF +
-                  "    Track 3: " + Tracks[3] + CRLF +
-                  "    Track 4: " + Tracks[4] + CRLF +
-                  "    Track 5: " + Tracks[5] + CRLF +
-                  "    Track 6: " + Tracks[6] + CRLF +
-                  "    Track 7: " + Tracks[7] + CRLF +
-                  "    Track 8: " + Tracks[8] + CRLF +
-                  "    Track 9: " + Tracks[9] + CRLF;
+    return String("Yard:") + "\r\n" +
+                  "    Track 0: " + Tracks[0] + "\r\n" +
+                  "    Track 1: " + Tracks[1] + "\r\n" +
+                  "    Track 2: " + Tracks[2] + "\r\n" +
+                  "    Track 3: " + Tracks[3] + "\r\n" +
+                  "    Track 4: " + Tracks[4] + "\r\n" +
+                  "    Track 5: " + Tracks[5] + "\r\n" +
+                  "    Track 6: " + Tracks[6] + "\r\n" +
+                  "    Track 7: " + Tracks[7] + "\r\n" +
+                  "    Track 8: " + Tracks[8] + "\r\n" +
+                  "    Track 9: " + Tracks[9] + "\r\n";
 }
 
 /// <summary>
@@ -166,16 +165,16 @@ JsonObject AppSettings::ActuatorSettings::toJson()
 /// <returns>The printable string.</returns>
 String AppSettings::ActuatorSettings::toString()
 {
-    return String("Actuator:") + CRLF +
-                  "    SwitchLimit1: " + SwitchLimit1 + CRLF +
-                  "    SwitchLimit1: " + SwitchLimit2 + CRLF +
-                  "    SwitchStop:   " + SwitchStop   + CRLF +
-                  "    LedRunning:   " + LedRunning   + CRLF +
-                  "    LedInLimit:   " + LedInLimit   + CRLF +
-                  "    LedAlarmOn:   " + LedAlarmOn   + CRLF +
-                  "    MoveSpeed:    " + MoveSpeed    + CRLF +
-                  "    Retract:      " + Retract      + CRLF +
-                  "    Length:       " + Length       + CRLF;
+    return String("Actuator:") + "\r\n" +
+                  "    SwitchLimit1: " + SwitchLimit1 + "\r\n" +
+                  "    SwitchLimit1: " + SwitchLimit2 + "\r\n" +
+                  "    SwitchStop:   " + SwitchStop   + "\r\n" +
+                  "    LedRunning:   " + LedRunning   + "\r\n" +
+                  "    LedInLimit:   " + LedInLimit   + "\r\n" +
+                  "    LedAlarmOn:   " + LedAlarmOn   + "\r\n" +
+                  "    MoveSpeed:    " + MoveSpeed    + "\r\n" +
+                  "    Retract:      " + Retract      + "\r\n" +
+                  "    Length:       " + Length       + "\r\n";
 }
 
 /// <summary>
@@ -226,17 +225,17 @@ JsonObject AppSettings::StepperSettings::toJson()
 /// <returns>The printable string.</returns>
 String AppSettings::StepperSettings::toString()
 {
-    return String("Stepper:") + CRLF +
-                  "    PinPUL:              " + PinPUL              + CRLF +
-                  "    PinDIR:              " + PinDIR              + CRLF +
-                  "    PinENA:              " + PinENA              + CRLF +
-                  "    PinALM:              " + PinALM              + CRLF +
-                  "    MicroSteps:          " + MicroSteps          + CRLF +
-                  "    MaxSpeed:            " + MaxSpeed            + CRLF +
-                  "    Acceleration:        " + Acceleration        + CRLF +
-                  "    StepsPerRotation:    " + StepsPerRotation    + CRLF +
-                  "    DistancePerRotation: " + DistancePerRotation + CRLF +
-                  "    MinPulseWidth:       " + MinPulseWidth       + CRLF;
+    return String("Stepper:") + "\r\n" +
+                  "    PinPUL:              " + PinPUL              + "\r\n" +
+                  "    PinDIR:              " + PinDIR              + "\r\n" +
+                  "    PinENA:              " + PinENA              + "\r\n" +
+                  "    PinALM:              " + PinALM              + "\r\n" +
+                  "    MicroSteps:          " + MicroSteps          + "\r\n" +
+                  "    MaxSpeed:            " + MaxSpeed            + "\r\n" +
+                  "    Acceleration:        " + Acceleration        + "\r\n" +
+                  "    StepsPerRotation:    " + StepsPerRotation    + "\r\n" +
+                  "    DistancePerRotation: " + DistancePerRotation + "\r\n" +
+                  "    MinPulseWidth:       " + MinPulseWidth       + "\r\n";
 }
 
 /// <summary>
@@ -269,8 +268,8 @@ JsonObject AppSettings::HttpSettings::toJson()
 /// <returns>The printable string.</returns>
 String AppSettings::HttpSettings::toString()
 {
-    return String("Http:") + CRLF +
-                  "    Port:   " + Port + CRLF;
+    return String("Http:") + "\r\n" +
+                  "    Port:   " + Port + "\r\n";
 }
 
 /// <summary>
@@ -305,9 +304,9 @@ JsonObject AppSettings::TelnetSettings::toJson()
 /// <returns>The printable string.</returns>
 String AppSettings::TelnetSettings::toString()
 {
-    return String("Telnet:") + CRLF +
-                  "    Port:   " + Port + CRLF +
-                  "    Prompt: " + Prompt + CRLF;
+    return String("Telnet:") + "\r\n" +
+                  "    Port:   " + Port + "\r\n" +
+                  "    Prompt: " + Prompt + "\r\n";
 }
 
 /// <summary>
@@ -354,15 +353,15 @@ JsonObject AppSettings::WiFiSettings::toJson()
 /// <returns>The printable string.</returns>
 String AppSettings::WiFiSettings::toString()
 {
-    return String("WiFi:") + CRLF +
-                  "    DHCP:     " + ((DHCP == 1) ? "true" : "false") + CRLF +
-                  "    SSID:     " + SSID     + CRLF +
-                  "    Password: " + Password + CRLF +
-                  "    Hostname: " + Hostname + CRLF +
-                  "    Address:  " + Address  + CRLF +
-                  "    Gateway:  " + Gateway  + CRLF + 
-                  "    Subnet:   " + Subnet   + CRLF +
-                  "    DNS:      " + DNS      + CRLF;
+    return String("WiFi:") + "\r\n" +
+                  "    DHCP:     " + ((DHCP == 1) ? "true" : "false") + "\r\n" +
+                  "    SSID:     " + SSID     + "\r\n" +
+                  "    Password: " + Password + "\r\n" +
+                  "    Hostname: " + Hostname + "\r\n" +
+                  "    Address:  " + Address  + "\r\n" +
+                  "    Gateway:  " + Gateway  + "\r\n" + 
+                  "    Subnet:   " + Subnet   + "\r\n" +
+                  "    DNS:      " + DNS      + "\r\n";
 }
 
 /// <summary>
@@ -399,10 +398,10 @@ JsonObject AppSettings::APSettings::toJson()
 /// <returns>The printable string.</returns>
 String AppSettings::APSettings::toString()
 {
-    return String("AP :") + CRLF +
-                    "    SSID:     " + SSID     + CRLF +
-                    "    Password: " + Password + CRLF +
-                    "    Hostname: " + Hostname + CRLF;
+    return String("AP :") + "\r\n" +
+                    "    SSID:     " + SSID     + "\r\n" +
+                    "    Password: " + Password + "\r\n" +
+                    "    Hostname: " + Hostname + "\r\n";
 }
 
 /// <summary>

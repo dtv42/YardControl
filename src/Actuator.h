@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>16-4-2023 2:24 PM</modified>
+// <modified>24-4-2023 10:53 AM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 #include <Arduino.h>
@@ -22,6 +22,7 @@ class LinearActuator
 private:
     AccelStepperWithDistance _stepper;          // The stepper instance (AccelStepper).
 
+    bool _constantSpeed = false;                // Flag indicating that no speed calculation is done.
     bool _isCalibrating = false;                // Flag indicating that the calibration is running.
     bool _isCalibrated  = false;                // Flag indicating that the calibration was successful.
     bool _isInLimit = false;                    // Flag indicating that the stepper has hit a limit switch.

@@ -6,11 +6,12 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>21-4-2023 2:30 PM</modified>
+// <modified>24-4-2023 6:40 AM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
+#pragma once
 
-#pragma Region Command Callbacks
+#pragma region Command Callbacks
 
 void nop();                     // The NOP command /just print the prompt.
 void json();                    // Toggles the output (print) mode.

@@ -209,6 +209,22 @@
                 });
         }
 
+        // Helper function to send PUT request with no data.
+        async function putRequest(url) {
+            await fetch(host + url, { method: "PUT" })
+                .then((response) => {
+                    if (!response.ok)
+                        throw new Error('PUT ' + url + ' => ' + response.statusText);
+                    else
+                        Online = true;
+                })
+                .catch((error) => {
+                    message.innerText = "Error: Unable to PUT " + url;
+                    toast.show();
+                    Online = false;
+                });
+        }
+
         function onoff() {
             if (onoffSwitch.checked) {
                 postRequest("/enable");
@@ -224,7 +240,7 @@
                 toast.show();
             }
             else {
-                postRequest("/track?number=" + t);
+                putRequest("/track?number=" + t);
                 updateDisplay();
             }
         }
@@ -242,7 +258,7 @@
                 toast.show();
             }
             else {
-                postRequest("/move?value=" + value);
+                putRequest("/move?value=" + value);
                 updateDisplay();
             }
         }

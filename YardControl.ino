@@ -6,13 +6,19 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:44 PM</created>
-// <modified>21-4-2023 3:42 PM</modified>
+// <modified>24-4-2023 10:41 AM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
+#if !(defined(ARDUINO_RASPBERRY_PI_PICO_W))
+#error For RASPBERRY_PI_PICO_W only
+#endif
+
+// Disable all traces when set to 0.
+#define ARDUINOTRACE_ENABLE 1
 
 #pragma region Includes
 
-#include "src/Defines.h"
+#include <ArduinoTrace.h>
 
 #include <LittleFS.h>
 #include <WebServer.h>
@@ -65,338 +71,6 @@ CommandsClass Commands;
 
 #pragma endregion
 
-#pragma region Http Helper
-
-/// <summary>
-/// Stream a file to the Http client. The Mime type is set based on the file extension. 
-/// </summary>
-/// <param name="path">The path of the file.</param>
-void sendFile(String path)
-{
-    String mime = "application/octet-stream";
-
-    if (path.endsWith(".html"))
-    {
-        mime = "text/html";
-    }
-    else if (path.endsWith(".css"))
-    {
-        mime = "text/css";
-    }
-    else if (path.endsWith(".js"))
-    {
-        mime = "application/javascript";
-    }
-    else if (path.endsWith(".json"))
-    {
-        mime = "application/json";
-    }
-    else if (path.endsWith(".ico"))
-    {
-        mime = "image/x-icon";
-    }
-
-    if (LittleFS.exists(path))
-    {
-        File file = LittleFS.open(path, "r");
-
-        if (!file)
-        {
-            HttpServer.send(500, "text/plain", String("Error opening file ") + path + ".");
-        }
-        else
-        {
-            HttpServer.setContentLength(file.size());
-            HttpServer.streamFile(file, mime);
-        }
-
-        file.close();
-    }
-    else
-    {
-        HttpServer.send(404, "text/plain", String("File ") + path + " not found");
-    }
-}
-
-/// <summary>
-/// Recieves a file (string content) and writes to the file system.
-/// Note this works for small files only.
-/// </summary>
-/// <param name="path">The path of the file.</param>
-/// <param name="content">The file content (string).</param>
-void receiveFile(String path, String content)
-{
-    File file = LittleFS.open(path, "w");
-
-    if (!file)
-    {
-        HttpServer.send(500, "text/plain", String("Error opening file ") + path + ".");
-    }
-    else
-    {
-        if (file.print(content))
-        {
-            HttpServer.send(200, "text/plain", "OK");
-        }
-        else
-        {
-            HttpServer.send(500, "text/plain", String("Saving file to ") + path + " failed.");
-        }
-    }
-
-    file.close();
-}
-
-/// <summary>
-/// Return the default file ('index.html').
-/// </summary>
-void getRoot()
-{
-    if (HttpServer.method() != HTTP_GET)
-    {
-        HttpServer.send(405, "text/plain", "Method Not Allowed");
-    }
-    else
-    {
-        sendFile("/www/index.html");
-    }
-}
-
-/// <summary>
-/// Returns requested file (uri).
-/// </summary>
-void getFile()
-{
-    if (HttpServer.method() != HTTP_GET)
-    {
-        HttpServer.send(405, "text/plain", "Method Not Allowed");
-    }
-    else
-    {
-        sendFile(String("/www") + HttpServer.uri());
-    }
-}
-
-/// <summary>
-/// Returns the application settings file ('appsettings.json').
-/// </summary>
-void getAppSettings()
-{
-    sendFile(HttpServer.uri());
-}
-
-/// <summary>
-/// Returns a JSON representation of various info items.
-/// </summary>
-void getInfo()
-{
-    if (HttpServer.method() != HTTP_GET)
-    {
-        HttpServer.send(405, "text/plain", "Method Not Allowed");
-    }
-    else
-    {
-        String json;
-        String info = HttpServer.uri().substring(1);
-
-        if (info == "settings")
-        {
-            json = Settings.toJsonString();
-        }
-        else if (info == "system")
-        {
-            SystemInfo systemInfo;
-            json = systemInfo.toJsonString();
-        }
-        else if (info == "server")
-        {
-            ServerInfo serverInfo;
-            json = serverInfo.toJsonString();
-        }
-        else if (info == "status")
-        {
-            ActuatorInfo actuatorInfo;
-            json = actuatorInfo.toJsonString();
-        }
-        else if (info == "wifi")
-        {
-            WiFiInfo wifiInfo;
-            json = wifiInfo.toJsonString();
-        }
-        else if (info == "gpio")
-        {
-            json = Pins.toJsonString();
-        }
-        else
-        {
-            HttpServer.send(500, "text/plain", "Could not find the info");
-            return;
-        }
-
-        HttpServer.send(200, "application/json", json);
-    }
-}
-
-/// <summary>
-/// Execute basic command (no arguments).
-/// </summary>
-void postBaseCommand()
-{
-    if (HttpServer.method() != HTTP_POST)
-    {
-        HttpServer.send(405, "text/plain", "Method Not Allowed");
-    }
-    else
-    {
-        String command = HttpServer.uri().substring(1);
-
-        if (Commands.isValidBaseCommand(command))
-        {
-            Commands.parse(command);
-            HttpServer.send(200, "text/plain", "OK");
-        }
-        else
-        {
-            HttpServer.send(404, "text/plain", String("Command ") + command + " not found");
-        }
-    }
-}
-
-/// <summary>
-/// Execute integer command (one integer argument).
-/// </summary>
-void postIntegerCommand()
-{
-    if (HttpServer.method() != HTTP_POST)
-    {
-        HttpServer.send(405, "text/plain", "Method Not Allowed");
-    }
-    else
-    {
-        int n = HttpServer.args();
-
-        if (n == 0)
-        {
-            HttpServer.send(400, "text/plain", "A single argument expected");
-        }
-        if (n > 1)
-        {
-            HttpServer.send(400, "text/plain", "Only one argument expected");
-        }
-        else
-        {
-            String arg = HttpServer.arg(0);
-
-            if (Commands.isInteger(arg))
-            {
-                String command = HttpServer.uri().substring(1);
-
-                if (Commands.isValidLongCommand(command))
-                {
-                    command += " " + arg;
-                    Commands.parse(command);
-                    HttpServer.send(200, "text/plain", "OK");
-                }
-                else
-                {
-                    HttpServer.send(404, "text/plain", String("Command ") + command + " not found");
-                }
-            }
-            else
-            {
-                HttpServer.send(400, "text/plain", String("Argument ") + arg + " not a valid integer");
-            }
-        }
-    }
-}
-
-/// <summary>
-/// Execute float command (one float argument).
-/// </summary>
-void postFloatCommand()
-{
-    if (HttpServer.method() != HTTP_POST)
-    {
-        HttpServer.send(405, "text/plain", "Method Not Allowed");
-    }
-    else
-    {
-        int n = HttpServer.args();
-
-        if (n == 0)
-        {
-            HttpServer.send(400, "text/plain", "A single argument expected");
-        }
-        if (n > 1)
-        {
-            HttpServer.send(400, "text/plain", "Only one argument expected");
-        }
-        else
-        {
-            String arg = HttpServer.arg(0);
-
-            if (Commands.isFloat(arg))
-            {
-                String command = HttpServer.uri().substring(1);
-
-                if (Commands.isValidFloatCommand(command))
-                {
-                    command += " " + arg;
-                    Commands.parse(command);
-                    HttpServer.send(200, "text/plain", "OK");
-                }
-                else
-                {
-                    HttpServer.send(404, "text/plain", String("Command ") + command + " not found");
-                }
-            }
-            else
-            {
-                HttpServer.send(400, "text/plain", String("Argument ") + arg + " not a valid number");
-            }
-        }
-    }
-}
-
-/// <summary>
-/// Receive the application settings file ('appsettings.json').
-/// </summary>
-void postSettings()
-{
-    int n = HttpServer.args();
-
-    if (n != 1)
-    {
-        HttpServer.send(400, "text/plain", "A file content (JSON) was expected.");
-    }
-    else
-    {
-        String arg = HttpServer.arg(0);
-        receiveFile(HttpServer.uri(), arg);
-    }
-}
-
-/// <summary>
-/// Reboot the system.
-/// </summary>
-void postReboot()
-{
-    // We don't want to wait for a telnet response - rebooting immediately.
-    Telnet.print("Rebooting...");
-    Telnet.disconnectClient();
-    rp2040.reboot();
-}
-
-/// <summary>
-/// Not found handler (returns the about page).
-/// </summary>
-void notFound()
-{
-    sendFile("/www/about.html");
-}
-
-#pragma endregion
-
 #pragma region Telnet Events
 
 /// <summary>
@@ -405,6 +79,8 @@ void notFound()
 /// <param name="ip">The IP address of the telnet client.</param>
 void onTelnetConnect(String ip)
 {
+    TRACE(); DUMP(ip);
+
     Telnet.println(HEADER);
     Telnet.println(COPYRIGHT);
     Telnet.println();
@@ -418,6 +94,7 @@ void onTelnetConnect(String ip)
 /// <param name="ip">The IP address of the telnet client.</param>
 void onTelnetDisconnect(String ip)
 {
+    TRACE(); DUMP(ip);
 }
 
 /// <summary>
@@ -426,6 +103,7 @@ void onTelnetDisconnect(String ip)
 /// <param name="ip">The IP address of the telnet client.</param>
 void onTelnetReconnect(String ip)
 {
+    TRACE(); DUMP(ip);
 }
 
 /// <summary>
@@ -434,6 +112,7 @@ void onTelnetReconnect(String ip)
 /// <param name="ip">The IP address of the telnet client.</param>
 void onTelnetConnectionAttempt(String ip)
 {
+    TRACE(); DUMP(ip);
 }
 
 /// <summary>
@@ -460,8 +139,8 @@ void setup()
 
 #pragma region Initialize Serial
 
-    // Initialize serial and wait for port to open (if on USB).
-    Serial.begin(SERIAL_SPEED);
+    // Initialize serial - default baudrate is 115200 (and wait for port to open if on USB).
+    Serial.begin();
     // while (!Serial) { delay(10); }
     delay(1000);
 
@@ -620,15 +299,15 @@ void setup()
     HttpServer.on("/release",   postBaseCommand);
     HttpServer.on("/reboot",    postReboot);
 
-    // Web server setup - POST commands with argument
-    HttpServer.on("/step",         postIntegerCommand);
-    HttpServer.on("/move",         postFloatCommand);
-    HttpServer.on("/stepto",       postIntegerCommand);
-    HttpServer.on("/moveto",       postFloatCommand);
-    HttpServer.on("/track",        postIntegerCommand);
-    HttpServer.on("/speed",        postFloatCommand);
-    HttpServer.on("/maxspeed",     postFloatCommand);
-    HttpServer.on("/acceleration", postFloatCommand);
+    // Web server setup - PUT commands with argument
+    HttpServer.on("/step",         putIntegerCommand);
+    HttpServer.on("/move",         putFloatCommand);
+    HttpServer.on("/stepto",       putIntegerCommand);
+    HttpServer.on("/moveto",       putFloatCommand);
+    HttpServer.on("/track",        putIntegerCommand);
+    HttpServer.on("/speed",        putFloatCommand);
+    HttpServer.on("/maxspeed",     putFloatCommand);
+    HttpServer.on("/acceleration", putFloatCommand);
 
     // Upload the application settings.
     HttpServer.on("/appsettings.json", postSettings);

@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>19-4-2023 5:48 PM</modified>
+// <modified>24-4-2023 10:56 AM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 #include <Arduino.h>
@@ -76,7 +76,7 @@ void LinearActuator::run()
     digitalWrite(Settings.Actuator.LedRunning, _stepper.isRunning() ? HIGH : LOW);
     digitalWrite(Settings.Actuator.LedInLimit, _isInLimit ? HIGH : LOW);
     digitalWrite(Settings.Actuator.LedAlarmOn, _isAlarmOn ? HIGH : LOW);
-    _isCalibrating ? _stepper.runSpeed() : _stepper.run();
+    _constantSpeed ? _stepper.runSpeed() : _stepper.run();
 }
 
 /// <summary>
@@ -135,16 +135,16 @@ void LinearActuator::switchOn(uint8_t pin)
     else if (pin == Settings.Actuator.SwitchLimit1)
     {
         _isInLimit = true;
-        _stepper.moveRelative(Settings.Actuator.Retract);
+        _constantSpeed = true;
         _stepper.setSpeed(Settings.Actuator.MoveSpeed);
-        _stepper.runToPosition();
+        _stepper.moveRelative(Settings.Actuator.Retract);
     }
     else if (pin == Settings.Actuator.SwitchLimit2)
     {
         _isInLimit = true;
-        _stepper.moveRelative(-Settings.Actuator.Retract);
+        _constantSpeed = true;
         _stepper.setSpeed(Settings.Actuator.MoveSpeed);
-        _stepper.runToPosition();
+        _stepper.moveRelative(-Settings.Actuator.Retract);
     }
 }
 
@@ -153,6 +153,8 @@ void LinearActuator::switchOn(uint8_t pin)
 /// </summary>
 void LinearActuator::switchOff(uint8_t pin)
 {
+    _constantSpeed = false;
+
     if (pin == Settings.Actuator.SwitchStop)
     {
         // Do nothing. Release stop has to be triggered through Http or Telnet.
@@ -185,11 +187,12 @@ void LinearActuator::switchOff(uint8_t pin)
 }
 
 /// <summary>
-/// Start the calibration routine by moving to the maximum negative position (actuator length).
+/// Start the calibration routine by moving a large negative position (actuator length).
 /// </summary>
 void LinearActuator::calibrate()
 {
-    _stepper.moveToDistance(_stepper.getCurrentPositionDistance() - Settings.Actuator.Length);
+    _stepper.moveRelative(Settings.Actuator.Length);
     _stepper.setSpeed(Settings.Actuator.MoveSpeed);
     _isCalibrating = true;
+    _constantSpeed = true;
 }

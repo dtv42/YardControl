@@ -6,9 +6,11 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>13-4-2023 1:43 PM</modified>
+// <modified>24-4-2023 6:28 AM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
+#pragma once
+
 #include <array>
 
 #include <LittleFS.h>

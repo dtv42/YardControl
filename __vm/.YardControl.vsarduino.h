@@ -18,5 +18,7 @@
 #include <picow_digital.cpp> 
 #include <picow_init.cpp> 
 #include "..\YardControl.ino"
+#include "..\Commands.ino"
+#include "..\HttpHelper.ino"
 #endif
 #endif

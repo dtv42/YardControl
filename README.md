@@ -175,14 +175,14 @@ The main module gets the settings, connects to an wlan access point, creates the
    6. Get UTC time using NTP.
    7. Initialize the Commands.
    8. Set up all commands (name, callback).
-   9. Setup the HTTP GET requests.
-   10. Setup the HTTP POST requests.
+   9. Setup the HTTP requests.
    11. Setup the telnet callbacks.
    12. Start the web server.
    13. Start the telnet server.
 3.  Enter loop().
     1.  Update Led.
     2.  Update Telnet.
+    3.  Update Inputs.
     3.  Update Actuator.
     4.  Update Http Server.
 
@@ -366,6 +366,12 @@ Also an extension to Bootstrap to switch between light and dark theme is used (s
 The web server is used to implement the web interface for the stepper test app. The REST based API is used by the web pages to request settings, current data, and system information. The GET requests can also be used to integrate the sensors into other applications. All provided REST requests returns data in JSON format.
 
 ### REST API's
+The following list summarizes the conventions adopted by the RESTful implementation.
+
+   - GET&nbsp;&ensp;&ensp;&emsp;Retrieves the current status, information, or settings.
+   - PUT&nbsp;&ensp;&ensp;&emsp;Modifies some data (speed, position, etc.).
+   - POST&nbsp;&ensp;&emsp;Updates settings or execute commands.
+   - DELETE&emsp;Not used.
 
 | GET Request       | Description                                           |
 |-------------------|-------------------------------------------------------|
@@ -392,6 +398,9 @@ The web server is used to implement the web interface for the stepper test app. 
 | /stop	            | Stops the stepper motor.                              |
 | /release          | Relase the stopped motor.                             |
 | /reboot	        | Reboots the machine.                                  |
+
+| PUT Request       | Description                                           |
+|-------------------|-------------------------------------------------------|
 | /step	            | Move the number of steps (relative).                  |
 | /move	            | Move the number of mm (relative).                     |
 | /stepto	        | Move to absolute position (steps).                    |

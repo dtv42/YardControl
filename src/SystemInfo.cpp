@@ -13,7 +13,6 @@
 
 #include "SystemInfo.h"
 #include "Version.h"
-#include "Defines.h"
 
 /// <summary>
 ///  Using the global RP2040 instance to get the actual data.
@@ -64,15 +63,15 @@ String SystemInfo::toJsonString()
 /// <returns>The printable string.</returns>
 String SystemInfo::toString()
 {
-	return String("System Info:") + CRLF +
-	              "    SystemTime: " + SystemTime + CRLF +
-	              "    Software:   " + Software   + CRLF +
-	              "    BoardInfo:  " + BoardInfo  + CRLF +
-	              "    BoardID:    " + BoardID    + CRLF +
-	              "    BoardTemp:  " + BoardTemp  + CRLF +
-	              "    CpuFreqMHz: " + CpuFreqMHz + CRLF +
-	              "    HeapSize:   " + HeapSize   + CRLF +
-	              "    FreeHeap:   " + FreeHeap   + CRLF +
-	              "    UsedHeap:   " + UsedHeap   + CRLF +
-                  CRLF;
+	return String("System Info:") + "\r\n" +
+	              "    SystemTime: " + SystemTime + "\r\n" +
+	              "    Software:   " + Software   + "\r\n" +
+	              "    BoardInfo:  " + BoardInfo  + "\r\n" +
+	              "    BoardID:    " + BoardID    + "\r\n" +
+	              "    BoardTemp:  " + BoardTemp  + "\r\n" +
+	              "    CpuFreqMHz: " + CpuFreqMHz + "\r\n" +
+	              "    HeapSize:   " + HeapSize   + "\r\n" +
+	              "    FreeHeap:   " + FreeHeap   + "\r\n" +
+	              "    UsedHeap:   " + UsedHeap   + "\r\n" +
+                  "\r\n";
 }

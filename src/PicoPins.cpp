@@ -11,8 +11,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 #include "PicoPins.h"
 
-#define CRLF "\r\n"
-
 /// <summary>
 /// Initializes the pin fields. A default name is used if no name was specified.
 /// The GPIO pin is initialized with the specified pin mode.
@@ -193,7 +191,7 @@ String GpioPins::toJsonString()
 /// <returns>The printable string.</returns>
 String GpioPins::toString()
 {
-    String result = String("GPIO State:") + CRLF;
+    String result = String("GPIO State:") + "\r\n";
     int length = 0;
 
     // Find the maximum name length for all (registered) GPIO pins.
@@ -257,7 +255,7 @@ String GpioPins::toString()
             name2   = String("[ ") + _padTo("", length) + " ]";
         }
 
-        result = result + name1 + status1 + mode1 + PICO_W_PINS[row] + mode2 + status2 + name2 + CRLF;
+        result = result + name1 + status1 + mode1 + PICO_W_PINS[row] + mode2 + status2 + name2 + "\r\n";
     }
 
     return result;

@@ -13,7 +13,6 @@
 
 #include "AppSettings.h"
 #include "ServerInfo.h"
-#include "Defines.h"
 
 extern AppSettings Settings;
 
@@ -75,12 +74,12 @@ String ServerInfo::toJsonString()
 /// </summary>
 String ServerInfo::toString()
 {
-	return String("TCP Server Info:") + CRLF +
-	              "    Address: " + Address + CRLF +
-	              "    Name:    " + Name    + CRLF +
-	              "    Mode:    " + Mode    + CRLF +
-	              "    Port:    " + Port    + CRLF +
-                  "    Telnet:  " + Telnet  + CRLF +
-	              "    Prompt:  " + Prompt  + CRLF +
-                  CRLF;
+	return String("TCP Server Info:") + "\r\n" +
+	              "    Address: " + Address + "\r\n" +
+	              "    Name:    " + Name    + "\r\n" +
+	              "    Mode:    " + Mode    + "\r\n" +
+	              "    Port:    " + Port    + "\r\n" +
+                  "    Telnet:  " + Telnet  + "\r\n" +
+	              "    Prompt:  " + Prompt  + "\r\n" +
+                  "\r\n";
 }

@@ -1,32 +1,30 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CommandFunctions.cpp" company="DTV-Online">
+// <copyright file="Commands.ino" company="DTV-Online">
 //   Copyright (c) 2023 Dr. Peter Trimmel. All rights reserved.
 // </copyright>
 // <license>
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>21-4-2023 12:56 PM</created>
-// <modified>21-4-2023 2:06 PM</modified>
+// <modified>24-4-2023 10:41 AM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
-#include <Arduino.h>
+#define ARDUINOTRACE_ENABLE 1
 
-#include "Commands.h"
-#include "AppSettings.h"
-#include "TelnetServer.h"
-#include "ActuatorInfo.h"
-#include "ServerInfo.h"
-#include "SystemInfo.h"
-#include "WiFiInfo.h"
-#include "Actuator.h"
-#include "PicoPins.h"
-#include "GpioInputs.h"
+#include <ArduinoTrace.h>
 
-extern AppSettings Settings;
-extern TelnetServer Telnet;
-extern CommandsClass Commands;
-extern LinearActuator Actuator;
-extern GpioPins Pins;
+#include "src/AppSettings.h"
+#include "src/TelnetServer.h"
+#include "src/Actuator.h"
+#include "src/GpioInputs.h"
+
+#include "src/ActuatorInfo.h"
+#include "src/ServerInfo.h"
+#include "src/SystemInfo.h"
+#include "src/WiFiInfo.h"
+#include "src/PicoPins.h"
+
+#include "src/Commands.h"
 
 #pragma region Standard Callbacks
 
@@ -35,17 +33,24 @@ extern GpioPins Pins;
 /// </summary>
 void json()
 {
+    TRACE();
     if (Commands.VerboseOutput) Telnet.println("json()");
     Commands.JsonOutput = !Commands.JsonOutput;
 }
 
+/// <summary>
+/// The quit command waits for a response
+/// </summary>
 void quit()
 {
+    TRACE();
+
     if (Commands.VerboseOutput) Telnet.println("quit()");
 
     if (Commands.WaitForResponse)
     {
         Telnet.println("Bye...");
+        Telnet.disconnectClient();
     }
     else
     {
@@ -59,6 +64,7 @@ void quit()
 /// </summary>
 void help()
 {
+    TRACE();
     if (Commands.VerboseOutput) Telnet.println("help()");
     Telnet.println(Commands.getHelp());
 }
@@ -68,6 +74,7 @@ void help()
 /// </summary>
 void verbose()
 {
+    TRACE();
     if (Commands.VerboseOutput) Telnet.println("verbose()");
     Commands.VerboseOutput = !Commands.VerboseOutput;
 }
@@ -78,6 +85,7 @@ void verbose()
 /// <param name="message">The error message to be displayed.</param>
 void error(String message)
 {
+    TRACE();
     if (Commands.VerboseOutput) Telnet.println(String("error(") + message + ")");
     Telnet.println(message);
 }
@@ -99,6 +107,7 @@ void nop()
 /// </summary>
 void status()
 {
+    TRACE();
     if (Commands.VerboseOutput) Telnet.println("status()");
     ActuatorInfo info;
     Commands.JsonOutput ? Telnet.print(info.toJsonString()) : Telnet.print(info.toString());
@@ -109,6 +118,7 @@ void status()
 /// </summary>
 void position()
 {
+    TRACE();
     if (Commands.VerboseOutput) Telnet.println("position()");
     Telnet.println(String("position: ") + Actuator.getPosition());
 }
@@ -118,6 +128,7 @@ void position()
 /// </summary>
 void plus()
 {
+    TRACE();
     if (Commands.VerboseOutput) Telnet.println("plus()");
     Actuator.moveRelative(1);
 }
@@ -127,6 +138,7 @@ void plus()
 /// </summary>
 void minus()
 {
+    TRACE();
     if (Commands.VerboseOutput) Telnet.println("minus()");
     Actuator.moveRelative(-1);
 }
@@ -136,6 +148,7 @@ void minus()
 /// </summary>
 void forward()
 {
+    TRACE();
     if (Commands.VerboseOutput) Telnet.println("forward()");
     Actuator.moveRelativeDistance(0.1);
 }
@@ -145,6 +158,7 @@ void forward()
 /// </summary>
 void backward()
 {
+    TRACE();
     if (Commands.VerboseOutput) Telnet.println("backward()");
     Actuator.moveRelativeDistance(-0.1);
 }
@@ -154,6 +168,7 @@ void backward()
 /// </summary>
 void calibrate()
 {
+    TRACE();
     if (Commands.VerboseOutput) Telnet.println("calibrate()");
     Actuator.calibrate();
 }
@@ -163,6 +178,7 @@ void calibrate()
 /// </summary>
 void enable()
 {
+    TRACE();
     if (Commands.VerboseOutput) Telnet.println("enable()");
     Actuator.enable();
 }
@@ -172,6 +188,7 @@ void enable()
 /// </summary>
 void disable()
 {
+    TRACE();
     if (Commands.VerboseOutput) Telnet.println("disable()");
     Actuator.disable();
 }
@@ -181,6 +198,7 @@ void disable()
 /// </summary>
 void stop()
 {
+    TRACE();
     if (Commands.VerboseOutput) Telnet.println("stop()");
     Actuator.stop();
 }
@@ -190,6 +208,7 @@ void stop()
 /// </summary>
 void release()
 {
+    TRACE();
     if (Commands.VerboseOutput) Telnet.println("release()");
     Actuator.release();
 }
@@ -199,6 +218,7 @@ void release()
 /// </summary>
 void reset()
 {
+    TRACE();
     if (Commands.VerboseOutput) Telnet.println("reset()");
     Actuator.reset();
 }
@@ -208,6 +228,7 @@ void reset()
 /// </summary>
 void home()
 {
+    TRACE();
     if (Commands.VerboseOutput) Telnet.println("home()");
     Actuator.home();
 }
@@ -217,6 +238,7 @@ void home()
 /// </summary>
 void gpio()
 {
+    TRACE();
     if (Commands.VerboseOutput) Telnet.println("gpio()");
     Commands.JsonOutput ? Telnet.print(Pins.toJsonString()) : Telnet.print(Pins.toString());
 }
@@ -226,6 +248,7 @@ void gpio()
 /// </summary>
 void speed()
 {
+    TRACE();
     if (Commands.VerboseOutput) Telnet.println("speed()");
     Telnet.print(Actuator.getSpeed());
 }
@@ -235,6 +258,7 @@ void speed()
 /// </summary>
 void maxspeed()
 {
+    TRACE();
     if (Commands.VerboseOutput) Telnet.println("maxspeed()");
     Telnet.print(Actuator.getMaxSpeed());
 }
@@ -244,6 +268,7 @@ void maxspeed()
 /// </summary>
 void acceleration()
 {
+    TRACE();
     if (Commands.VerboseOutput) Telnet.println("acceleration()");
     Telnet.print(Actuator.getAcceleration());
 }
@@ -256,6 +281,7 @@ void acceleration()
 /// <param name="value">The position to be moved to.</param>
 void moveAbsoluteDistance(float value)
 {
+    TRACE(); DUMP(value);
     if (Commands.VerboseOutput) Telnet.println(String("moveAbsoluteDistance(") + value + ")");
     Actuator.moveAbsoluteDistance(value);
 }
@@ -266,6 +292,7 @@ void moveAbsoluteDistance(float value)
 /// <param name="value">The distance to be moved.</param>
 void moveRelativeDistance(float value)
 {
+    TRACE(); DUMP(value);
     if (Commands.VerboseOutput) Telnet.println(String("moveRelativeDistance(") + value + ")");
     Actuator.moveRelativeDistance(value);
 }
@@ -276,6 +303,7 @@ void moveRelativeDistance(float value)
 /// <param name="value">The position to be moved to.</param>
 void moveAbsolute(long value)
 {
+    TRACE(); DUMP(value);
     if (Commands.VerboseOutput) Telnet.println(String("moveAbsolute(") + value + ")");
     Actuator.moveAbsolute(value);
 }
@@ -286,6 +314,7 @@ void moveAbsolute(long value)
 /// <param name="value">The steps to be moved.</param>
 void moveRelative(long value)
 {
+    TRACE(); DUMP(value);
     if (Commands.VerboseOutput) Telnet.println(String("moveRelative(") + value + ")");
     Actuator.moveRelative(value);
 }
@@ -296,6 +325,7 @@ void moveRelative(long value)
 /// <param name="value">The track number.</param>
 void moveToTrack(long value)
 {
+    TRACE(); DUMP(value);
     if (Commands.VerboseOutput) Telnet.println(String("moveToTrack(") + value + ")");
     if (value >= 0 && value < Settings.Yard.Tracks.size())
         Actuator.moveAbsolute(Settings.Yard.Tracks[value]);
@@ -307,6 +337,7 @@ void moveToTrack(long value)
 /// <param name="value">The new speed value.</param>
 void speed(float value)
 {
+    TRACE(); DUMP(value);
     if (Commands.VerboseOutput) Telnet.println(String("speed(") + value + ")");
     Actuator.setSpeed(value);
 }
@@ -317,6 +348,7 @@ void speed(float value)
 /// <param name="value">The new maximum speed value.</param>
 void maxspeed(float value)
 {
+    TRACE(); DUMP(value);
     if (Commands.VerboseOutput) Telnet.println(String("maxspeed(") + value + ")");
     Actuator.setMaxSpeed(value);
 }
@@ -327,6 +359,7 @@ void maxspeed(float value)
 /// <param name="value">The new acceleration value.</param>
 void acceleration(float value)
 {
+    TRACE(); DUMP(value);
     if (Commands.VerboseOutput) Telnet.println(String("acceleration(") + value + ")");
     Actuator.setAcceleration(value);
 }
@@ -338,6 +371,7 @@ void acceleration(float value)
 /// </summary>
 void pico()
 {
+    TRACE();
     if (Commands.VerboseOutput) Telnet.println("pico()");
     Telnet.print(PICO_W_GPIO);
 }
@@ -347,6 +381,7 @@ void pico()
 /// </summary>
 void wifi()
 {
+    TRACE();
     if (Commands.VerboseOutput) Telnet.println("wifi()");
     WiFiInfo info;
     Commands.JsonOutput ? Telnet.print(info.toJsonString()) : Telnet.print(info.toString());
@@ -357,6 +392,7 @@ void wifi()
 /// </summary>
 void system()
 {
+    TRACE();
     if (Commands.VerboseOutput) Telnet.println("system()");
     SystemInfo info;
     Commands.JsonOutput ? Telnet.print(info.toJsonString()) : Telnet.print(info.toString());
@@ -367,6 +403,7 @@ void system()
 /// </summary>
 void server()
 {
+    TRACE();
     if (Commands.VerboseOutput) Telnet.println("server()");
     ServerInfo info;
     Commands.JsonOutput ? Telnet.print(info.toJsonString()) : Telnet.print(info.toString());
@@ -377,6 +414,7 @@ void server()
 /// </summary>
 void settings()
 {
+    TRACE();
     if (Commands.VerboseOutput) Telnet.println("settings()");
     Commands.JsonOutput ? Telnet.print(Settings.toJsonString()) : Telnet.print(Settings.toString());
 }
@@ -386,6 +424,7 @@ void settings()
 /// </summary>
 void reboot()
 {
+    TRACE();
     if (Commands.VerboseOutput) Telnet.println("reboot()");
 
     if (Commands.WaitForResponse)

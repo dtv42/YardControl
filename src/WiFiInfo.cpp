@@ -13,7 +13,6 @@
 #include <WiFi.h>
 
 #include "WiFiInfo.h"
-#include "Defines.h"
 
 /// <summary>
 ///  Using a WiFi instance to get the actual data.
@@ -105,7 +104,7 @@ String WiFiInfo::toJsonString()
         return json;
     }
     else {
-        return String("{}") + CRLF;
+        return String("{}") + "\r\n";
     }
 }
 
@@ -117,32 +116,32 @@ String WiFiInfo::toString()
 {
 	if (Mode == "AP")
 	{
-        return String("WiFi AP Info:") + CRLF +
-                      "    Version:  " + Version  + CRLF +
-                      "    Mode:     " + Mode     + CRLF +
-                      "    SSID:     " + SSID     + CRLF +
-                      "    Hostname: " + Hostname + CRLF +
-                      "    Address:  " + Address  + CRLF +
-                      "    Gateway:  " + Gateway  + CRLF +
-                      "    Subnet:   " + Subnet   + CRLF +
-                      "    MAC:      " + MAC      + CRLF +
-                      "    Clients:  " + Clients  + CRLF +
-                      CRLF;
+        return String("WiFi AP Info:") + "\r\n" +
+                      "    Version:  " + Version  + "\r\n" +
+                      "    Mode:     " + Mode     + "\r\n" +
+                      "    SSID:     " + SSID     + "\r\n" +
+                      "    Hostname: " + Hostname + "\r\n" +
+                      "    Address:  " + Address  + "\r\n" +
+                      "    Gateway:  " + Gateway  + "\r\n" +
+                      "    Subnet:   " + Subnet   + "\r\n" +
+                      "    MAC:      " + MAC      + "\r\n" +
+                      "    Clients:  " + Clients  + "\r\n" +
+                      "\r\n";
 	}
     else if (Mode == "STA")
     {
-        return String("WiFi Connection Info:") + CRLF +
-                      "    Version:  " + Version  + CRLF +
-                      "    Mode:     " + Mode     + CRLF +
-                      "    SSID:     " + SSID     + CRLF +
-                      "    Hostname: " + Hostname + CRLF +
-                      "    Address:  " + Address  + CRLF +
-                      "    Gateway:  " + Gateway  + CRLF +
-                      "    Subnet:   " + Subnet   + CRLF +
-                      "    DNS:      " + DNS      + CRLF +
-                      "    RSSI:     " + RSSI     + CRLF +
-                      "    MAC:      " + MAC      + CRLF +
-                      CRLF;
+        return String("WiFi Connection Info:") + "\r\n" +
+                      "    Version:  " + Version  + "\r\n" +
+                      "    Mode:     " + Mode     + "\r\n" +
+                      "    SSID:     " + SSID     + "\r\n" +
+                      "    Hostname: " + Hostname + "\r\n" +
+                      "    Address:  " + Address  + "\r\n" +
+                      "    Gateway:  " + Gateway  + "\r\n" +
+                      "    Subnet:   " + Subnet   + "\r\n" +
+                      "    DNS:      " + DNS      + "\r\n" +
+                      "    RSSI:     " + RSSI     + "\r\n" +
+                      "    MAC:      " + MAC      + "\r\n" +
+                      "\r\n";
     }
     else 
     {

@@ -9,9 +9,10 @@
 // <modified>17-4-2023 8:43 AM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
-#include "Defines.h"
-#include <ArduinoTrace.h>
+// Disable all traces when set to 0.
+#define ARDUINOTRACE_ENABLE 1
 
+#include <ArduinoTrace.h>
 #include "AppSettings.h"
 #include "Actuator.h"
 #include "GpioInputs.h"
@@ -27,8 +28,7 @@ extern LinearActuator Actuator;
 /// <param name="pin">The input pin number.</param>
 void alarmOnCallback(uint8_t pin)
 {
-    TRACE();
-    DUMP(pin);
+    TRACE(); DUMP(pin);
     Actuator.alarmOn(pin);
 }
 
@@ -38,8 +38,7 @@ void alarmOnCallback(uint8_t pin)
 /// <param name="pin">The input pin number.</param>
 void alarmOffCallback(uint8_t pin)
 {
-    TRACE();
-    DUMP(pin);
+    TRACE(); DUMP(pin);
     Actuator.alarmOff(pin);
 }
 
@@ -49,8 +48,7 @@ void alarmOffCallback(uint8_t pin)
 /// <param name="pin">The input pin number.</param>
 void switchOnCallback(uint8_t pin)
 {
-    TRACE();
-    DUMP(pin);
+    TRACE(); DUMP(pin);
     Actuator.switchOn(pin);
 }
 
@@ -60,8 +58,7 @@ void switchOnCallback(uint8_t pin)
 /// <param name="pin">The input pin number.</param>
 void switchOffCallback(uint8_t pin)
 {
-    TRACE();
-    DUMP(pin);
+    TRACE(); DUMP(pin);
     Actuator.switchOff(pin);
 }
 
@@ -69,6 +66,8 @@ void switchOffCallback(uint8_t pin)
 
 void GpioInputs::init()
 {
+    TRACE();
+
     StepperAlarm.setup(Settings.Stepper.PinALM);
     SwitchStop.setup(Settings.Actuator.SwitchStop);
     SwitchLimit1.setup(Settings.Actuator.SwitchLimit1);

@@ -9,9 +9,12 @@
 // <modified>21-4-2023 12:56 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
+// Disable all traces when set to 0.
+#define ARDUINOTRACE_ENABLE 1
+
+#include <ArduinoTrace.h>
 #include <StringSplitter.h>
 
-#include "Defines.h"
 #include "Commands.h"
 
 /// <summary>
@@ -38,6 +41,8 @@ String CommandsClass::_padTo(String str, const size_t num, const char paddingCha
 /// <returns>The command index.</returns>
 int CommandsClass::_findBaseCommandByShortcut(String shortcut)
 {
+    TRACE(); DUMP(shortcut);
+
     int index = -1;
     shortcut.toLowerCase();
 
@@ -60,6 +65,8 @@ int CommandsClass::_findBaseCommandByShortcut(String shortcut)
 /// <returns>The command index.</returns>
 int CommandsClass::_findBaseCommandByName(String name)
 {
+    TRACE(); DUMP(name);
+
     int index = -1;
     name.toLowerCase();
 
@@ -81,6 +88,8 @@ int CommandsClass::_findBaseCommandByName(String name)
 /// <param name="index">The command index.</param>
 void CommandsClass::_processBaseCommand(int index)
 {
+    TRACE(); DUMP(index);
+
     BaseCommand cmd = _baseCommands[index];
     _lastCommand = cmd;
 
@@ -95,6 +104,8 @@ void CommandsClass::_processBaseCommand(int index)
 /// <returns>The command index.</returns>
 int CommandsClass::_findLongCommandByShortcut(String shortcut)
 {
+    TRACE(); DUMP(shortcut);
+
     int index = -1;
     shortcut.toLowerCase();
 
@@ -117,6 +128,8 @@ int CommandsClass::_findLongCommandByShortcut(String shortcut)
 /// <returns>The command index.</returns>
 int CommandsClass::_findLongCommandByName(String name)
 {
+    TRACE(); DUMP(name);
+
     int index = -1;
     name.toLowerCase();
 
@@ -139,6 +152,8 @@ int CommandsClass::_findLongCommandByName(String name)
 /// <param name="arg">The command argument.</param>
 void CommandsClass::_processLongCommand(int index, String arg)
 {
+    TRACE(); DUMP(index); DUMP(arg);
+
     if (!isInteger(arg))
     {
         error(String("Provided argument '") + arg + "' not a valid integer number");
@@ -160,6 +175,8 @@ void CommandsClass::_processLongCommand(int index, String arg)
 /// <returns>The command index.</returns>
 int CommandsClass::_findFloatCommandByShortcut(String shortcut)
 {
+    TRACE(); DUMP(shortcut);
+
     int index = -1;
     shortcut.toLowerCase();
 
@@ -182,6 +199,8 @@ int CommandsClass::_findFloatCommandByShortcut(String shortcut)
 /// <returns>The command index.</returns>
 int CommandsClass::_findFloatCommandByName(String name)
 {
+    TRACE(); DUMP(name);
+
     int index = -1;
     name.toLowerCase();
 
@@ -204,6 +223,8 @@ int CommandsClass::_findFloatCommandByName(String name)
 /// <param name="arg">The command argument.</param>
 void CommandsClass::_processFloatCommand(int index, String arg)
 {
+    TRACE(); DUMP(index); DUMP(arg);
+
     if (!isFloat(arg))
     {
         error(String("Provided argument '") + arg + "' not a valid float number");
@@ -225,6 +246,8 @@ void CommandsClass::_processFloatCommand(int index, String arg)
 /// <param name="command"></param>
 void CommandsClass::parse(String command)
 {
+    TRACE(); DUMP(command);
+
     // Check for empty input.
     if (command.length() == 0)
     {
@@ -428,9 +451,9 @@ void CommandsClass::parse(String command)
 /// <returns>String containing the command help.</returns>
 String CommandsClass::getHelp()
 {
-    String help = String("Test Command:") + CRLF +
-        "Test routine for a simple commandline parser." + CRLF + CRLF +
-        "The following commands with no argument are available:" + CRLF + CRLF;
+    String help = String("Test Command:") + "\r\n" +
+        "Test routine for a simple commandline parser." + "\r\n" + "\r\n" +
+        "The following commands with no argument are available:" + "\r\n" + "\r\n";
 
     // Generate the help string for the available base commands (with shortcut).
     for (int i = 0; i < MAX_BASE_COMMANDS; ++i)
@@ -440,11 +463,11 @@ String CommandsClass::getHelp()
         if (command.Shortcut.length() > 0)
         {
             String padded = _padTo(command.Name, MAX_BASE_SHORTCUT_COMMAND_LENGTH);
-            help += String("    ") + command.Shortcut + " | " + padded + " - " + command.Description + CRLF;
+            help += String("    ") + command.Shortcut + " | " + padded + " - " + command.Description + "\r\n";
         }
     }
 
-    help += CRLF;
+    help += "\r\n";
 
     // Generate the help string for the available base commands (no shortcut).
     for (int i = 0; i < MAX_BASE_COMMANDS; ++i)
@@ -454,12 +477,12 @@ String CommandsClass::getHelp()
         if (command.Shortcut.length() == 0)
         {
             String padded = _padTo(command.Name, MAX_BASE_COMMAND_LENGTH);
-            help += String("    ") + padded + " - " + command.Description + CRLF;
+            help += String("    ") + padded + " - " + command.Description + "\r\n";
         }
     }
 
-    help += CRLF;
-    help += String("The following commands require an argument:") + CRLF + CRLF;
+    help += "\r\n";
+    help += String("The following commands require an argument:") + "\r\n" + "\r\n";
 
     // Generate the help string for the available integer commands (with shortcut).
     for (int i = 0; i < MAX_LONG_COMMANDS; ++i)
@@ -469,11 +492,11 @@ String CommandsClass::getHelp()
         if (command.Shortcut.length() > 0)
         {
             String padded = _padTo(command.Name, MAX_ARG1_SHORTCUT_COMMAND_LENGTH);
-            help += String("    ") + command.Shortcut + " | " + padded + " <integer> - " + command.Description + CRLF;
+            help += String("    ") + command.Shortcut + " | " + padded + " <integer> - " + command.Description + "\r\n";
         }
     }
 
-    help += CRLF;
+    help += "\r\n";
 
     // Generate the help string for the available number commands (with shortcut).
     for (int i = 0; i < MAX_FLOAT_COMMANDS; ++i)
@@ -483,11 +506,11 @@ String CommandsClass::getHelp()
         if (command.Shortcut.length() > 0)
         {
             String padded = _padTo(command.Name, MAX_ARG1_SHORTCUT_COMMAND_LENGTH);
-            help += String("    ") + command.Shortcut + " | " + padded + " <number>  - " + command.Description + CRLF;
+            help += String("    ") + command.Shortcut + " | " + padded + " <number>  - " + command.Description + "\r\n";
         }
     }
 
-    help += CRLF;
+    help += "\r\n";
 
     // Generate the help string for the available number commands (no shortcut).
     for (int i = 0; i < MAX_LONG_COMMANDS; ++i)
@@ -497,11 +520,11 @@ String CommandsClass::getHelp()
         if (command.Shortcut.length() == 0)
         {
             String padded = _padTo(command.Name, MAX_ARG1_COMMAND_LENGTH);
-            help += String("    ") + padded + " <integer> - " + command.Description + CRLF;
+            help += String("    ") + padded + " <integer> - " + command.Description + "\r\n";
         }
     }
 
-    help += CRLF;
+    help += "\r\n";
 
     // Generate the help string for the available number commands (no shortcut).
     for (int i = 0; i < MAX_FLOAT_COMMANDS; ++i)
@@ -511,7 +534,7 @@ String CommandsClass::getHelp()
         if (command.Shortcut.length() == 0)
         {
             String padded = _padTo(command.Name, MAX_ARG1_COMMAND_LENGTH);
-            help += String("    ") + padded + " <number>  - " + command.Description + CRLF;
+            help += String("    ") + padded + " <number>  - " + command.Description + "\r\n";
         }
     }
 

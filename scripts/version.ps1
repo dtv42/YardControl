@@ -15,24 +15,24 @@ $cmd = "gitversion.exe /output file /outputfile " + $json
 cmd /c $cmd
 $version = Get-Content -Path $json | ConvertFrom-Json
 
-$crlf = "`r`n"
+$"\r\n" = "`r`n"
 $file = Get-Content -Path $path
-$lines = $file -split $crlf
+$lines = $file -split $"\r\n"
 $header = ''
 
 # Get only the file header (12 lines up to #pragma)
 for ($i=0; $i -lt 12; $i++)
 {
-    $header += $lines[$i] + $crlf
+    $header += $lines[$i] + $"\r\n"
 }
 
 # Add the C++ code (static SOFTWARE_VERSION and LAST_MODIFIED_DATE)
-$code = $crlf +
-        "struct Auto" + $crlf +
-        "{" + $crlf +
-        "    static constexpr const char* const SOFTWARE_VERSION = `"V" + $($version.AssemblySemFileVer) + "-" + $($version.UncommittedChanges) + " " + $($version.CommitDate) + "`";" + $crlf + 
-        "    static constexpr const char* const LAST_MODIFIED_DATE = __DATE__;" + $crlf +
-        "};" + $crlf
+$code = $"\r\n" +
+        "struct Auto" + $"\r\n" +
+        "{" + $"\r\n" +
+        "    static constexpr const char* const SOFTWARE_VERSION = `"V" + $($version.AssemblySemFileVer) + "-" + $($version.UncommittedChanges) + " " + $($version.CommitDate) + "`";" + $"\r\n" + 
+        "    static constexpr const char* const LAST_MODIFIED_DATE = __DATE__;" + $"\r\n" +
+        "};" + $"\r\n"
 
 $content = $header + $code
 
