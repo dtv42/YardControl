@@ -310,7 +310,6 @@
         }
 
         // Various status data.
-        ConstantSpeed = false;
         Calibrating = false;
         Calibrated = false;
         Enabled = false;
@@ -322,9 +321,7 @@
         Target = 0;
         StepsToGo = 0;
         Position = 0.0;
-        Speed = 0.0;
-        MaxSpeed = 0.0;
-        Acceleration = 0.0;
+        Interval = 0;
 
         // Get the actuator status.
         async function getStatus() {
@@ -335,20 +332,16 @@
                     return response.json();
                 })
                 .then((json) => {
-                    ConstantSpeed = json.ConstantSpeed;
                     Calibrated    = json.CalibratedFlag; 
                     Calibrating   = json.CalibratingFlag;
                     Enabled       = json.EnabledFlag;    
                     Running       = json.RunningFlag;  
                     Limited       = json.LimitedFlag;  
                     Alarm         = json.AlarmFlag;
-                    Steps         = json.Steps;        
-                    Target        = json.Target;       
+                    Steps         = json.Steps;
                     StepsToGo     = json.StepsToGo;    
-                    Position      = json.Position;     
-                    Speed         = json.Speed;         
-                    MaxSpeed      = json.MaxSpeed;      
-                    Acceleration  = json.Acceleration;  
+                    Position      = json.Position;
+                    Interval      = json.Interval;
                     Online        = true;
                 })
                 .catch((error) => {

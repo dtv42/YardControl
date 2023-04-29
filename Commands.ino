@@ -6,10 +6,9 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>21-4-2023 12:56 PM</created>
-// <modified>25-4-2023 4:28 PM</modified>
+// <modified>29-4-2023 1:14 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
-
 #include "src/AppSettings.h"
 #include "src/TelnetServer.h"
 #include "src/Actuator.h"
@@ -201,16 +200,6 @@ void stop()
 }
 
 /// <summary>
-/// Release the stepper motor from stop.
-/// </summary>
-void release()
-{
-    TRACE();
-    if (Commands.VerboseOutput) Telnet.println("release()");
-    Actuator.release();
-}
-
-/// <summary>
 /// Reset the stepper motor position.
 /// </summary>
 void reset()
@@ -227,8 +216,7 @@ void save()
 {
     TRACE();
     if (Commands.VerboseOutput) Telnet.println("save()");
-    Settings.Stepper.MaxSpeed = Actuator.getMaxSpeed();
-    Settings.Stepper.Acceleration = Actuator.getAcceleration();
+    Settings.Stepper.Interval = Actuator.getInterval();
     Settings.save();
 }
 
@@ -253,43 +241,13 @@ void gpio()
 }
 
 /// <summary>
-/// Print the current speed [steps per second].
+/// Print the current timer interval [microsecond].
 /// </summary>
-void speed()
+void interval()
 {
     TRACE();
-    if (Commands.VerboseOutput) Telnet.println("speed()");
-    Telnet.println(String(Actuator.getSpeed()));
-}
-
-/// <summary>
-/// Print the maximum speed [steps per second].
-/// </summary>
-void maxspeed()
-{
-    TRACE();
-    if (Commands.VerboseOutput) Telnet.println("maxspeed()");
-    Telnet.println(String(Actuator.getMaxSpeed()));
-}
-
-/// <summary>
-/// Print the acceleration [steps per second per second].
-/// </summary>
-void acceleration()
-{
-    TRACE();
-    if (Commands.VerboseOutput) Telnet.println("acceleration()");
-    Telnet.println(String(Actuator.getAcceleration()));
-}
-
-/// <summary>
-/// Prints the minimum pulsewidth [microseconds].
-/// </summary>
-void pulsewidth()
-{
-    TRACE();
-    if (Commands.VerboseOutput) Telnet.println("pulsewidth()");
-    Telnet.println(String(Actuator.getPulseWidth()));
+    if (Commands.VerboseOutput) Telnet.println("interval()");
+    Telnet.println(String(Actuator.getInterval()));
 }
 
 /// <summary>
@@ -372,48 +330,14 @@ void moveToTrack(long value)
 }
 
 /// <summary>
-/// Set the current speed [steps per second].
+/// Set the timer interval [microseconds].
 /// </summary>
-/// <param name="value">The new speed value.</param>
-void speed(float value)
+/// <param name="value">The new interval value.</param>
+void interval(long value)
 {
     TRACE(); DUMP(value);
-    if (Commands.VerboseOutput) Telnet.println(String("speed(") + value + ")");
-    Actuator.setSpeed(value);
-}
-
-/// <summary>
-/// Set the maximum speed [steps per second].
-/// </summary>
-/// <param name="value">The new maximum speed value.</param>
-void maxspeed(float value)
-{
-    TRACE(); DUMP(value);
-    if (Commands.VerboseOutput) Telnet.println(String("maxspeed(") + value + ")");
-    Actuator.setMaxSpeed(value);
-}
-
-/// <summary>
-/// Set the acceleration [steps per second per second].
-/// </summary>
-/// <param name="value">The new acceleration value.</param>
-void acceleration(float value)
-{
-    TRACE(); DUMP(value);
-    if (Commands.VerboseOutput) Telnet.println(String("acceleration(") + value + ")");
-    Actuator.setAcceleration(value);
-}
-
-/// <summary>
-/// Sets the minimum pulsewidth [microseconds].
-/// </summary>
-/// <param name="value">The new pulse width.</param>
-void pulsewidth(long value)
-{
-    TRACE(); DUMP(value);
-    if (Commands.VerboseOutput) Telnet.println(String("pulsewidth(") + value + ")");
-    Settings.Stepper.MinPulseWidth = value;
-    Actuator.setPulseWidth(value);
+    if (Commands.VerboseOutput) Telnet.println(String("interval(") + value + ")");
+    Actuator.setInterval(value);
 }
 
 /// <summary>

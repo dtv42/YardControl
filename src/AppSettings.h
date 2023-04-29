@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>26-4-2023 7:30 AM</modified>
+// <modified>29-4-2023 9:46 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -72,7 +72,6 @@ public:
         uint8_t  LedInLimit   = 5;              // Led output pin number (limit hit).
         uint8_t  LedAlarmOn   = 6;              // Led output pin number (alarm on).
 
-        float    MoveSpeed    = 100;            // Calibration speed to move toward limit.
         float    Retract      = 5.0;            // Retract distance when limit is hit (mm).
         float    Length       = 500.0;          // Length of the linear actuator (mm).
 
@@ -92,19 +91,17 @@ public:
         uint8_t  PinDIR              = 1;       // The output pin number for driver DIR input (direction).
         uint8_t  PinENA              = 2;       // The output pin number for driver ENA input (enable).
         uint8_t  PinALM              = 3;       // The input pin number for driver ALM output (alarm).
-        uint8_t  MicroSteps          = 1;       // The multiplication factor for steps (max. 32).
-        float    MaxSpeed            = 1000.0;  // The desired maximum speed in steps per second. Must be > 0.
-        float    Acceleration        = 50.0;    // The acceleration in steps per second per second. Must be > 0.0.
+        uint32_t Interval            = 100;     // The timer interval in multiples of 10 microseconds.
+        uint8_t  MicroSteps          = 1;       // The multiplication factor for steps (microsteps).
         uint16_t StepsPerRotation    = 200;     // The number of steps per rotation (360°).
         float    DistancePerRotation = 1.0;     // The distance in mm per rotation (360°).
-        uint16_t MinPulseWidth       = 20;      // The minimum allowed pulse width.
 
         void fromJson(JsonObject json);         // Update from JSON representation.
         String toJsonString(); 	                // Get a serialized JSON representation.
         JsonObject toJson();                    // Get a JSON representation.
         String toString(); 	                    // Get a string representation.
     };
-
+    
     class HttpSettings
     {
     private:

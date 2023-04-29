@@ -6,11 +6,9 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>28-4-2023 8:57 PM</modified>
+// <modified>29-4-2023 9:43 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
-#include <Arduino.h>
-
 #include "Actuator.h"
 #include "Commands.h"
 #include "AppSettings.h"
@@ -20,6 +18,7 @@
 extern AppSettings Settings;
 extern TelnetServer Telnet;
 extern CommandsClass Commands;
+extern RPI_PICO_Timer Timer;
 
 /// <summary>
 /// Initialize the stepper instance using the application settings. 
@@ -27,60 +26,63 @@ extern CommandsClass Commands;
 /// </summary>
 void LinearActuator::init()
 {
-    _stepper = AccelStepperWithDistance(AccelStepper::DRIVER, Settings.Stepper.PinPUL, Settings.Stepper.PinDIR);
-    _stepper.setEnablePin(Settings.Stepper.PinENA);
-    _stepper.setMaxSpeed(Settings.Stepper.MaxSpeed);
-    _stepper.setAcceleration(Settings.Stepper.Acceleration);
-    _stepper.setStepsPerRotation(Settings.Stepper.StepsPerRotation);
-    _stepper.setDistancePerRotation(Settings.Stepper.DistancePerRotation);
-    _stepper.setPinsInverted(false, false, true);
+    _PUL = Settings.Stepper.PinPUL;
+    _DIR = Settings.Stepper.PinDIR;
+    _ENA = Settings.Stepper.PinENA;
 
-    setMicroSteps(Settings.Stepper.MicroSteps);
-    setPulseWidth(Settings.Stepper.MinPulseWidth);
+    _interval = Settings.Stepper.Interval;
+    _microsteps = Settings.Stepper.MicroSteps;
+    _stepsPerRotation = Settings.Stepper.StepsPerRotation;
+    _distancePerRotation = Settings.Stepper.DistancePerRotation;
 
-    _stepper.enableOutputs();
+    _position = 0;
+    _target = 0;
+    _count = 0;
 }
 
-float  LinearActuator::getSpeed()                        { return _stepper.speed(); }
-void   LinearActuator::setSpeed(float value)             { _stepper.setSpeed(value); }
-float  LinearActuator::getMaxSpeed()                     { return _stepper.maxSpeed(); }
-void   LinearActuator::setMaxSpeed(float value)          { _stepper.setMaxSpeed(value); }
-float  LinearActuator::getAcceleration()                 { return _stepper.acceleration(); }
-void   LinearActuator::setAcceleration(float value)      { _stepper.setAcceleration(value); }
-ushort LinearActuator::getPulseWidth()                   { return _pulsewidth;}
-void   LinearActuator::setPulseWidth(ushort value)       { _stepper.setMinPulseWidth(value); _pulsewidth = value; }
-ushort LinearActuator::getMicroSteps()                   { return _microsteps; }
-void   LinearActuator::setMicroSteps(ushort value)       { _stepper.setMicroStep(value); _microsteps = value;}
-long   LinearActuator::getSteps()                        { return _stepper.currentPosition(); }
-long   LinearActuator::getTarget()                       { return _stepper.targetPosition(); }
-long   LinearActuator::getStepsToGo()                    { return _stepper.distanceToGo(); }
-float  LinearActuator::getPosition()                     { return _stepper.getCurrentPositionDistance(); }
-bool   LinearActuator::getEnabledFlag()                  { return digitalRead(Settings.Stepper.PinENA) == LOW; }
-bool   LinearActuator::getRunningFlag()                  { return _stepper.isRunning(); }
-bool   LinearActuator::getLimitFlag()                    { return _getLimitFlag; }
-bool   LinearActuator::getAlarmFlag()                    { return _getAlarmFlag; }
-bool   LinearActuator::getCalibratingFlag()              { return _getCalibratingFlag; }
-bool   LinearActuator::getCalibratedFlag()               { return _getCalibratedFlag; }
-bool   LinearActuator::getConstantSpeedFlag()            { return _constantSpeed; }
-void   LinearActuator::enable()                          { _stepper.enableOutputs(); }
-void   LinearActuator::disable()                         { _stepper.disableOutputs(); }
-void   LinearActuator::home()                            { _stepper.moveTo(0); }
-void   LinearActuator::reset()                           { _stepper.setCurrentPosition(0); home(); }
-void   LinearActuator::moveAbsolute(long value)          { _stepper.moveTo(value); }
-void   LinearActuator::moveRelative(long value)          { _stepper.move(value); }
-void   LinearActuator::moveAbsoluteDistance(float value) { _stepper.moveToDistance(value); }
-void   LinearActuator::moveRelativeDistance(float value) { _stepper.moveRelative(value); }
+void      LinearActuator::_ccw()                            { digitalWrite(_DIR, LOW); _direction = LinearActuator::Direction::CCW; }
+void      LinearActuator::_cw()                             { digitalWrite(_DIR, HIGH); _direction = LinearActuator::Direction::CW; }
+     
+uint      LinearActuator::getCount()                        { return _count; }
+uint      LinearActuator::getInterval()                     { return _interval; }
+void      LinearActuator::setInterval(uint value)           { _interval = value; }
+ushort    LinearActuator::getMicroSteps()                   { return _microsteps; }
+void      LinearActuator::setMicroSteps(ushort value)       { _microsteps = value; }
+long      LinearActuator::getSteps()                        { return _position; }
+long      LinearActuator::getTarget()                       { return _target; }
+long      LinearActuator::getStepsToGo()                    { return _target - _position; }
+float     LinearActuator::getPosition()                     { return  (_distancePerRotation * _position) / (_stepsPerRotation * _microsteps); }
 
-/// <summary>
-/// The main update routine - called from loop().
-/// Update indicator leds and run the stepper.
-/// </summary>
-void LinearActuator::run()
+LinearActuator::Direction LinearActuator::getDirection()    { return _direction; }
+bool      LinearActuator::getEnabledFlag()                  { return _enabledFlag; }
+bool      LinearActuator::getRunningFlag()                  { return _target != _position; }
+bool      LinearActuator::getLimitFlag()                    { return _limitFlag; }
+bool      LinearActuator::getAlarmFlag()                    { return _alarmFlag; }
+bool      LinearActuator::getCalibratingFlag()              { return _calibratingFlag; }
+bool      LinearActuator::getCalibratedFlag()               { return _calibratedFlag; }
+
+void      LinearActuator::home()                            { _target = 0; }
+void      LinearActuator::reset()                           { _position = 0; _target = 0; _count = 0; }
+
+void      LinearActuator::moveAbsolute(long value)          { _target = value; }
+void      LinearActuator::moveRelative(long value)          { _target = _position + value; }
+void      LinearActuator::moveAbsoluteDistance(float value) { _target = value * (_stepsPerRotation * _microsteps) / _distancePerRotation; }
+void      LinearActuator::moveRelativeDistance(float value) { _target = _position + (value * (_stepsPerRotation * _microsteps) / _distancePerRotation); }
+
+void LinearActuator::enable()
 {
-    digitalWrite(Settings.Actuator.LedRunning, _stepper.isRunning() ? HIGH : LOW);
-    digitalWrite(Settings.Actuator.LedInLimit, _getLimitFlag ? HIGH : LOW);
-    digitalWrite(Settings.Actuator.LedAlarmOn, _getAlarmFlag ? HIGH : LOW);
-    _constantSpeed ? _stepper.runSpeed() : _stepper.run();
+    digitalWrite(_ENA, LOW);
+    delayMicroseconds(200);
+    _enabledFlag = true;
+    _count = 0;
+}
+
+void LinearActuator::disable()
+{
+    digitalWrite(_ENA, HIGH);
+    delayMicroseconds(200);
+    _enabledFlag = false;
+    _count = 0;
 }
 
 /// <summary>
@@ -90,9 +92,7 @@ void LinearActuator::retract(long value)
 {
     if ((value == 1) || (value == -1))
     {
-        _stepper.moveRelative(value * Settings.Actuator.Retract);
-        _stepper.setSpeed(Settings.Actuator.MoveSpeed);
-        _constantSpeed = true;
+        moveRelativeDistance(value * Settings.Actuator.Retract);
     }
 }
 
@@ -102,30 +102,20 @@ void LinearActuator::retract(long value)
 /// </summary>
 void LinearActuator::stop()
 {
-    _getCalibratingFlag = false;
-    _stepper.disableOutputs();
-    _stepper.setSpeed(0);
-    _stepper.moveTo(_stepper.currentPosition());
-}
-
-/// <summary>
-/// Release the stepper motor from a stop by enabling the outputs.
-/// </summary>
-void LinearActuator::release()
-{
-    _stepper.setSpeed(0);
-    _stepper.enableOutputs();
+    _calibratingFlag = false;
+    _target = _position;
+    _count = 0;
+    disable();
 }
 
 /// <summary>
 /// Callback routine for the stepper alarm on event (over voltage or over current).
+/// The stepper motor is stopped (disabled).
 /// </summary>
 void LinearActuator::alarmOn(uint8_t pin)
 {
-    _getAlarmFlag = true;
-    _stepper.disableOutputs();
-    _stepper.setSpeed(0);
-    _stepper.moveTo(_stepper.currentPosition());
+    _alarmFlag = true;
+    stop();
 }
 
 /// <summary>
@@ -133,8 +123,8 @@ void LinearActuator::alarmOn(uint8_t pin)
 /// </summary>
 void LinearActuator::alarmOff(uint8_t pin)
 {
-    _getAlarmFlag = false;
-    _stepper.enableOutputs();
+    _alarmFlag = false;
+    enable();
 }
 
 /// <summary>
@@ -142,22 +132,22 @@ void LinearActuator::alarmOff(uint8_t pin)
 /// </summary>
 void LinearActuator::switchOn(uint8_t pin)
 {
+    // The stop switch has been turned on.
     if (pin == Settings.Actuator.SwitchStop)
     {
-        _getCalibratingFlag = false;
-        _getCalibratedFlag = false;
-        _stepper.disableOutputs();
-        _stepper.setSpeed(0);
-        _stepper.moveTo(_stepper.currentPosition());
+        _calibratedFlag = false;
+        stop();
     }
+    // If the first limit switch has been hit retract (positive direction).
     else if (pin == Settings.Actuator.SwitchLimit1)
     {
-        _getLimitFlag = true;
+        _limitFlag = true;
         retract(1);
     }
+    // If the second limit switch has been hit retract (negative direction).
     else if (pin == Settings.Actuator.SwitchLimit2)
     {
-        _getLimitFlag = true;
+        _limitFlag = true;
         retract(-1);
     }
 }
@@ -167,47 +157,105 @@ void LinearActuator::switchOn(uint8_t pin)
 /// </summary>
 void LinearActuator::switchOff(uint8_t pin)
 {
-    _constantSpeed = false;
-
     if (pin == Settings.Actuator.SwitchStop)
     {
-        // Do nothing. Release stop has to be triggered through Http or Telnet.
+        enable();
     }
     else if (pin == Settings.Actuator.SwitchLimit1)
     {
-        _getLimitFlag = false;
-        _stepper.setSpeed(0);
-        _stepper.move(0);
+        _limitFlag = false;
+        _target = _position;
 
-        if (_getCalibratingFlag)
+        // If calibrating reset current position to new home position (zero).
+        if (_calibratingFlag)
         {
-            _stepper.setCurrentPosition(0);
-            _getCalibratingFlag = false;
-            _getCalibratedFlag = true;
+            _target = 0;
+            _position = 0;
+            _calibratedFlag = true;
+            _calibratingFlag = false;
         }
     }
     else if (pin == Settings.Actuator.SwitchLimit2)
     {
-        _getLimitFlag = false;
-        _stepper.setSpeed(0);
-        _stepper.move(0);
+        _limitFlag = false;
+        _target = _position;
 
-        if (_getCalibratingFlag)
+        // If calibrating stop calibrating (this should not happen).
+        if (_calibratingFlag)
         {
-            _getCalibratedFlag = false;
-            _getCalibratingFlag = false;
+            _calibratedFlag = false;
+            _calibratingFlag = false;
         }
     }
 }
 
 /// <summary>
 /// Start the calibration routine by moving a large negative position (actuator length).
+/// Eventually the first limit switch should be engaged near the home position.
 /// </summary>
 void LinearActuator::calibrate()
 {
-    _stepper.moveRelative(-Settings.Actuator.Length);
-    _stepper.setSpeed(Settings.Actuator.MoveSpeed);
-    _constantSpeed = true;
-    _getCalibratingFlag = true;
+    moveRelativeDistance(-Settings.Actuator.Length);
+    _calibratingFlag = true;
 }
 
+/// <summary>
+/// Timer callback - move a single step if not yet at target.
+/// The timer is triggered every 10 microseconds (100 kHz).
+/// </summary>
+void LinearActuator::onTimer()
+{
+    // Action only if enabled.
+    if (_enabledFlag)
+    {
+        ++_count;
+        
+        // If just started check the direction and restart count if new direction detected. Otherwise start pulse.
+        if (_count == 1)
+        {
+            if (_position < _target)
+            {
+                if (_direction != LinearActuator::Direction::CW)
+                {
+                    _cw();
+                    _count = 0;
+                }
+                else
+                {
+                    digitalWrite(_PUL, HIGH);
+                }
+            }
+            else if (_position > _target)
+            {
+                if (_direction != LinearActuator::Direction::CCW)
+                {
+                    _ccw();
+                    _count = 0;
+                }
+                else
+                {
+                    digitalWrite(_PUL, HIGH);
+                }
+            }
+        }
+        // Turn output low (end pulse) and update position.
+        else if (_count == 2)
+        {
+            digitalWrite(_PUL, LOW);
+
+            if (_position < _target)
+            {
+                ++_position;
+            }
+            else if (_position > _target)
+            {
+                --_position;
+            }
+        }
+        // If the total interval count has been reached reset count.
+        else if (_count > _interval)
+        {
+            _count = 0;
+        }
+    }
+}

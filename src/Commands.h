@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>28-4-2023 12:05 PM</modified>
+// <modified>29-4-2023 9:59 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -30,7 +30,6 @@ void backward();
 void calibrate();
 void enable();
 void disable();
-void release();
 void stop();
 void home();
 void gpio();
@@ -46,11 +45,7 @@ void reboot();
 void reset();
 void save();
 
-void speed();
-void maxspeed();
-void acceleration();
-
-void pulsewidth();
+void interval();
 void microsteps();
 
 void moveAbsolute(long value);
@@ -61,11 +56,7 @@ void retract(long value);
 void moveAbsoluteDistance(float value);
 void moveRelativeDistance(float value);
 
-void speed(float value);
-void maxspeed(float value);
-void acceleration(float value);
-
-void pulsewidth(long value);
+void interval(long value);
 void microsteps(long value);
 
 #pragma endregion
@@ -150,8 +141,8 @@ public:
 ///
 /// The following command types are supported:
 ///
-///     BaseCommand - A command with an optional shortcut and no arguments.
-///     LongCommand - A command with an optional shortcut and a single float argument.
+///     BaseCommand  - A command with an optional shortcut and no arguments.
+///     LongCommand  - A command with an optional shortcut and a single long argument.
 ///     FloatCommand - A command with an optional shortcut and a single float argument.
 ///
 /// </summary>
@@ -160,9 +151,9 @@ class CommandsClass
 private:
     String _padTo(String str, const size_t num, const char paddingChar = ' ');
 
-    static const int MAX_BASE_COMMANDS = 32;
+    static const int MAX_BASE_COMMANDS = 28;
     static const int MAX_LONG_COMMANDS = 6;
-    static const int MAX_FLOAT_COMMANDS = 5;
+    static const int MAX_FLOAT_COMMANDS = 2;
 
     static const int MAX_BASE_COMMAND_LENGTH = 12;
     static const int MAX_BASE_SHORTCUT_COMMAND_LENGTH = 9;
@@ -174,41 +165,36 @@ private:
     /// The list of supported base commands (no arguments).
     /// </summary>
     BaseCommand _baseCommands[MAX_BASE_COMMANDS] = {
-        { "help",         "?", "Shows this help information.",                 help         },  // Built-in help command.
-        { "quit",         "q", "Terminates the program.",                      quit         },  // Quit command (awaiting confirmation).
-        { "json",         "j", "Toggle JSON output mode.",                     json         },  // Output mode command.
-        { "verbose",      "v", "Toggle verbose output.",                       verbose      },  // Output verbose command.
+        { "help",         "?", "Shows this help information.",                 help        },  // Built-in help command.
+        { "quit",         "q", "Terminates the program.",                      quit        },  // Quit command (awaiting confirmation).
+        { "json",         "j", "Toggle JSON output mode.",                     json        },  // Output mode command.
+        { "verbose",      "v", "Toggle verbose output.",                       verbose     },  // Output verbose command.
 
-        { "status",       "s", "Shows the current state of the motor driver.", status       },
-        { "position",     "p", "Shows the current position.",                  position     },
-        { "plus",         "+", "Moves a step forward.",                        plus         },
-        { "minus",        "-", "Moves a step backward.",                       minus        },
-        { "forward",      "f", "Moves a 0.1 mm distance forward.",             forward      },
-        { "backward",     "b", "Moves a 0.1 mm distance backward.",            backward     },
-        { "calibrate",    "c", "Run a calibration sequence.",                  calibrate    },
-        { "enable",       "e", "Enabling the output (after disable).",         enable       },
-        { "disable",      "d", "Stops the motor by disabling the output.",     disable      },
-        { "release",      "r", "Release the stopped motor.",                   release      },
-        { "stop",         "x", "Stops the running motor (decelerating).",      stop         },
-        { "home",         "h", "Moves to home position (position = 0).",       home         },
-        { "gpio",         "g", "Shows the GPIO input and output pin values.",  gpio         },
+        { "status",       "s", "Shows the current state of the motor driver.", status      },
+        { "position",     "p", "Shows the current position.",                  position    },
+        { "plus",         "+", "Moves a step forward.",                        plus        },
+        { "minus",        "-", "Moves a step backward.",                       minus       },
+        { "forward",      "f", "Moves a 0.1 mm distance forward.",             forward     },
+        { "backward",     "b", "Moves a 0.1 mm distance backward.",            backward    },
+        { "calibrate",    "c", "Run a calibration sequence.",                  calibrate   },
+        { "enable",       "e", "Enabling the output (after disable).",         enable      },
+        { "disable",      "d", "Stops the motor by disabling the output.",     disable     },
+        { "stop",         "x", "Stops the running motor (decelerating).",      stop        },
+        { "home",         "h", "Moves to home position (position = 0).",       home        },
+        { "gpio",         "g", "Shows the GPIO input and output pin values.",  gpio        },
 
-        { "yard",         "",  "Show yard track settings.",                    yard         },
-        { "pico",         "",  "Show Pico W pin layout.",                      pico         },
-        { "wifi",         "",  "Shows the WiFi information.",                  wifi         },
-        { "server",       "",  "Shows the server information.",                server       },
-        { "system",       "",  "Shows the system information.",                system       },
-        { "settings",     "",  "Shows the settings information.",              settings     },
-        { "appsettings",  "",  "Shows the appsettings file.",                  appsettings  },
-        { "reboot",       "",  "Reboots the RP2040.",                          reboot       },
-        { "reset",        "",  "Resets the current position to zero.",         reset        },
-        { "save",         "",  "Sves the updated application settings.",       save         },
+        { "yard",         "",  "Show yard track settings.",                    yard        },
+        { "pico",         "",  "Show Pico W pin layout.",                      pico        },
+        { "wifi",         "",  "Shows the WiFi information.",                  wifi        },
+        { "server",       "",  "Shows the server information.",                server      },
+        { "system",       "",  "Shows the system information.",                system      },
+        { "settings",     "",  "Shows the settings information.",              settings    },
+        { "appsettings",  "",  "Shows the appsettings file.",                  appsettings },
+        { "reboot",       "",  "Reboots the RP2040.",                          reboot      },
+        { "reset",        "",  "Resets the current position to zero.",         reset       },
+        { "save",         "",  "Sves the updated application settings.",       save        },
 
-        { "speed",        "",  "Gets the current speed (steps/(sec*sec)).",    speed        },
-        { "maxspeed",     "",  "Gets the maximum speed (steps/sec).",          maxspeed     },
-        { "acceleration", "",  "Gets the acceleration (steps/(sec*sec)).",     acceleration },
-
-        { "pulsewidth",   "",  "Gets the pulsewidth (microseconds).",          pulsewidth   },
+        { "interval",     "",  "Gets the timer interval (microseconds).",      interval     },
         { "microsteps",   "",  "Gets the microsteps.",                         microsteps   },
     };
 
@@ -220,13 +206,13 @@ private:
     /// The list of supported long commands (one long argument).
     /// </summary>
     LongCommand _longCommands[MAX_LONG_COMMANDS] = {
-        { "stepto", "m", "Moves to absolute position (steps).",   moveAbsolute },
-        { "step",   "s", "Moves the number of steps (relative).", moveRelative },
-        { "track",  "t", "Moves to track number.",                moveToTrack  },
+        { "stepto",      "m", "Moves to absolute position (steps).",     moveAbsolute },
+        { "step",        "s", "Moves the number of steps (relative).",   moveRelative },
+        { "track",       "t", "Moves to track number.",                  moveToTrack  },
 
-        { "retract",     "", "Retracts a short distance.",          retract    },
-        { "pulsewidth",  "", "Sets the pulsewidth (microseconds).", pulsewidth },
-        { "microsteps",  "", "Sets the microsteps.",                microsteps },
+        { "retract",     "",  "Retracts a short distance.",              retract      },
+        { "interval",    "",  "Sets the timer interval (microseconds).", interval     },
+        { "microsteps",  "",  "Sets the microsteps.",                    microsteps   },
     };
 
     int _findLongCommandByShortcut(String shortcut);    // Returns the command index (or -1 if not found).
@@ -237,12 +223,8 @@ private:
     /// The list of supported float commands (one float argument).
     /// </summary>
     FloatCommand _floatCommands[MAX_FLOAT_COMMANDS] = {
-        { "moveto",       "a", "Moves to absolute position (mm).",         moveAbsoluteDistance },
-        { "move",         "r", "Moves the number of mm (relative).",       moveRelativeDistance },
-
-        { "speed",        "",  "Sets the current speed. (steps/sec).",     speed },
-        { "maxspeed",     "",  "Sets the maximum speed. (steps/sec).",     maxspeed },
-        { "acceleration", "",  "Sets the acceleration (steps/(sec*sec)).", acceleration },
+        { "moveto", "a", "Moves to absolute position (mm).",   moveAbsoluteDistance },
+        { "move",   "r", "Moves the number of mm (relative).", moveRelativeDistance },
     };
 
     int _findFloatCommandByShortcut(String shortcut);   // Returns the command index (or -1 if not found).

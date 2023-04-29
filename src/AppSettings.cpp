@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>26-4-2023 8:17 AM</modified>
+// <modified>29-4-2023 3:08 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 #include <StringSplitter.h>
@@ -142,7 +142,6 @@ void AppSettings::ActuatorSettings::fromJson(JsonObject json)
         LedInLimit = json["LedInLimit"] | LedInLimit;
         LedAlarmOn = json["LedAlarmOn"] | LedAlarmOn;
 
-        MoveSpeed = json["MoveSpeed"] | MoveSpeed;
         Retract   = json["Retract"]   | Retract;
         Length    = json["Length"]    | Length;
     }
@@ -163,7 +162,6 @@ JsonObject AppSettings::ActuatorSettings::toJson()
     _doc["LedInLimit"] = LedInLimit;
     _doc["LedAlarmOn"] = LedAlarmOn;
 
-    _doc["MoveSpeed"] = MoveSpeed;
     _doc["Retract"]   = Retract;
     _doc["Length"]    = Length;
 
@@ -194,7 +192,6 @@ String AppSettings::ActuatorSettings::toString()
                   "    LedRunning:   " + LedRunning   + "\r\n" +
                   "    LedInLimit:   " + LedInLimit   + "\r\n" +
                   "    LedAlarmOn:   " + LedAlarmOn   + "\r\n" +
-                  "    MoveSpeed:    " + MoveSpeed    + "\r\n" +
                   "    Retract:      " + Retract      + "\r\n" +
                   "    Length:       " + Length       + "\r\n";
 }
@@ -211,12 +208,10 @@ void AppSettings::StepperSettings::fromJson(JsonObject json)
         PinDIR              = json["PinDIR"]              | PinDIR;
         PinENA              = json["PinENA"]              | PinENA;
         PinALM              = json["PinALM"]              | PinALM;
+        Interval            = json["Interval"]            | Interval;
         MicroSteps          = json["MicroSteps"]          | MicroSteps;
-        MaxSpeed            = json["MaxSpeed"]            | MaxSpeed;
-        Acceleration        = json["Acceleration"]        | Acceleration;
         StepsPerRotation    = json["StepsPerRotation"]    | StepsPerRotation;
         DistancePerRotation = json["DistancePerRotation"] | DistancePerRotation;
-        MinPulseWidth       = json["MinPulseWidth"]       | MinPulseWidth;
     }
 }
 
@@ -231,12 +226,10 @@ JsonObject AppSettings::StepperSettings::toJson()
     _doc["PinDIR"]              = PinDIR;
     _doc["PinENA"]              = PinENA;
     _doc["PinALM"]              = PinALM;
-    _doc["MicroSteps"]          = MicroSteps; 
-    _doc["MaxSpeed"]            = MaxSpeed; 
-    _doc["Acceleration"]        = Acceleration; 
+    _doc["Interval"]            = Interval;
+    _doc["MicroSteps"]          = MicroSteps;
     _doc["StepsPerRotation"]    = StepsPerRotation;
     _doc["DistancePerRotation"] = DistancePerRotation;
-    _doc["MinPulseWidth"]       = MinPulseWidth;
 
     return _doc.as<JsonObject>();
 }
@@ -263,12 +256,10 @@ String AppSettings::StepperSettings::toString()
                   "    PinDIR:              " + PinDIR              + "\r\n" +
                   "    PinENA:              " + PinENA              + "\r\n" +
                   "    PinALM:              " + PinALM              + "\r\n" +
+                  "    Interval:            " + Interval            + "\r\n" +
                   "    MicroSteps:          " + MicroSteps          + "\r\n" +
-                  "    MaxSpeed:            " + MaxSpeed            + "\r\n" +
-                  "    Acceleration:        " + Acceleration        + "\r\n" +
                   "    StepsPerRotation:    " + StepsPerRotation    + "\r\n" +
-                  "    DistancePerRotation: " + DistancePerRotation + "\r\n" +
-                  "    MinPulseWidth:       " + MinPulseWidth       + "\r\n";
+                  "    DistancePerRotation: " + DistancePerRotation + "\r\n";
 }
 
 /// <summary>

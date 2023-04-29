@@ -6,15 +6,13 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>12-4-2023 6:54 PM</modified>
+// <modified>29-4-2023 9:47 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 
 #pragma once
 
 #include <Arduino.h>
-
-#include "AccelStepperWithDistance.h"
 
 #define ARDIUNOJSON_TAB "    "
 
@@ -31,7 +29,6 @@ private:
 public:
     ActuatorInfo();
 
-    bool  ConstantSpeedFlag;    // Flag indicating running with constant speed.
     bool  CalibratingFlag;      // Flag indicating the calibration routine is running.
     bool  CalibratedFlag;       // Flag indicating the calibration has been completed.
     bool  EnabledFlag;          // Flag indicating if motor is enabled.
@@ -39,17 +36,14 @@ public:
     bool  LimitFlag;            // Flag indicating that a limit switch has turned on.
     bool  AlarmFlag;            // Flag indicating that the stepper driver alarm has been turned on.
 
+    long  Count;                // The current interval count.
     long  Steps;                // The current motor position in steps.
     long  Target;               // The target position in steps. Positive is clockwise from the 0 position.
     long  StepsToGo;            // The remaining steps from the current position to the target position.
 
     float Position;             // The current motor position in mm.
-    float Speed;                // The current speed in steps per second.
-    float MaxSpeed;             // The currently configured maximum speed.
-    float Acceleration;         // The currently configured acceleration/deceleration.
-
+    long  Interval;             // The current timer interval in microseconds.
     long  Microsteps;           // The currently configured microsteps.
-    long  Pulsewidth;           // The currently configured minimum pulsewidth.
 
     String toJsonString();      // Get a serialized JSON representation.
     String toString();          // Get a string representation.

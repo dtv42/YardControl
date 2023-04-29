@@ -137,10 +137,6 @@
                         <td><span id="actuatorLedAlarmOn"></span></td>
                     </tr>
                     <tr>
-                        <td class="col-2">Move&nbsp;Speed:</td>
-                        <td><span id="actuatorMoveSpeed"></span></td>
-                    </tr>
-                    <tr>
                         <td class="col-2">Retract:</td>
                         <td><span id="actuatorRetract"></span></td>
                     </tr>
@@ -172,16 +168,12 @@
                         <td><span id="stepperPinALM"></span></td>
                     </tr>
                     <tr>
+                        <td class="col-2">Interval:</td>
+                        <td><span id="stepperInterval"></span></td>
+                    </tr>
+                    <tr>
                         <td class="col-2">Microsteps:</td>
                         <td><span id="stepperMicroSteps"></span></td>
-                    </tr>
-                    <tr>
-                        <td class="col-2">Max&nbsp;Speed:</td>
-                        <td><span id="stepperMaxSpeed"></span></td>
-                    </tr>
-                    <tr>
-                        <td class="col-2">Acceleration:</td>
-                        <td><span id="stepperAcceleration"></span></td>
                     </tr>
                     <tr>
                         <td class="col-2">Steps/Rotation:</td>
@@ -344,7 +336,6 @@
         const actuatorLedRunning         = document.getElementById('actuatorLedRunning');
         const actuatorLedInLimit         = document.getElementById('actuatorLedInLimit');
         const actuatorLedAlarmOn         = document.getElementById('actuatorLedAlarmOn');
-        const actuatorMoveSpeed          = document.getElementById('actuatorMoveSpeed');
         const actuatorRetract            = document.getElementById('actuatorRetract');
         const actuatorLength             = document.getElementById('actuatorLength');
 
@@ -352,9 +343,8 @@
         const stepperPinDIR              = document.getElementById('stepperPinDIR');
         const stepperPinENA              = document.getElementById('stepperPinENA');
         const stepperPinALM              = document.getElementById('stepperPinALM');
+        const stepperInterval            = document.getElementById('stepperInterval');
         const stepperMicroSteps          = document.getElementById('stepperMicroSteps');
-        const stepperMaxSpeed            = document.getElementById('stepperMaxSpeed');
-        const stepperAcceleration        = document.getElementById('stepperAcceleration');
         const stepperStepsPerRotation    = document.getElementById('stepperStepsPerRotation');
         const stepperDistancePerRotation = document.getElementById('stepperDistancePerRotation');
 
@@ -402,7 +392,6 @@
                     actuatorLedRunning.textContent = json.Actuator.LedRunning;
                     actuatorLedInLimit.textContent = json.Actuator.LedInLimit;
                     actuatorLedAlarmOn.textContent = json.Actuator.LedAlarmOn;
-                    actuatorMoveSpeed.textContent  = json.Actuator.MoveSpeed;
                     actuatorRetract.textContent    = json.Actuator.Retract;
                     actuatorLength.textContent     = json.Actuator.Length;
 
@@ -410,9 +399,8 @@
                     stepperPinDIR.textContent              = json.Stepper.PinDIR;
                     stepperPinENA.textContent              = json.Stepper.PinENA;
                     stepperPinALM.textContent              = json.Stepper.PinALM;
+                    stepperInterval.textContent            = json.Stepper.Interval;
                     stepperMicroSteps.textContent          = json.Stepper.MicroSteps;
-                    stepperMaxSpeed.textContent            = json.Stepper.MaxSpeed;
-                    stepperAcceleration.textContent        = json.Stepper.Acceleration;
                     stepperStepsPerRotation.textContent    = json.Stepper.StepsPerRotation;
                     stepperDistancePerRotation.textContent = json.Stepper.DistancePerRotation;
 

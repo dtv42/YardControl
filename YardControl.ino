@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:44 PM</created>
-// <modified>26-4-2023 10:17 AM</modified>
+// <modified>29-4-2023 9:10 AM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 #if !(defined(ARDUINO_RASPBERRY_PI_PICO_W))
@@ -68,6 +68,20 @@ TelnetServer Telnet;
 
 // Create the (global) commands instance.
 CommandsClass Commands;
+
+// Timer used to drive the stepper motor (fixed frequency of 100 kHz).
+RPI_PICO_Timer Timer(0);                   
+
+#pragma endregion
+
+#pragma region Timer Callback
+
+bool TimerHandler(struct repeating_timer* t)
+{
+    (void)t;
+    Actuator.onTimer();
+    return true;
+}
 
 #pragma endregion
 
@@ -305,9 +319,6 @@ void setup()
     HttpServer.on("/stepto",       putIntegerCommand);
     HttpServer.on("/moveto",       putFloatCommand);
     HttpServer.on("/track",        putIntegerCommand);
-    HttpServer.on("/speed",        putFloatCommand);
-    HttpServer.on("/maxspeed",     putFloatCommand);
-    HttpServer.on("/acceleration", putFloatCommand);
 
     // Upload the application settings.
     HttpServer.on("/appsettings.json", postSettings);
@@ -346,6 +357,27 @@ void setup()
 
 #pragma endregion
 
+#pragma region Initialize Timer
+
+    /// The timer callback is triggered every 10 microseconds (100 kHz).
+    if (Timer.attachInterrupt(100000, TimerHandler))
+    {
+        Serial.println("Starting Timer OK");
+        Actuator.enable();
+    }
+    else
+    {
+        Serial.println("Cannot start Timer");
+
+        // Don't continue, just indicate the error.
+        Led.pattern(1, 5);
+
+        while (true)
+            Led.update();
+    }
+
+#pragma endregion
+
     // Indicate setup end.
     Led.pattern(1, 1);
 }
@@ -355,14 +387,13 @@ void setup()
 #pragma region Loop
 
 /// <summary>
-/// Arduino loop function. Gets called continuosly to update input and output operations.
+/// Arduino loop function. Gets called continuosly to update input, output, and other operations.
 /// </summary>
 void loop()
 {
     Led.update();
     Inputs.run();
     Telnet.loop();
-    Actuator.run();
     HttpServer.handleClient();
 }
 
