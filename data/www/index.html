@@ -2,19 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Yard Control - Home</title>
     <link rel="shortcut icon" href="favicon.ico" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="css/custom-input-switch.css">
     <link rel="stylesheet" href="css/dark-mode-switch.css">
-    <style>
-        .btn-xl {
-            padding: 10px 20px;
-            font-size: 20px;
-            border-radius: 9px;
-        }
-    </style>
+    <link rel="stylesheet" href="css/custom-styles.css">
 </head>
 <body>
     <div class="container-fluid">
@@ -58,7 +52,7 @@
                                 <path d="M8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z" />
                             </svg>
                         </label>
-                        <input class="form-check-input" type="checkbox" id="darkSwitch" />
+                        <input class="form-check-input" type="checkbox" id="darkSwitch" title="Switch Themes"/>
                     </div>
                 </div>
             </div>
@@ -89,38 +83,38 @@
                                 <h5 id="line2">123456789012345678901234567</h5>
                             </div>
                         </div>
-                        <button class="btn btn-dark   btn-xl m-1" onclick="track(1)" title="Select track 1"><i class="bi bi-1-square"></i></button>
-                        <button class="btn btn-dark   btn-xl m-1" onclick="track(2)" title="Select track 2"><i class="bi bi-2-square"></i></button>
-                        <button class="btn btn-dark   btn-xl m-1" onclick="track(3)" title="Select track 3"><i class="bi bi-3-square"></i></button>
-                        <button class="btn btn-danger btn-xl m-1" onclick="stop()"   title="Stop immediately"><i class="bi bi-sign-stop"></i></button>
+                        <button id="buttonOne"   class="btn btn-dark   btn-xl m-1" onclick="track(1)" title="Select track 1"><i class="bi bi-1-square"></i></button>
+                        <button id="buttonTwo"   class="btn btn-dark   btn-xl m-1" onclick="track(2)" title="Select track 2"><i class="bi bi-2-square"></i></button>
+                        <button id="buttonThree" class="btn btn-dark   btn-xl m-1" onclick="track(3)" title="Select track 3"><i class="bi bi-3-square"></i></button>
+                        <button id="buttonStop"  class="btn btn-danger btn-xl m-1" onclick="stop()"   title="Stop immediately"><i class="bi bi-sign-stop"></i></button>
                     </div>
                     <div class="bg-white p-1 rounded shadow-sm">
-                        <button class="btn btn-dark      btn-xl m-1" onclick="track(4)" title="Select track 4"><i class="bi bi-4-square"></i></button>
-                        <button class="btn btn-dark      btn-xl m-1" onclick="track(5)" title="Select track 5"><i class="bi bi-5-square"></i></button>
-                        <button class="btn btn-dark      btn-xl m-1" onclick="track(6)" title="Select track 6"><i class="bi bi-6-square"></i></button>
-                        <button class="btn btn-secondary btn-xl m-1" onclick="move(10)" title="Move forward 10 mm"><i class="bi bi-arrow-down-square"></i></button>
+                        <button id="buttonFour"    class="btn btn-dark      btn-xl m-1" onclick="track(4)" title="Select track 4"><i class="bi bi-4-square"></i></button>
+                        <button id="buttonFive"    class="btn btn-dark      btn-xl m-1" onclick="track(5)" title="Select track 5"><i class="bi bi-5-square"></i></button>
+                        <button id="buttonSix"     class="btn btn-dark      btn-xl m-1" onclick="track(6)" title="Select track 6"><i class="bi bi-6-square"></i></button>
+                        <button id="buttonForward" class="btn btn-secondary btn-xl m-1" onclick="move(10)" title="Move forward 10 mm"><i class="bi bi-arrow-down-square"></i></button>
                     </div>
                     <div class="bg-white p-1 rounded shadow-sm">
-                        <button class="btn btn-dark      btn-xl m-1" onclick="track(7)"  title="Select track 7"><i class="bi bi-7-square"></i></button>
-                        <button class="btn btn-dark      btn-xl m-1" onclick="track(8)"  title="Select track 8"><i class="bi bi-8-square"></i></button>
-                        <button class="btn btn-dark      btn-xl m-1" onclick="track(9)"  title="Select track 9"><i class="bi bi-9-square"></i></button>
-                        <button class="btn btn-secondary btn-xl m-1" onclick="move(-10)" title="Move backward 10 mm"><i class="bi bi-arrow-up-square"></i></button>
+                        <button id="buttonSeven"    class="btn btn-dark      btn-xl m-1" onclick="track(7)"  title="Select track 7"><i class="bi bi-7-square"></i></button>
+                        <button id="buttonEight"    class="btn btn-dark      btn-xl m-1" onclick="track(8)"  title="Select track 8"><i class="bi bi-8-square"></i></button>
+                        <button id="buttonNine"     class="btn btn-dark      btn-xl m-1" onclick="track(9)"  title="Select track 9"><i class="bi bi-9-square"></i></button>
+                        <button id="buttonBackward" class="btn btn-secondary btn-xl m-1" onclick="move(-10)" title="Move backward 10 mm"><i class="bi bi-arrow-up-square"></i></button>
                     </div>
                     <div class="bg-white p-1 rounded shadow-sm">
-                        <button class="btn btn-dark      btn-xl m-1" onclick="move(1)"  title="Move forward 1 mm"><i class="bi bi-plus-square"></i></button>
-                        <button class="btn btn-dark      btn-xl m-1" onclick="track(0)" title="Select track 0"><i class="bi bi-0-square"></i></button>
-                        <button class="btn btn-dark      btn-xl m-1" onclick="move(-1)" title="Move backward 1 mm"><i class="bi bi-dash-square"></i></button>
-                        <button class="btn btn-secondary btn-xl m-1" onclick="home()"   title="Move home"><i class="bi bi-chevron-bar-contract"></i></button>
+                        <button id="buttonPlus"  class="btn btn-dark      btn-xl m-1" onclick="move(1)"  title="Move forward 1 mm"><i class="bi bi-plus-square"></i></button>
+                        <button id="buttonZero"  class="btn btn-dark      btn-xl m-1" onclick="track(0)" title="Select track 0"><i class="bi bi-0-square"></i></button>
+                        <button id="buttonMinus" class="btn btn-dark      btn-xl m-1" onclick="move(-1)" title="Move backward 1 mm"><i class="bi bi-dash-square"></i></button>
+                        <button id="buttonHome"  class="btn btn-secondary btn-xl m-1" onclick="home()"   title="Move home"><i class="bi bi-chevron-bar-contract"></i></button>
                     </div>
                     <div class="bg-white p-1 rounded shadow-sm font-monospace">
-                        <h5><i id="led1" class="bi bi-circle-fill" style="color:lightgray"></i>&nbsp;Online&nbsp;&nbsp;<i id="led2" class="bi bi-circle-fill" style="color:lightgray"></i>&nbsp;Running&nbsp;&nbsp;<i id="led3" class="bi bi-circle-fill" style="color:lightgray"></i>&nbsp;Limits&nbsp;&nbsp;<i id="led4" class="bi bi-circle-fill" style="color:lightgray"></i>&nbsp;Alarm</h5>
+                        <h5><i id="led1" class="bi bi-circle-fill"></i>&nbsp;Online&nbsp;&nbsp;<i id="led2" class="bi bi-circle-fill"></i>&nbsp;Running&nbsp;&nbsp;<i id="led3" class="bi bi-circle-fill"></i>&nbsp;Limits&nbsp;&nbsp;<i id="led4" class="bi bi-circle-fill"></i>&nbsp;Alarm</h5>
                     </div>
                 </div>
             </div>
         </div>
         <div class="row mt-3 ms-1 text-left">
             <p>Last changed at <span id="textTimestamp">00:00:00</span> UTC.</p>
-            <p><input class="form-check-input" type="checkbox" id="autoUpdateSwitch" />&nbsp;&nbsp;Auto&nbsp;Update</p>
+            <p><input class="form-check-input" type="checkbox" id="autoUpdateSwitch" title="Auto Update" />&nbsp;&nbsp;Auto&nbsp;Update</p>
         </div>
     </div>
     <!-- Toast Popup -->
@@ -142,7 +136,7 @@
     </footer>
 
     <!-- Bootstrap 5 -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" charset="utf-8"></script>
     <!-- Custom Code -->
     <script>
         // Toast used by error messages from web requests.
@@ -156,6 +150,23 @@
         // Various elements.
         const onoffSwitch = document.getElementById('onoffSwitch');
         const onoffLabel = document.getElementById('onoffLabel');
+
+        const buttonOne      = document.getElementById('buttonOne');
+        const buttonTwo      = document.getElementById('buttonTwo');
+        const buttonThree    = document.getElementById('buttonThree');
+        const buttonFour     = document.getElementById('buttonFour');
+        const buttonFive     = document.getElementById('buttonFive');
+        const buttonSix      = document.getElementById('buttonSix');
+        const buttonSeven    = document.getElementById('buttonSeven');
+        const buttonEight    = document.getElementById('buttonEight');
+        const buttonNine     = document.getElementById('buttonNine');
+        const buttonZero     = document.getElementById('buttonZero');
+        const buttonStop     = document.getElementById('buttonStop');
+        const buttonPlus     = document.getElementById('buttonPlus');
+        const buttonMinus    = document.getElementById('buttonMinus');
+        const buttonForward  = document.getElementById('buttonForward');
+        const buttonBackward = document.getElementById('buttonBackward');
+        const buttonHome     = document.getElementById('buttonHome');
 
         const line1 = document.getElementById('line1');
         const line2 = document.getElementById('line2');
@@ -239,6 +250,10 @@
                 message.innerText = "Yard Control not enabled!";
                 toast.show();
             }
+            else if (Running) {
+                message.innerText = "Yard Control is currently moving!";
+                toast.show();
+            }
             else {
                 putRequest("/track?number=" + t);
                 updateDisplay();
@@ -257,6 +272,10 @@
                 message.innerText = "Yard Control not enabled!";
                 toast.show();
             }
+            else if (Running) {
+                message.innerText = "Yard Control is currently moving!";
+                toast.show();
+            }
             else {
                 putRequest("/move?value=" + value);
                 updateDisplay();
@@ -267,6 +286,10 @@
         function home() {
             if (!Enabled) {
                 message.innerText = "Yard Control not enabled!";
+                toast.show();
+            }
+            else if (Running) {
+                message.innerText = "Yard Control is currently moving!";
                 toast.show();
             }
             else {
@@ -282,16 +305,18 @@
                     }
                 }
             }
+
             updateDisplay();
         }
 
         // Various status data.
+        ConstantSpeed = false;
         Calibrating = false;
         Calibrated = false;
         Enabled = false;
         Running = false;
         Limited = false;
-        AlarmOn = false;
+        Alarm = false;
         Online = false;
         Steps = 0;
         Target = 0;
@@ -310,12 +335,13 @@
                     return response.json();
                 })
                 .then((json) => {
-                    Calibrated    = json.IsCalibrated; 
-                    Calibrating   = json.IsCalibrating;
-                    Enabled       = json.IsEnabled;    
-                    Running       = json.IsRunning;  
-                    Limited       = json.InLimited;  
-                    AlarmOn       = json.AlarmOn;
+                    ConstantSpeed = json.ConstantSpeed;
+                    Calibrated    = json.CalibratedFlag; 
+                    Calibrating   = json.CalibratingFlag;
+                    Enabled       = json.EnabledFlag;    
+                    Running       = json.RunningFlag;  
+                    Limited       = json.LimitedFlag;  
+                    Alarm         = json.AlarmFlag;
                     Steps         = json.Steps;        
                     Target        = json.Target;       
                     StepsToGo     = json.StepsToGo;    
@@ -345,6 +371,13 @@
             html2 = text2.replaceAll(" ", "&nbsp;");
             html3 = text3.replaceAll(" ", "&nbsp;");
 
+            if (Calibrated) {
+                buttonHome.classList = "btn btn-success btn-xl m1"
+            }
+            else {
+                buttonHome.classList = "btn btn-secondary btn-xl m1"
+            }
+
             if (Running) {
                 line1.innerHTML = html1;
                 line2.innerHTML = html2;
@@ -370,12 +403,12 @@
             led1.style.color = Online  ? 'yellow'      : 'darkgray';
             led2.style.color = Running ? 'yellowgreen' : 'darkgray';
             led3.style.color = Limited ? 'orange'      : 'darkgray';
-            led4.style.color = AlarmOn ? 'red'         : 'darkgray';
+            led4.style.color = Alarm   ? 'red'         : 'darkgray';
 
             textTimestamp.innerText = new Date(Date.now()).toUTCString();
         }
 
-        interval = setInterval(autoUpdate, 1000);
+        interval = setInterval(autoUpdate, 500);
         startAutoUpdate();
     </script>
 </body>

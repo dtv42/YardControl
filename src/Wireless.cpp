@@ -1,4 +1,4 @@
-// --------------------------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Wireless.cpp" company="DTV-Online">
 //   Copyright (c) 2023 Dr. Peter Trimmel. All rights reserved.
 // </copyright>
@@ -6,9 +6,10 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:49 PM</created>
-// <modified>10-4-2023 10:29 AM</modified>
+// <modified>25-4-2023 4:24 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
+
 #include <Arduino.h>
 #include <String.h>
 #include <WiFi.h>

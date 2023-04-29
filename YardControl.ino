@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:44 PM</created>
-// <modified>24-4-2023 10:41 AM</modified>
+// <modified>26-4-2023 10:17 AM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 #if !(defined(ARDUINO_RASPBERRY_PI_PICO_W))
@@ -14,7 +14,7 @@
 #endif
 
 // Disable all traces when set to 0.
-#define ARDUINOTRACE_ENABLE 1
+#define ARDUINOTRACE_ENABLE 0
 
 #pragma region Includes
 
@@ -271,7 +271,7 @@ void setup()
     HttpServer.on("/info.html",                   getFile);
     HttpServer.on("/settings.html",               getFile);
     HttpServer.on("/favicon.ico",                 getFile);
-    HttpServer.on("/css/custom-input-switch.css", getFile);
+    HttpServer.on("/css/custom-styles.css",       getFile);
     HttpServer.on("/css/dark-mode-switch.css",    getFile);
     HttpServer.on("/js/dark-mode-switch.min.js",  getFile);
 

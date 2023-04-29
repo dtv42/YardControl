@@ -9,6 +9,7 @@
 // <modified>21-4-2023 12:56 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
+
 // Disable all traces when set to 0.
 #define ARDUINOTRACE_ENABLE 1
 

@@ -6,9 +6,10 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>24-4-2023 6:40 AM</modified>
+// <modified>28-4-2023 12:05 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
+
 #pragma once
 
 #pragma region Command Callbacks
@@ -34,21 +35,28 @@ void stop();
 void home();
 void gpio();
 
+void yard();
 void pico();
 void wifi();
 void server();
 void system();
 void settings();
+void appsettings();
 void reboot();
 void reset();
+void save();
 
 void speed();
 void maxspeed();
 void acceleration();
 
+void pulsewidth();
+void microsteps();
+
 void moveAbsolute(long value);
 void moveRelative(long value);
 void moveToTrack(long value);
+void retract(long value);
 
 void moveAbsoluteDistance(float value);
 void moveRelativeDistance(float value);
@@ -56,6 +64,9 @@ void moveRelativeDistance(float value);
 void speed(float value);
 void maxspeed(float value);
 void acceleration(float value);
+
+void pulsewidth(long value);
+void microsteps(long value);
 
 #pragma endregion
 
@@ -149,8 +160,8 @@ class CommandsClass
 private:
     String _padTo(String str, const size_t num, const char paddingChar = ' ');
 
-    static const int MAX_BASE_COMMANDS = 27;
-    static const int MAX_LONG_COMMANDS = 3;
+    static const int MAX_BASE_COMMANDS = 32;
+    static const int MAX_LONG_COMMANDS = 6;
     static const int MAX_FLOAT_COMMANDS = 5;
 
     static const int MAX_BASE_COMMAND_LENGTH = 12;
@@ -182,17 +193,23 @@ private:
         { "home",         "h", "Moves to home position (position = 0).",       home         },
         { "gpio",         "g", "Shows the GPIO input and output pin values.",  gpio         },
 
+        { "yard",         "",  "Show yard track settings.",                    yard         },
         { "pico",         "",  "Show Pico W pin layout.",                      pico         },
         { "wifi",         "",  "Shows the WiFi information.",                  wifi         },
         { "server",       "",  "Shows the server information.",                server       },
         { "system",       "",  "Shows the system information.",                system       },
         { "settings",     "",  "Shows the settings information.",              settings     },
+        { "appsettings",  "",  "Shows the appsettings file.",                  appsettings  },
         { "reboot",       "",  "Reboots the RP2040.",                          reboot       },
         { "reset",        "",  "Resets the current position to zero.",         reset        },
+        { "save",         "",  "Sves the updated application settings.",       save         },
 
         { "speed",        "",  "Gets the current speed (steps/(sec*sec)).",    speed        },
         { "maxspeed",     "",  "Gets the maximum speed (steps/sec).",          maxspeed     },
         { "acceleration", "",  "Gets the acceleration (steps/(sec*sec)).",     acceleration },
+
+        { "pulsewidth",   "",  "Gets the pulsewidth (microseconds).",          pulsewidth   },
+        { "microsteps",   "",  "Gets the microsteps.",                         microsteps   },
     };
 
     int _findBaseCommandByShortcut(String shortcut);
@@ -206,6 +223,10 @@ private:
         { "stepto", "m", "Moves to absolute position (steps).",   moveAbsolute },
         { "step",   "s", "Moves the number of steps (relative).", moveRelative },
         { "track",  "t", "Moves to track number.",                moveToTrack  },
+
+        { "retract",     "", "Retracts a short distance.",          retract    },
+        { "pulsewidth",  "", "Sets the pulsewidth (microseconds).", pulsewidth },
+        { "microsteps",  "", "Sets the microsteps.",                microsteps },
     };
 
     int _findLongCommandByShortcut(String shortcut);    // Returns the command index (or -1 if not found).
@@ -216,12 +237,12 @@ private:
     /// The list of supported float commands (one float argument).
     /// </summary>
     FloatCommand _floatCommands[MAX_FLOAT_COMMANDS] = {
-        { "moveto",       "a", "Moves to absolute position (mm).",             moveAbsoluteDistance },
-        { "move",         "r", "Moves the number of mm (relative).",           moveRelativeDistance },
+        { "moveto",       "a", "Moves to absolute position (mm).",         moveAbsoluteDistance },
+        { "move",         "r", "Moves the number of mm (relative).",       moveRelativeDistance },
 
-        { "speed",        "",  "Sets the current speed. (steps/sec).",         speed },
-        { "maxspeed",     "",  "Sets the maximum speed. (steps/sec).",         maxspeed },
-        { "acceleration", "",  "Sets the acceleration (steps/(sec*sec)).",     acceleration },
+        { "speed",        "",  "Sets the current speed. (steps/sec).",     speed },
+        { "maxspeed",     "",  "Sets the maximum speed. (steps/sec).",     maxspeed },
+        { "acceleration", "",  "Sets the acceleration (steps/(sec*sec)).", acceleration },
     };
 
     int _findFloatCommandByShortcut(String shortcut);   // Returns the command index (or -1 if not found).

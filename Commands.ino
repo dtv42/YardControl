@@ -6,12 +6,9 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>21-4-2023 12:56 PM</created>
-// <modified>24-4-2023 10:41 AM</modified>
+// <modified>25-4-2023 4:28 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
-#define ARDUINOTRACE_ENABLE 1
-
-#include <ArduinoTrace.h>
 
 #include "src/AppSettings.h"
 #include "src/TelnetServer.h"
@@ -224,6 +221,18 @@ void reset()
 }
 
 /// <summary>
+/// Save the current application settings updating max. speed and acceleration.
+/// </summary>
+void save()
+{
+    TRACE();
+    if (Commands.VerboseOutput) Telnet.println("save()");
+    Settings.Stepper.MaxSpeed = Actuator.getMaxSpeed();
+    Settings.Stepper.Acceleration = Actuator.getAcceleration();
+    Settings.save();
+}
+
+/// <summary>
 /// Move to home (zero).
 /// </summary>
 void home()
@@ -250,7 +259,7 @@ void speed()
 {
     TRACE();
     if (Commands.VerboseOutput) Telnet.println("speed()");
-    Telnet.print(Actuator.getSpeed());
+    Telnet.println(String(Actuator.getSpeed()));
 }
 
 /// <summary>
@@ -260,7 +269,7 @@ void maxspeed()
 {
     TRACE();
     if (Commands.VerboseOutput) Telnet.println("maxspeed()");
-    Telnet.print(Actuator.getMaxSpeed());
+    Telnet.println(String(Actuator.getMaxSpeed()));
 }
 
 /// <summary>
@@ -270,10 +279,41 @@ void acceleration()
 {
     TRACE();
     if (Commands.VerboseOutput) Telnet.println("acceleration()");
-    Telnet.print(Actuator.getAcceleration());
+    Telnet.println(String(Actuator.getAcceleration()));
+}
+
+/// <summary>
+/// Prints the minimum pulsewidth [microseconds].
+/// </summary>
+void pulsewidth()
+{
+    TRACE();
+    if (Commands.VerboseOutput) Telnet.println("pulsewidth()");
+    Telnet.println(String(Actuator.getPulseWidth()));
+}
+
+/// <summary>
+/// Prints the microsteps.
+/// </summary>
+void microsteps()
+{
+    TRACE();
+    if (Commands.VerboseOutput) Telnet.println("microsteps()");
+    Telnet.println(String(Actuator.getMicroSteps()));
 }
 
 // Number command functions (callbacks).
+
+/// <summary>
+/// Retracts a short distance.
+/// </summary>
+/// <param name="value">The direction (+1 or -1).</param>
+void retract(long value)
+{
+    TRACE(); DUMP(value);
+    if (Commands.VerboseOutput) Telnet.println(String("retract(") + value + ")");
+    Actuator.retract(value);
+}
 
 /// <summary>
 /// Move to absolute distance [mm].
@@ -364,7 +404,41 @@ void acceleration(float value)
     Actuator.setAcceleration(value);
 }
 
+/// <summary>
+/// Sets the minimum pulsewidth [microseconds].
+/// </summary>
+/// <param name="value">The new pulse width.</param>
+void pulsewidth(long value)
+{
+    TRACE(); DUMP(value);
+    if (Commands.VerboseOutput) Telnet.println(String("pulsewidth(") + value + ")");
+    Settings.Stepper.MinPulseWidth = value;
+    Actuator.setPulseWidth(value);
+}
+
+/// <summary>
+/// Sets the microsteps.
+/// </summary>
+/// <param name="value">The new microsteps.</param>
+void microsteps(long value)
+{
+    TRACE(); DUMP(value);
+    if (Commands.VerboseOutput) Telnet.println(String("microsteps(") + value + ")");
+    Settings.Stepper.MicroSteps = value;
+    Actuator.setMicroSteps(value);
+}
+
 // Basic command functions (callbacks).
+
+/// <summary>
+/// Print the track settings.
+/// </summary>
+void yard()
+{
+    TRACE();
+    if (Commands.VerboseOutput) Telnet.println("yard()");
+    Commands.JsonOutput ? Telnet.print(Settings.Yard.toJsonString()) : Telnet.print(Settings.Yard.toString());
+}
 
 /// <summary>
 /// Print the Pico W pin layout.
@@ -417,6 +491,18 @@ void settings()
     TRACE();
     if (Commands.VerboseOutput) Telnet.println("settings()");
     Commands.JsonOutput ? Telnet.print(Settings.toJsonString()) : Telnet.print(Settings.toString());
+}
+
+/// <summary>
+/// Print the application settings file.
+/// </summary>
+void appsettings()
+{
+    TRACE();
+    if (Commands.VerboseOutput) Telnet.println("appsettings()");
+    File file = LittleFS.open(SETTINGS_FILE, "r");
+    Telnet.print(file.readString());
+    file.close();
 }
 
 /// <summary>

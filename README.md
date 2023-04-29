@@ -26,24 +26,69 @@ With higher frequency the usable torque is decreased considerably.
 
 
 ### Stepper Motor Driver
-The stepper motor driver used is a TB6600 and allows microstepping up to 16, leading to a frequency of 32 kHz for the maximum RPM. The maximum pulse frequency for a duty cyle of 50/50 is 13 kHz, for a duty cycle of 25/75 it is 20 kHz or 12.5 usec pulse width and a maximum of 375 RPM.
+The stepper motor driver used is a DM542T and allows microstepping up to 128.
+The DM542T (V4.0) is designed to operate within 18 - 50VDC voltage input.
+The minimum pulse width is 2.5 μs.
 
-![TB6600](Documents/TB6600.jpg)
+![D M542 T](documents/DM542T.png)
 
-It supports speed and direction
-control. You can set its micro step and output current with 6 DIP switch. There are 7 kinds
-of micro steps (1, 2/A, 2/B, 4, 8, 16) and 8 kinds of current control (0.5A, 1A, 1.5A, 2A, 2.5A, 2.8A, 3.0A, 3.5A) in all. 
-All signal terminals adopt high-speed optocoupler isolation.
+The DM542T(V4.0) has one 8-bit DIP switch and one 1-bit selector. The first 8-bit is used to configure settings of micro
+step resolution, output current, motor standstill current, pulse type and smoothing time as shown below.
+
+~~~
+|  SW1  |  SW2  |  SW3  |  SW4  |  SW5  |  SW6  |  SW7  |  SW8  |
+
+     Output Current       Idle              Microstep
+                         Current
+~~~
+Microstep resolution is set by SW5, 6, 7, 8 of the DIP switches as shown in the following table.
+
+| Microsteps | Steps/rev. | SW5 | SW6 | SW7 | SW8 |
+|------------|------------|-----|-----|-----|-----|
+| 1          | 200        | ON  | ON  | ON  | ON  |
+| 2          | 400        | OFF | ON  | ON  | ON  |
+| 4          | 800        | ON  | OFF | ON  | ON  |
+| 8          | 1600       | OFF | OFF | ON  | ON  |
+| 16         | 3200       | ON  | ON  | OFF | ON  |
+| 32         | 6400       | OFF | ON  | OFF | ON  |
+| 64         | 12800      | ON  | OFF | OFF | ON  |
+| 128        | 25600      | OFF | OFF | OFF | ON  |
+| 5          | 1000       | ON  | ON  | ON  | OFF |
+| 10         | 2000       | OFF | ON  | ON  | OFF |
+| 20         | 4000       | ON  | OFF | ON  | OFF |
+| 25         | 5000       | OFF | OFF | ON  | OFF |
+| 40         | 8000       | ON  | ON  | OFF | OFF |
+| 50         | 10000      | OFF | ON  | OFF | OFF |
+| 100        | 20000      | ON  | OFF | OFF | OFF |
+| 125        | 25000      | OFF | OFF | OFF | OFF |
+
+##### Output Current Configurations
+The first three bits (SW1, 2, 3) of the DIP switch are used to set the dynamic current.
+
+| Peak Current | RMS Current | SW1 | SW2 | SW3 |
+|--------------|-------------|-----|-----|-----|
+|    1.00A     |    0.71A    | ON  | ON  | ON  |
+|    1.46A     |    1.04A    | OFF | ON  | ON  |
+|    1.91A     |    1.36A    | ON  | OFF | ON  |
+|    2.37A     |    1.69A    | OFF | OFF | ON  |
+|    2.84A     |    2.03A    | ON  | ON  | OFF |
+|    3.31A     |    2.36A    | OFF | ON  | OFF |
+|    3.76A     |    2.69A    | ON  | OFF | OFF |
+|    4.50A     |    3.20A    | OFF | OFF | OFF |
 
 #### **Features**
-- Support 8 kinds of current control
-- Support 6 kinds of micro steps adjustable
-- The interfaces adopt high-speed optocoupler isolation
-- Automatic semi-flow to reduce heat
-- Large area heat sink
-- Anti-high-frequency interference ability
-- Input anti-reverse protection
-- Overheat, over current and short circuit
+- Step & direction (PUL/DIR) control
+- Input voltage 20-50VDC (recommended 24-48VDC)
+- 200 KHz max pulse input frequency
+- 16 microstep resolutions of 200-25,600 via DIP switches
+- 8 output current settings of 1.0-4.5A via DIP Switches
+- Idle current reduction to 50% or 90% selection via SW4
+- Auto-tuning to match wide-range NEMA 11, 17, 23 and 24 stepper motors
+- Anti-Resonance for optimal torque, extra smooth motion, low motor heating and noise
+- Soft-start with no “jump” when powered on
+- Optically isolated inputs with 5V or 24V
+- Fault output
+- Over-voltage and over-current protections
 
 #### **Electrical Specification**
 
@@ -69,6 +114,11 @@ All signal terminals adopt high-speed optocoupler isolation.
     EN+     Off-line Control Enable +
     EN-     Off-line Control Enable - 
 ~~~
+**Signal Output**
+~~~ txt
+    ALM+    Fault output +
+    ALM-    Fault output -
+~~~
 **Motor Machine Winding**
 ~~~ txt
     A+ Stepper motor A+
@@ -82,9 +132,11 @@ All signal terminals adopt high-speed optocoupler isolation.
     GND     GND
 ~~~
 
-Note that the ENA input pin of the TB6600 is inverted (enabled = LOW) and is optional (connect the ENA input pin to ground).
+When over voltage or over current protection happens, DM542T(V4.0) red status LED light will blink and the
+impedance state between ALM+ and ALM- will change (from low to high or high to low depending on configuration)
+Note that the ENA input pin of the DM542T is inverted (enabled = LOW) and is optional (connect the ENA input pin to ground).
 
-### ![Raspberry Pi](Documents/RaspberryPilOGO.png) Pico W
+### ![Raspberry Pi](documents/RaspberryPiLOGO.png) Pico W
 The Raspberry Pi Pico W is a microcontroller board based on the Raspberry Pi RP2040 microcontroller chip
 and has been designed to be a low cost yet flexible development platform for RP2040, with a 2.4GHz
 wireless interface and the following key features:
@@ -102,26 +154,25 @@ wireless interface and the following key features:
 - 30 multi-function general purpose I/O (four can be used for ADC)
 - 12-bit 500ksps analogue to digital converter (ADC)
 
-![Pico W](Documents/picow-pinout.png)
+![Pico W](documents/picow-pinout.png)
 
 ### Logic Level Shifter
 Since the Raspberry Pi Pico W GPIO support 3.3V and 
 the TB6600 motor driver provides 5V inputs, the TXS0108 logic level shifter is used.
 
-![TXS0108](Documents/TXS0108.png)
+![S-L1600](documents/s-l1600.jpg)
 
 #### **Features**
 - Bi-directional
 - Automatic direction control
-- Maximum data rates: 110 Mbps (push pull)
 - 1.2 Mbps (open drain)
 - Low voltage 1.4 to 3.6 V
 - High voltage 1.65 to 5.5 V
-- Dimensions: 26 mm x 16 mm
+- Dimensions: 15 mm x 13 mm
 
 # Development
 
-##  ![Arduino](Documents/ArduinoLogo.png) Arduino
+##  ![Arduino](documents/ArduinoLogo.png) Arduino
 Arduino is an open-source hardware and software company, project, and user community that designs and manufactures single-board microcontrollers and microcontroller kits for building digital devices.
 
 The microcontrollers can be programmed using the C and C++ programming languages, using a standard API which is also known as the Arduino Programming Language, inspired by the Processing language and used with a modified version of the Processing IDE.
@@ -138,6 +189,7 @@ Additional libraries are used. They can be found and installed via the Arduino l
 - LittelFS
 - Blinkenlight
 - StringSplitter
+- ArduinoTrace
 
 ## Local Modules
 The local modules implement the application settings (read from a JSON file), support for blinking leds, system info, wireless connection, and a command interpreter.
@@ -250,18 +302,19 @@ All application settings are maintained here. The settings classses provided are
     },
     "Actuator": {
         "LedRunning": 3,
-        "LedLimit": 4,
-        "LedStop": 5,
-        "SwitchStop": 6,
-        "SwitchLimit1": 7,
-        "SwitchLimit2": 8,
+        "LedInLimit": 4,
+        "LedAlarmOn": 5,
+        "SwitchStop": 7,
+        "SwitchLimit1": 8,
+        "SwitchLimit2": 9,
         "MoveSpeed": 1000.0,
-        "Retract": 2.5
+        "Retract": 3200
     },
     "Stepper": {
         "PinPUL": 0,
         "PinDIR": 1,
         "PinENA": 2,
+        "PinALM": 6,
         "MicroSteps": 16,
         "MaxSpeed": 2000.0,
         "Acceleration": 300.0,
@@ -291,7 +344,6 @@ All application settings are maintained here. The settings classses provided are
         "Password": "<Password>",
         "Hostname": "<Hostname>"
     }
-}
 ~~~
 
 ### Telnet Commands

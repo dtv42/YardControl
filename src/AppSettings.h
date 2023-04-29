@@ -6,9 +6,10 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>24-4-2023 6:28 AM</modified>
+// <modified>26-4-2023 7:30 AM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
+
 #pragma once
 
 #include <array>
@@ -52,6 +53,7 @@ public:
         };
 
         void fromJson(JsonObject json);         // Update from JSON representation.
+        String toJsonString(); 	                // Get a serialized JSON representation.
         JsonObject toJson();                    // Get a JSON representation.
         String toString();                      // Get a string representation.
     };
@@ -71,10 +73,11 @@ public:
         uint8_t  LedAlarmOn   = 6;              // Led output pin number (alarm on).
 
         float    MoveSpeed    = 100;            // Calibration speed to move toward limit.
-        uint16_t Retract      = 1600;           // Retract distance when limit is hit (steps).
+        float    Retract      = 5.0;            // Retract distance when limit is hit (mm).
         float    Length       = 500.0;          // Length of the linear actuator (mm).
 
         void fromJson(JsonObject json);         // Update from JSON representation.
+        String toJsonString(); 	                // Get a serialized JSON representation.
         JsonObject toJson();                    // Get a JSON representation.
         String toString();                      // Get a string representation.
     };
@@ -97,6 +100,7 @@ public:
         uint16_t MinPulseWidth       = 20;      // The minimum allowed pulse width.
 
         void fromJson(JsonObject json);         // Update from JSON representation.
+        String toJsonString(); 	                // Get a serialized JSON representation.
         JsonObject toJson();                    // Get a JSON representation.
         String toString(); 	                    // Get a string representation.
     };
@@ -110,6 +114,7 @@ public:
         uint16_t Port = 80;                     // The Http Server port number.
 
         void fromJson(JsonObject json);         // Update from JSON representation.
+        String toJsonString(); 	                // Get a serialized JSON representation.
         JsonObject toJson();                    // Get a JSON representation.
         String toString();                      // Get a string representation.
     };
@@ -124,6 +129,7 @@ public:
         String   Prompt = ">";                  // The command line input prompt.
 
         void fromJson(JsonObject json);         // Update from JSON representation.
+        String toJsonString(); 	                // Get a serialized JSON representation.
         JsonObject toJson();                    // Get a JSON representation.
         String toString();                      // Get a string representation.
     };
@@ -144,6 +150,7 @@ public:
         String DNS;			                    // The domain name server.
 
         void fromJson(JsonObject json);         // Update from JSON representation.
+        String toJsonString(); 	                // Get a serialized JSON representation.
         JsonObject toJson();                    // Get a JSON representation.
         String toString();                      // Get a string representation.
     };
@@ -159,6 +166,7 @@ public:
         String Hostname;                        // The WiFi Access Point hostname
 
         void fromJson(JsonObject json);         // Update from JSON representation.
+        String toJsonString(); 	                // Get a serialized JSON representation.
         JsonObject toJson();                    // Get a JSON representation.
         String toString();                      // Get a string representation.
     };

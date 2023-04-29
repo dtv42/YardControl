@@ -4,7 +4,7 @@
   Copyright(c) 2023 Dr. Peter Trimmel. All rights reserved.
   Licensed under the MIT license. See the LICENSE file in the project root for more information.
   Created: 9-4-2023 7:45 PM
-  Modified: 10-4-2023 11:00 AM
+  Modified: 24-4-2023 11:56 AM
   Author: Peter Trimmel
 -------------------------------------------------------------------------------------------------------------------- #>
 $path = "..\\src\\version.h"
@@ -28,11 +28,12 @@ for ($i=0; $i -lt 12; $i++)
 
 # Add the C++ code (static SOFTWARE_VERSION and LAST_MODIFIED_DATE)
 $code = $"\r\n" +
-        "struct Auto" + $"\r\n" +
-        "{" + $"\r\n" +
-        "    static constexpr const char* const SOFTWARE_VERSION = `"V" + $($version.AssemblySemFileVer) + "-" + $($version.UncommittedChanges) + " " + $($version.CommitDate) + "`";" + $"\r\n" + 
-        "    static constexpr const char* const LAST_MODIFIED_DATE = __DATE__;" + $"\r\n" +
-        "};" + $"\r\n"
+        "#pragma once\r\n\r\n" +
+        "struct Auto\r\n" +
+        "{\r\n" +
+        "    static constexpr const char* const SOFTWARE_VERSION = `"V" + $($version.AssemblySemFileVer) + "-" + $($version.UncommittedChanges) + " " + $($version.CommitDate) + "`";\r\n" + 
+        "    static constexpr const char* const LAST_MODIFIED_DATE = __DATE__;\r\n" +
+        "};\r\n"
 
 $content = $header + $code
 

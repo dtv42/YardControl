@@ -25,6 +25,9 @@
     <Filter Include="Data Files\www\js">
       <UniqueIdentifier>{8c4f1b06-8051-4c73-bcb3-ed39de74a866}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Documents">
+      <UniqueIdentifier>{fed3d95c-27af-477c-93d3-e863b63711b1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\arduino folders read me.txt">
@@ -69,7 +72,7 @@
     <None Include="data\www\js\dark-mode-switch.min.js">
       <Filter>Data Files\www\js</Filter>
     </None>
-    <None Include="data\www\css\custom-input-switch.css">
+    <None Include="data\www\css\custom-styles.css">
       <Filter>Data Files\www\css</Filter>
     </None>
   </ItemGroup>
@@ -181,6 +184,24 @@
   <ItemGroup>
     <Image Include="data\www\favicon.ico">
       <Filter>Data Files\www</Filter>
+    </Image>
+    <Image Include="documents\ArduinoLogo.png">
+      <Filter>Documents</Filter>
+    </Image>
+    <Image Include="documents\pico_w.png">
+      <Filter>Documents</Filter>
+    </Image>
+    <Image Include="documents\picow-pinout.png">
+      <Filter>Documents</Filter>
+    </Image>
+    <Image Include="documents\RaspberryPiLogo.png">
+      <Filter>Documents</Filter>
+    </Image>
+    <Image Include="documents\s-l1600.jpg">
+      <Filter>Documents</Filter>
+    </Image>
+    <Image Include="documents\DM542T.png">
+      <Filter>Documents</Filter>
     </Image>
   </ItemGroup>
 </Project>

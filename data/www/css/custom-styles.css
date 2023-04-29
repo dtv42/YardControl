@@ -1,3 +1,21 @@
+@charset "UTF-8";
+/*!
+ * copyright (c) 2023 Dr. Peter Trimmel. All rights reserved.
+ * licensed under the MIT license. See the LICENSE file in the project root for more information.
+ * created 9-4-2023 7:45 PM
+ * modified 26-4-2023 7:30 AM
+ */
+
+#led1 #led2 #led3 #led4 {
+    color: lightgray;
+}
+
+.btn-xl {
+    padding: 10px 20px;
+    font-size: 20px;
+    border-radius: 9px;
+}
+
 .form-switch .form-check-input:focus {
     border-color: rgba(0, 0, 0, 0.25);
     outline: 0;

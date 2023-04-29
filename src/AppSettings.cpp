@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>13-4-2023 1:42 PM</modified>
+// <modified>26-4-2023 8:17 AM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 #include <StringSplitter.h>
@@ -97,6 +97,17 @@ JsonObject AppSettings::YardSettings::toJson()
 }
 
 /// <summary>
+/// Returns a (pretty) string representation of the current settings.
+/// </summary>
+/// <returns>The serialized JSON document.</returns>
+String AppSettings::YardSettings::toJsonString()
+{
+    String json;
+    serializeJsonPretty(toJson(), json);
+    return json;
+}
+
+/// <summary>
 /// Creates a printable string representation of the settings.
 /// </summary>
 /// <returns>The printable string.</returns>
@@ -160,6 +171,17 @@ JsonObject AppSettings::ActuatorSettings::toJson()
 }
 
 /// <summary>
+/// Returns a (pretty) string representation of the current settings.
+/// </summary>
+/// <returns>The serialized JSON document.</returns>
+String AppSettings::ActuatorSettings::toJsonString()
+{
+    String json;
+    serializeJsonPretty(toJson(), json);
+    return json;
+}
+
+/// <summary>
 /// Creates a printable string representation of the settings.
 /// </summary>
 /// <returns>The printable string.</returns>
@@ -220,6 +242,17 @@ JsonObject AppSettings::StepperSettings::toJson()
 }
 
 /// <summary>
+/// Returns a (pretty) string representation of the current settings.
+/// </summary>
+/// <returns>The serialized JSON document.</returns>
+String AppSettings::StepperSettings::toJsonString()
+{
+    String json;
+    serializeJsonPretty(toJson(), json);
+    return json;
+}
+
+/// <summary>
 /// Creates a printable string representation of the settings.
 /// </summary>
 /// <returns>The printable string.</returns>
@@ -263,6 +296,17 @@ JsonObject AppSettings::HttpSettings::toJson()
 }
 
 /// <summary>
+/// Returns a (pretty) string representation of the current settings.
+/// </summary>
+/// <returns>The serialized JSON document.</returns>
+String AppSettings::HttpSettings::toJsonString()
+{
+    String json;
+    serializeJsonPretty(toJson(), json);
+    return json;
+}
+
+/// <summary>
 /// Creates a printable string representation of the settings.
 /// </summary>
 /// <returns>The printable string.</returns>
@@ -296,6 +340,17 @@ JsonObject AppSettings::TelnetSettings::toJson()
     _doc["Prompt"] = Prompt;
 
     return _doc.as<JsonObject>();
+}
+
+/// <summary>
+/// Returns a (pretty) string representation of the current settings.
+/// </summary>
+/// <returns>The serialized JSON document.</returns>
+String AppSettings::TelnetSettings::toJsonString()
+{
+    String json;
+    serializeJsonPretty(toJson(), json);
+    return json;
 }
 
 /// <summary>
@@ -348,6 +403,17 @@ JsonObject AppSettings::WiFiSettings::toJson()
 }
 
 /// <summary>
+/// Returns a (pretty) string representation of the current settings.
+/// </summary>
+/// <returns>The serialized JSON document.</returns>
+String AppSettings::WiFiSettings::toJsonString()
+{
+    String json;
+    serializeJsonPretty(toJson(), json);
+    return json;
+}
+
+/// <summary>
 /// Creates a printable string representation of the settings.
 /// </summary>
 /// <returns>The printable string.</returns>
@@ -390,6 +456,17 @@ JsonObject AppSettings::APSettings::toJson()
     _doc["Hostname"] = Hostname;
 
     return _doc.as<JsonObject>();
+}
+
+/// <summary>
+/// Returns a (pretty) string representation of the current settings.
+/// </summary>
+/// <returns>The serialized JSON document.</returns>
+String AppSettings::APSettings::toJsonString()
+{
+    String json;
+    serializeJsonPretty(toJson(), json);
+    return json;
 }
 
 /// <summary>
