@@ -206,18 +206,6 @@
                         <td><a href="#postTrack" id="postTrack" onclick="postTrack()">/track</a></td>
                         <td>Move to track number.</td>
                     </tr>
-                    <tr>
-                        <td><a href="#postSpeed" id="postSpeed" onclick="postSpeed()">/speed</a></td>
-                        <td>Sets the maximum speed (steps per second).</td>
-                    </tr>
-                    <tr>
-                        <td><a href="#postMaxSpeed" id="postMaxSpeed" onclick="postMaxSpeed()">/maxspeed</a></td>
-                        <td>Sets the maximum speed (steps per second).</td>
-                    </tr>
-                    <tr>
-                        <td><a href="#postAcceleration" id="postAcceleration" onclick="postAcceleration()">/acceleration</a></td>
-                        <td>Sets the acceleration (steps per second per second).</td>
-                    </tr>
                 </tbody>
             </table>
 
@@ -319,18 +307,6 @@
 
         function postTrack() {
             alert("Posting a track command not supported from this page.");
-        }
-
-        function postSpeed() {
-            alert("Posting a set speed command not supported from this page.");
-        }
-
-        function postMaxSpeed() {
-            alert("Posting a set maxspeed command not supported from this page.");
-        }
-
-        function postAcceleration() {
-            alert("Posting a set acceleration command not supported from this page.");
         }
 
         telnet.href = "telnet://" + window.location.host;

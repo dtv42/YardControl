@@ -168,8 +168,8 @@
                         <td><span id="stepperPinALM"></span></td>
                     </tr>
                     <tr>
-                        <td class="col-2">Interval:</td>
-                        <td><span id="stepperInterval"></span></td>
+                        <td class="col-2">Speed:</td>
+                        <td><span id="stepperSpeed"></span></td>
                     </tr>
                     <tr>
                         <td class="col-2">Microsteps:</td>
@@ -343,7 +343,7 @@
         const stepperPinDIR              = document.getElementById('stepperPinDIR');
         const stepperPinENA              = document.getElementById('stepperPinENA');
         const stepperPinALM              = document.getElementById('stepperPinALM');
-        const stepperInterval            = document.getElementById('stepperInterval');
+        const stepperSpeed               = document.getElementById('stepperSpeed');
         const stepperMicroSteps          = document.getElementById('stepperMicroSteps');
         const stepperStepsPerRotation    = document.getElementById('stepperStepsPerRotation');
         const stepperDistancePerRotation = document.getElementById('stepperDistancePerRotation');
@@ -399,7 +399,7 @@
                     stepperPinDIR.textContent              = json.Stepper.PinDIR;
                     stepperPinENA.textContent              = json.Stepper.PinENA;
                     stepperPinALM.textContent              = json.Stepper.PinALM;
-                    stepperInterval.textContent            = json.Stepper.Interval;
+                    stepperSpeed.textContent               = json.Stepper.Speed;
                     stepperMicroSteps.textContent          = json.Stepper.MicroSteps;
                     stepperStepsPerRotation.textContent    = json.Stepper.StepsPerRotation;
                     stepperDistancePerRotation.textContent = json.Stepper.DistancePerRotation;

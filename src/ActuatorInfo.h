@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>29-4-2023 9:47 PM</modified>
+// <modified>1-5-2023 7:18 AM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -36,13 +36,15 @@ public:
     bool  LimitFlag;            // Flag indicating that a limit switch has turned on.
     bool  AlarmFlag;            // Flag indicating that the stepper driver alarm has been turned on.
 
-    long  Count;                // The current interval count.
+    long  Delta;                // The remaining steps from the current position to the target position.
     long  Steps;                // The current motor position in steps.
     long  Target;               // The target position in steps. Positive is clockwise from the 0 position.
-    long  StepsToGo;            // The remaining steps from the current position to the target position.
 
+    int   Direction;            // The current stepper direction (CW: 1, CCW: -1).
     float Position;             // The current motor position in mm.
-    long  Interval;             // The current timer interval in microseconds.
+    long  Delay;                // The current pulse delay in microseconds.
+    float Speed;                // The current speed in steps per second.
+    float SpeedRPM;             // The current motor speed in RPM.
     long  Microsteps;           // The currently configured microsteps.
 
     String toJsonString();      // Get a serialized JSON representation.

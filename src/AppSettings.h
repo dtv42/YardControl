@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>29-4-2023 9:46 PM</modified>
+// <modified>30-4-2023 6:48 AM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -91,7 +91,8 @@ public:
         uint8_t  PinDIR              = 1;       // The output pin number for driver DIR input (direction).
         uint8_t  PinENA              = 2;       // The output pin number for driver ENA input (enable).
         uint8_t  PinALM              = 3;       // The input pin number for driver ALM output (alarm).
-        uint32_t Interval            = 100;     // The timer interval in multiples of 10 microseconds.
+
+        float    Speed               = 1000.0;  // The stepper speed in steps per seconds.
         uint8_t  MicroSteps          = 1;       // The multiplication factor for steps (microsteps).
         uint16_t StepsPerRotation    = 200;     // The number of steps per rotation (360°).
         float    DistancePerRotation = 1.0;     // The distance in mm per rotation (360°).

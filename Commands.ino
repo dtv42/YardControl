@@ -6,9 +6,13 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>21-4-2023 12:56 PM</created>
-// <modified>29-4-2023 1:14 PM</modified>
+// <modified>3-5-2023 11:40 AM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
+
+// Disable all traces when set to 0.
+#define ARDUINOTRACE_ENABLE 0
+
 #include "src/AppSettings.h"
 #include "src/TelnetServer.h"
 #include "src/Actuator.h"
@@ -216,7 +220,6 @@ void save()
 {
     TRACE();
     if (Commands.VerboseOutput) Telnet.println("save()");
-    Settings.Stepper.Interval = Actuator.getInterval();
     Settings.save();
 }
 
@@ -241,13 +244,23 @@ void gpio()
 }
 
 /// <summary>
-/// Print the current timer interval [microsecond].
+/// Print the current speed [RPM].
 /// </summary>
-void interval()
+void rpm()
 {
     TRACE();
-    if (Commands.VerboseOutput) Telnet.println("interval()");
-    Telnet.println(String(Actuator.getInterval()));
+    if (Commands.VerboseOutput) Telnet.println("rpm()");
+    Telnet.println(String(Actuator.getSpeedRPM()));
+}
+
+/// <summary>
+/// Print the current speed [steps per second].
+/// </summary>
+void speed()
+{
+    TRACE();
+    if (Commands.VerboseOutput) Telnet.println("speed()");
+    Telnet.println(String(Actuator.getSpeed()));
 }
 
 /// <summary>
@@ -257,7 +270,7 @@ void microsteps()
 {
     TRACE();
     if (Commands.VerboseOutput) Telnet.println("microsteps()");
-    Telnet.println(String(Actuator.getMicroSteps()));
+    Telnet.println(String(Actuator.getMicrosteps()));
 }
 
 // Number command functions (callbacks).
@@ -270,7 +283,8 @@ void retract(long value)
 {
     TRACE(); DUMP(value);
     if (Commands.VerboseOutput) Telnet.println(String("retract(") + value + ")");
-    Actuator.retract(value);
+    if ((value == 1) || (value == -1))
+        Actuator.retract(static_cast<LinearActuator::Direction>(value));
 }
 
 /// <summary>
@@ -330,14 +344,25 @@ void moveToTrack(long value)
 }
 
 /// <summary>
-/// Set the timer interval [microseconds].
+/// Set the speed [RPM].
 /// </summary>
-/// <param name="value">The new interval value.</param>
-void interval(long value)
+/// <param name="value">The new speed value.</param>
+void rpm(float value)
 {
     TRACE(); DUMP(value);
-    if (Commands.VerboseOutput) Telnet.println(String("interval(") + value + ")");
-    Actuator.setInterval(value);
+    if (Commands.VerboseOutput) Telnet.println(String("rpm(") + value + ")");
+    Actuator.setSpeedRPM(value);
+}
+
+/// <summary>
+/// Set the speed [steps per seconds].
+/// </summary>
+/// <param name="value">The new speed value.</param>
+void speed(float value)
+{
+    TRACE(); DUMP(value);
+    if (Commands.VerboseOutput) Telnet.println(String("speed(") + value + ")");
+    Actuator.setSpeed(value);
 }
 
 /// <summary>
@@ -349,7 +374,7 @@ void microsteps(long value)
     TRACE(); DUMP(value);
     if (Commands.VerboseOutput) Telnet.println(String("microsteps(") + value + ")");
     Settings.Stepper.MicroSteps = value;
-    Actuator.setMicroSteps(value);
+    Actuator.setMicrosteps(value);
 }
 
 // Basic command functions (callbacks).

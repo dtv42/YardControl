@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>21-4-2023 12:55 PM</created>
-// <modified>21-4-2023 12:56 PM</modified>
+// <modified>2-5-2023 6:40 AM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -452,8 +452,8 @@ void CommandsClass::parse(String command)
 /// <returns>String containing the command help.</returns>
 String CommandsClass::getHelp()
 {
-    String help = String("Test Command:") + "\r\n" +
-        "Test routine for a simple commandline parser." + "\r\n" + "\r\n" +
+    String help = String("Yard Control:") + "\r\n" +
+        "A fiddle yard controller using a linear actuator." + "\r\n" + "\r\n" +
         "The following commands with no argument are available:" + "\r\n" + "\r\n";
 
     // Generate the help string for the available base commands (with shortcut).

@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>29-4-2023 9:59 PM</modified>
+// <modified>2-5-2023 6:36 AM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -45,7 +45,8 @@ void reboot();
 void reset();
 void save();
 
-void interval();
+void rpm();
+void speed();
 void microsteps();
 
 void moveAbsolute(long value);
@@ -56,7 +57,8 @@ void retract(long value);
 void moveAbsoluteDistance(float value);
 void moveRelativeDistance(float value);
 
-void interval(long value);
+void rpm(float value);
+void speed(float value);
 void microsteps(long value);
 
 #pragma endregion
@@ -135,9 +137,8 @@ public:
 /// This class maintains lists of available commands.
 ///
 ///     init()     - Initializes the command list.
-///     add()      - Creates a new command and adds to the command list.
-///     run()      - Parses the input line and runs the command.
-///     help()     - Gets a printable help string on the available commands.
+///     parse()    - Parses the input line and runs the command.
+///     getHelp()  - Gets a printable help string on the available commands.
 ///
 /// The following command types are supported:
 ///
@@ -151,9 +152,9 @@ class CommandsClass
 private:
     String _padTo(String str, const size_t num, const char paddingChar = ' ');
 
-    static const int MAX_BASE_COMMANDS = 28;
-    static const int MAX_LONG_COMMANDS = 6;
-    static const int MAX_FLOAT_COMMANDS = 2;
+    static const int MAX_BASE_COMMANDS = 29;
+    static const int MAX_LONG_COMMANDS = 5;
+    static const int MAX_FLOAT_COMMANDS = 4;
 
     static const int MAX_BASE_COMMAND_LENGTH = 12;
     static const int MAX_BASE_SHORTCUT_COMMAND_LENGTH = 9;
@@ -192,10 +193,10 @@ private:
         { "appsettings",  "",  "Shows the appsettings file.",                  appsettings },
         { "reboot",       "",  "Reboots the RP2040.",                          reboot      },
         { "reset",        "",  "Resets the current position to zero.",         reset       },
-        { "save",         "",  "Sves the updated application settings.",       save        },
+        { "save",         "",  "Saves the updated application settings.",      save        },
 
-        { "interval",     "",  "Gets the timer interval (microseconds).",      interval     },
-        { "microsteps",   "",  "Gets the microsteps.",                         microsteps   },
+        { "rpm",          "",  "Gets the speed RPM.",                          rpm         },
+        { "speed",        "",  "Gets the speed (steps per second).",           speed       },
     };
 
     int _findBaseCommandByShortcut(String shortcut);
@@ -206,13 +207,12 @@ private:
     /// The list of supported long commands (one long argument).
     /// </summary>
     LongCommand _longCommands[MAX_LONG_COMMANDS] = {
-        { "stepto",      "m", "Moves to absolute position (steps).",     moveAbsolute },
-        { "step",        "s", "Moves the number of steps (relative).",   moveRelative },
-        { "track",       "t", "Moves to track number.",                  moveToTrack  },
+        { "stepto",      "m", "Moves to absolute position (steps).",   moveAbsolute },
+        { "step",        "s", "Moves the number of steps (relative).", moveRelative },
+        { "track",       "t", "Moves to track number.",                moveToTrack  },
 
-        { "retract",     "",  "Retracts a short distance.",              retract      },
-        { "interval",    "",  "Sets the timer interval (microseconds).", interval     },
-        { "microsteps",  "",  "Sets the microsteps.",                    microsteps   },
+        { "retract",     "",  "Retracts a short distance.", retract    },
+        { "microsteps",  "",  "Sets the microsteps.",       microsteps },
     };
 
     int _findLongCommandByShortcut(String shortcut);    // Returns the command index (or -1 if not found).
@@ -225,6 +225,9 @@ private:
     FloatCommand _floatCommands[MAX_FLOAT_COMMANDS] = {
         { "moveto", "a", "Moves to absolute position (mm).",   moveAbsoluteDistance },
         { "move",   "r", "Moves the number of mm (relative).", moveRelativeDistance },
+
+        { "rpm",    "",  "Sets the speed in RPM.",             rpm   },
+        { "speed",  "",  "Sets the speed (steps per second).", speed },
     };
 
     int _findFloatCommandByShortcut(String shortcut);   // Returns the command index (or -1 if not found).

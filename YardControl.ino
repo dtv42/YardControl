@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:44 PM</created>
-// <modified>29-4-2023 9:10 AM</modified>
+// <modified>3-5-2023 3:23 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 #if !(defined(ARDUINO_RASPBERRY_PI_PICO_W))
@@ -24,6 +24,7 @@
 #include <WebServer.h>
 #include <Blinkenlight.h>
 #include <InputDebounce.h>
+#include <TimerInterrupt_Generic.h>
 
 #include "src/AppSettings.h"
 #include "src/PicoPins.h"
@@ -69,8 +70,8 @@ TelnetServer Telnet;
 // Create the (global) commands instance.
 CommandsClass Commands;
 
-// Timer used to drive the stepper motor (fixed frequency of 100 kHz).
-RPI_PICO_Timer Timer(0);                   
+// Create the (global) stepper driver timer.
+RPI_PICO_Timer Timer(0);
 
 #pragma endregion
 
@@ -179,7 +180,7 @@ void setup()
 
 #pragma endregion
 
-#pragma region Initialize Gpio
+#pragma region Initialize GPIO
 
     Pins.add(Settings.Stepper.PinPUL, OUTPUT, "PUL");
     Pins.add(Settings.Stepper.PinDIR, OUTPUT, "DIR");
@@ -197,10 +198,7 @@ void setup()
 
     Serial.print(Pins.toString());
 
-#pragma endregion
-
-#pragma region Initialize Inputs
-
+    // Initialize debounced inputs.
     Inputs.init();
 
 #pragma endregion
@@ -314,11 +312,11 @@ void setup()
     HttpServer.on("/reboot",    postReboot);
 
     // Web server setup - PUT commands with argument
-    HttpServer.on("/step",         putIntegerCommand);
-    HttpServer.on("/move",         putFloatCommand);
-    HttpServer.on("/stepto",       putIntegerCommand);
-    HttpServer.on("/moveto",       putFloatCommand);
-    HttpServer.on("/track",        putIntegerCommand);
+    HttpServer.on("/step",   putIntegerCommand);
+    HttpServer.on("/move",   putFloatCommand);
+    HttpServer.on("/stepto", putIntegerCommand);
+    HttpServer.on("/moveto", putFloatCommand);
+    HttpServer.on("/track",  putIntegerCommand);
 
     // Upload the application settings.
     HttpServer.on("/appsettings.json", postSettings);
@@ -329,7 +327,7 @@ void setup()
 
 #pragma endregion
 
-#pragma region Telnet Server
+#pragma region Initialize Telnet
 
     // Passing on functions for various Telnet events.
     Telnet.onConnect(onTelnetConnect);
@@ -359,15 +357,14 @@ void setup()
 
 #pragma region Initialize Timer
 
-    /// The timer callback is triggered every 10 microseconds (100 kHz).
-    if (Timer.attachInterrupt(100000, TimerHandler))
+    // Initialize timer with maximum frequency (100 kHz).
+    if (Timer.setFrequency(Actuator.FREQUENCY, TimerHandler))
     {
-        Serial.println("Starting Timer OK");
-        Actuator.enable();
+        Serial.println("Starting  Timer OK");
     }
     else
     {
-        Serial.println("Cannot start Timer");
+        Serial.println("Can't set Timer.");
 
         // Don't continue, just indicate the error.
         Led.pattern(1, 5);

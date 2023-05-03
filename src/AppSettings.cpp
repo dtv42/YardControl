@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>29-4-2023 3:08 PM</modified>
+// <modified>1-5-2023 6:10 AM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 #include <StringSplitter.h>
@@ -208,7 +208,7 @@ void AppSettings::StepperSettings::fromJson(JsonObject json)
         PinDIR              = json["PinDIR"]              | PinDIR;
         PinENA              = json["PinENA"]              | PinENA;
         PinALM              = json["PinALM"]              | PinALM;
-        Interval            = json["Interval"]            | Interval;
+        Speed               = json["Speed"]               | Speed;
         MicroSteps          = json["MicroSteps"]          | MicroSteps;
         StepsPerRotation    = json["StepsPerRotation"]    | StepsPerRotation;
         DistancePerRotation = json["DistancePerRotation"] | DistancePerRotation;
@@ -226,7 +226,7 @@ JsonObject AppSettings::StepperSettings::toJson()
     _doc["PinDIR"]              = PinDIR;
     _doc["PinENA"]              = PinENA;
     _doc["PinALM"]              = PinALM;
-    _doc["Interval"]            = Interval;
+    _doc["Speed"]               = Speed;
     _doc["MicroSteps"]          = MicroSteps;
     _doc["StepsPerRotation"]    = StepsPerRotation;
     _doc["DistancePerRotation"] = DistancePerRotation;
@@ -256,7 +256,7 @@ String AppSettings::StepperSettings::toString()
                   "    PinDIR:              " + PinDIR              + "\r\n" +
                   "    PinENA:              " + PinENA              + "\r\n" +
                   "    PinALM:              " + PinALM              + "\r\n" +
-                  "    Interval:            " + Interval            + "\r\n" +
+                  "    Speed:               " + Speed               + "\r\n" +
                   "    MicroSteps:          " + MicroSteps          + "\r\n" +
                   "    StepsPerRotation:    " + StepsPerRotation    + "\r\n" +
                   "    DistancePerRotation: " + DistancePerRotation + "\r\n";

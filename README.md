@@ -212,30 +212,32 @@ The main module gets the settings, connects to an wlan access point, creates the
 
 1. Create (global) instances.
     1. Create the onboard led instance.
-    2. Create the actuator instance.
-    3. Instanciates the web server (on port 80).
-    4. Instanciates the telnet server.
-    5. Create the commands instance.
+    2. Create the application settings.
+    3. Create the input and output pins.
+    4. Create the actuator instance.
+    5. Instanciates the web server (on port 80).
+    6. Instanciates the telnet server.
+    7. Create the commands instance.
+    8. Instanciates the global timer.
 2. Run the setup() function.
    1. Start the Serial interface (USB).
    2. Initialize the LittleFS file system.
    3. Initialize the Settings (appsettings.json).
-   4. Initialize the actuator instance.
-   5. Connect to a wlan access point.
+   4. Initializes the GPIO outputs and inputs.
+   5. Initialize the actuator instance.
+   6. Connect to a wlan access point.
       1. If not successful create local AP.
       2. If local AP cannot be creates, stop.
-   6. Get UTC time using NTP.
-   7. Initialize the Commands.
-   8. Set up all commands (name, callback).
-   9. Setup the HTTP requests.
-   11. Setup the telnet callbacks.
-   12. Start the web server.
-   13. Start the telnet server.
-3.  Enter loop().
+   7. Get UTC time using NTP.
+   8. Setup the HTTP requests.
+   9. Start the web server.
+   10. Setup the telnet callbacks.
+   11. Start the telnet server.
+   12. Initialize the global timer.
+3. Enter loop().
     1.  Update Led.
-    2.  Update Telnet.
-    3.  Update Inputs.
-    3.  Update Actuator.
+    2.  Update Inputs.
+    3.  Update Telnet.
     4.  Update Http Server.
 
 ### Commands
@@ -510,3 +512,106 @@ The Raspberry Pi Pico W and the GPIO pins (output from 'pico' command).
                    [   GP14 ] [19] |         | [22] [  GP17  ]
                    [   GP15 ] [20] |_________| [21] [  GP16  ]
 ~~~
+#### Stepper Driver Control
+A global periodic timer running at 100 kHz is used to generate pulses for the stepper motor driver unit.
+The timer callback function is therefore called 100000 times a second, or every 10 microseconds.
+
+An internal step counter is used to keep track of the required steps to reach a specified target.
+A second internal counter is used to determine the delay between pulses (steps) depending on the specified speed.
+The pulsewidth is fixed at 10 microseconds (the output is set high at the first call, and set low at the second call).
+The second counter is increased until the number of required calls (number of intervals) is reached.
+
+~~~
+|   1  |   2  |   3  |   4  |        |   n  |       Number of intervals (n)
+| 10us | 10us | 10us | 10us |        | 10us |       10 us intervals
+|------|------|------|------|........|------|
+| PUL+
+ ______
+|      |
+|      |_____________________........_______|       One output pulse (every n*10 us)
+
+|<---->|<--------------------........------>|       
+| 10us |           (n - 1)*10 us            |       Total time n*10 us
+~~~
+
+When the speed is specified in steps per second, the number of required 10 us intervals is dermined as follows:
+~~~
+ _               _               _               _              
+| |_____________| |_____________| |___......____| |_____________
+
+number of intervals = 100 kHz / (steps per second)
+~~~
+Since the number of intervals has to be an integer number, the set speed will be only approximately correct.
+However, the stepper driver is moving for the required number of steps with the set speed.
+The maximum speed is a delay of 10 us (2 intervals) resulting in a 20 us period or 50 kHz.
+
+For a typical stepper motor driver with 200 steps per revolution and a linear actuator with a lead screw providing 2 mm travel distance per revolution, this results in 100 steps per mm.
+When microstepping is used, the number of steps / mm is increased acordingly. The attainable speed for a stepper motor is in the range of 1000 rpm.
+With higher speed, the torque is considerable decreased, and the motor has to ramp up the speed slowly.
+Assuming a maximum frequency of 50 kHz, the resulting maximum RPM is as follows:
+
+~~~
+2.00    mm per rotation
+200     steps per rotation
+100000  timer frequency (100 kHz)
+50000   max steps per second (2 cycles)
+
+(steps/rotation) = microsteps*(steps/rotation)
+(max rpm)        = 60*(max steps/second)/(steps/rotation)
+(mm/sec)         = (distance/rotation)*(max rpm)/60
+(mm/min)         = (max rpm)/(distance/rotation)
+(steps/mm)       = (steps/rotation)/(distance/rotation)
+~~~
+| microsteps  | steps/rotation |   max rpm   |   mm/sec  |  mm/min   |  steps/mm  |
+|-------------|----------------|-------------|-----------|---------- |------------|
+|      1	  |      200	   |  15000.0000 | 500.00000 | 7500.000  |     100    |
+|      2	  |      400	   |   7500.0000 | 250.00000 | 3750.000  |     200    |
+|      4	  |      800	   |   3750.0000 | 125.00000 | 1875.000  |     400    |
+|      5	  |      1000	   |   3000.0000 | 100.00000 | 1500.000  |     500    |
+|      8	  |      1600	   |   1875.0000 | 62.50000  | 937.5000  |     800    |
+|      10	  |      2000	   |   1500.0000 | 50.00000  | 750.0000  |    1000    |
+|      **16**	  |      **3200**	   |   **937.5000**  |   **31.2500** | **468.7500**  |    **1600**    |
+|      20	  |      4000	   |    750.0000 | 25.00000  | 375.0000  |    2000    |
+|      25	  |      5000	   |    600.0000 | 20.00000  | 300.0000  |    2500    |
+|      32	  |      6400	   |    468.7500 | 15.62500  | 234.3750  |    3200    |
+|      40	  |      8000	   |    375.0000 | 12.50000  | 187.5000  |    4000    |
+|      50	  |      10000	   |    300.0000 | 10.00000  | 150.0000  |    5000    |
+|      64	  |      12800	   |    234.3750 |  7.81250  | 117.1875  |    6400    |
+|      100	  |      20000	   |    150.0000 |  5.00000  | 75.00000  |   10000    |
+|      125	  |      25000	   |    120.0000 |  4.00000  | 60.00000  |   12500    |
+|      128	  |      25600	   |    117.1875 |  3.90625  | 58.59375  |   12800    |
+
+
+With 16 microsteps the speed and intervals can be calculated as:
+
+~~~
+rpm       = 60*(steps/sec)/((steps/rotation)*microsteps)
+(mm/sec)  = (distance/rotation)*rpm/60
+intervals = INT(timer frequency/(steps/sec))
+speed     = (timer frequency)/intervals
+~~~
+| steps/sec |    rpm    |   mm/sec  | intervals	| speed  |
+|-----------|-----------|-----------|-----------|--------|
+|    1	    |   0.01875	|  0.000625	| 100000	| 1      |
+|    10	    |   0.18750	|  0.006250	|  10000	| 10     |
+|    25	    |   0.46875	|  0.015625	|   4000	| 25     |
+|    50	    |   0.93750	|  0.031250	|   2000	| 50     |
+|    75	    |   1.40625	|  0.046875	|   1333	| 75     |
+|    100	|   1.87500	|  0.062500	|   1000	| 100    |
+|    250	|   4.68750	|  0.156250	|    400	| 250    |
+|    500	|   9.37500	|  0.312500	|    200	| 500    |
+|    750	|  14.06250	|  0.468750	|    133	| 752    |
+|    1000	|  18.75000	|  0.625000	|    100	| 1000   |
+|    2500	|  46.87500	|  1.562500	|     40	| 2500   |
+|    5000	|  93.75000	|  3.125000	|     20	| 5000   |
+|    7500	| 140.62500	|  4.687500	|     13	| 7692   |
+|    10000	| 187.50000	|  6.250000	|     10	| 10000  |
+|    25000	| 468.75000	| 15.625000 | 	   4	| 25000  |
+|    50000	| 937.50000	| 31.250000 | 	   2	| 50000  |
+
+
+The total number of (10 us) intervals is stored in an integer variable.
+The maximum number (32 bit integer) is 2147483647 resulting in a maximum period of 21474836470 us () or ca. 6 hours.
+The minimum speed is therefore ca. 4 steps per day.
+
+
