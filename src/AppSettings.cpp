@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>1-5-2023 6:10 AM</modified>
+// <modified>4-5-2023 1:36 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 #include <StringSplitter.h>
@@ -208,7 +208,10 @@ void AppSettings::StepperSettings::fromJson(JsonObject json)
         PinDIR              = json["PinDIR"]              | PinDIR;
         PinENA              = json["PinENA"]              | PinENA;
         PinALM              = json["PinALM"]              | PinALM;
-        Speed               = json["Speed"]               | Speed;
+        MinSpeed            = json["MinSpeed"]            | MinSpeed;
+        MaxSpeed            = json["MaxSpeed"]            | MaxSpeed;
+        ConstSpeed          = json["ConstSpeed"]          | ConstSpeed;
+        Acceleration        = json["Acceleration"]        | Acceleration;
         MicroSteps          = json["MicroSteps"]          | MicroSteps;
         StepsPerRotation    = json["StepsPerRotation"]    | StepsPerRotation;
         DistancePerRotation = json["DistancePerRotation"] | DistancePerRotation;
@@ -226,7 +229,10 @@ JsonObject AppSettings::StepperSettings::toJson()
     _doc["PinDIR"]              = PinDIR;
     _doc["PinENA"]              = PinENA;
     _doc["PinALM"]              = PinALM;
-    _doc["Speed"]               = Speed;
+    _doc["MinSpeed"]            = MinSpeed;
+    _doc["MaxSpeed"]            = MaxSpeed;
+    _doc["ConstSpeed"]          = ConstSpeed;
+    _doc["Acceleration"]        = Acceleration;
     _doc["MicroSteps"]          = MicroSteps;
     _doc["StepsPerRotation"]    = StepsPerRotation;
     _doc["DistancePerRotation"] = DistancePerRotation;
@@ -256,7 +262,10 @@ String AppSettings::StepperSettings::toString()
                   "    PinDIR:              " + PinDIR              + "\r\n" +
                   "    PinENA:              " + PinENA              + "\r\n" +
                   "    PinALM:              " + PinALM              + "\r\n" +
-                  "    Speed:               " + Speed               + "\r\n" +
+                  "    MinSpeed:            " + MinSpeed            + "\r\n" +
+                  "    MaxSpeed:            " + MaxSpeed            + "\r\n" +
+                  "    ConstSpeed:          " + ConstSpeed          + "\r\n" +
+                  "    Acceleration:        " + Acceleration        + "\r\n" +
                   "    MicroSteps:          " + MicroSteps          + "\r\n" +
                   "    StepsPerRotation:    " + StepsPerRotation    + "\r\n" +
                   "    DistancePerRotation: " + DistancePerRotation + "\r\n";

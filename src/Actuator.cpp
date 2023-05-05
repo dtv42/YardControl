@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>3-5-2023 9:58 PM</modified>
+// <modified>5-5-2023 11:12 AM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 #include "Actuator.h"
@@ -23,6 +23,7 @@ extern bool TimerHandler(struct repeating_timer* t);
 
 /// <summary>
 /// Initialize the stepper instance using the application settings.
+/// Enable the driver and allow acceleration and deceleration.
 /// </summary>
 void LinearActuator::init()
 {
@@ -31,13 +32,16 @@ void LinearActuator::init()
     _ENA = Settings.Stepper.PinENA;
     _ALM = Settings.Stepper.PinALM;
 
-    setSpeed(Settings.Stepper.Speed);
+    setMaxSpeed(Settings.Stepper.MaxSpeed);
+    setConstSpeed(Settings.Stepper.ConstSpeed);
+    setAcceleration(Settings.Stepper.Acceleration);
     setMicrosteps(Settings.Stepper.MicroSteps);
     _stepsPerRotation = max(1, Settings.Stepper.StepsPerRotation);
     _distancePerRotation = max(1.0, Settings.Stepper.DistancePerRotation);
 
     reset();
     enable();
+    rampEnable();
 }
 
 /// <summary>
@@ -66,7 +70,7 @@ void LinearActuator::_cw()
 /// <returns>The speed in steps per second.</returns>
 float LinearActuator::_getSpeedFromIntervals(uint value)
 {
-    float speed = (value > 0) ? float(LinearActuator::FREQUENCY / value) : float(LinearActuator::MAXSPEED);
+    float speed = (value > 0) ? float(LinearActuator::FREQUENCY / value) : 0;
     return max(float(LinearActuator::FREQUENCY / INT_MAX), min(float(LinearActuator::MAXSPEED), speed));
 }
 
@@ -77,7 +81,7 @@ float LinearActuator::_getSpeedFromIntervals(uint value)
 /// <returns>The number of intervals.</returns>
 uint LinearActuator::_getIntervalsFromSpeed(float value)
 {
-    uint intervals = (value > 0) ? uint(LinearActuator::FREQUENCY / value) : INT_MAX;
+    uint intervals = (value > 0) ? uint(LinearActuator::FREQUENCY / value) : 0;
     return max(2, min(INT_MAX, intervals));
 }
 
@@ -131,6 +135,15 @@ float  LinearActuator::getDelay()
 }
 
 /// <summary>
+/// Gets the current speed in RPM.
+/// </summary>
+/// <returns>The speed [RPM].</returns>
+float  LinearActuator::getRPM()
+{
+    return _getRPMFromSpeed(_speed);
+}
+
+/// <summary>
 /// Gets the current speed in steps per second.
 /// </summary>
 /// <returns>The speed [steps per second].</returns>
@@ -140,32 +153,83 @@ float  LinearActuator::getSpeed()
 }
 
 /// <summary>
-/// Sets the current speed in steps per second.
+/// Gets the maximum speed.
+/// </summary>
+/// <returns>The minimum speed.</returns>
+float  LinearActuator::getMinSpeed()
+{
+    return _minSpeed;
+}
+
+/// <summary>
+/// Sets the minimum speed in steps per second.
 /// Note this also updates the settings.
 /// </summary>
-/// <param name="value">The speed [steps per second].</param>
-void   LinearActuator::setSpeed(float value)
+/// <param name="value">The maximum speed [steps per second].</param>
+void   LinearActuator::setMinSpeed(float value)
 {
-    _speed = min(MAXSPEED, max(MINSPEED, value));
-    Settings.Stepper.Speed = _speed;
+    _minSpeed = min(_maxSpeed, max(MINSPEED, value));
+    Settings.Stepper.MinSpeed = _minSpeed;
 }
 
 /// <summary>
-/// Gets the current speed in RPM.
+/// Gets the maximum speed.
 /// </summary>
-/// <returns>The speed [RPM].</returns>
-float  LinearActuator::getSpeedRPM()
+/// <returns>The maximum speed.</returns>
+float  LinearActuator::getMaxSpeed()
 {
-    return _getRPMFromSpeed(_speed);
+    return _maxSpeed;
 }
 
 /// <summary>
-/// Sets the current speed in RPM.
+/// Sets the maximum speed in steps per second.
+/// Note this also updates the settings.
 /// </summary>
-/// <param name="value">The speed [RPM].</param>
-void   LinearActuator::setSpeedRPM(float value)
+/// <param name="value">The maximum speed [steps per second].</param>
+void   LinearActuator::setMaxSpeed(float value)
 {
-    setSpeed(_getSpeedFromRPM(value));
+    _maxSpeed = min(MAXSPEED, max(_minSpeed, value));
+    Settings.Stepper.MaxSpeed = _maxSpeed;
+}
+
+/// <summary>
+/// Gets the constant speed.
+/// </summary>
+/// <returns>The constant speed.</returns>
+float  LinearActuator::getConstSpeed()
+{
+    return _constSpeed;
+}
+
+/// <summary>
+/// Sets the constant speed in steps per second.
+/// Note this also updates the settings.
+/// </summary>
+/// <param name="value">The constant speed [steps per second].</param>
+void   LinearActuator::setConstSpeed(float value)
+{
+    _constSpeed = min(MAXSPEED, max(MINSPEED, value));
+    Settings.Stepper.ConstSpeed = _constSpeed;
+}
+
+/// <summary>
+/// Gets the acceleration in speed per second.
+/// </summary>
+/// <returns>The acceleration.</returns>
+float  LinearActuator::getAcceleration()
+{
+    return _acceleration;
+}
+
+/// <summary>
+/// Sets the acceleration in speed per second.
+/// Note this also updates the settings.
+/// </summary>
+/// <param name="value">The acceleration.</param>
+void   LinearActuator::setAcceleration(float value)
+{
+    _acceleration = min(MAXSPEED, max(0, value));
+    Settings.Stepper.Acceleration = _acceleration;
 }
 
 /// <summary>
@@ -273,6 +337,15 @@ bool   LinearActuator::getRunningFlag()
 }
 
 /// <summary>
+/// Gets the constant speed flag.
+/// </summary>
+/// <returns>The flag value.</returns>
+bool   LinearActuator::getConstFlag()
+{
+    return _constFlag;
+}
+
+/// <summary>
 /// Gets the limit flag.
 /// </summary>
 /// <returns>The flag value.</returns>
@@ -329,15 +402,47 @@ void   LinearActuator::reset()
 
 /// <summary>
 /// Sets the target to the specified number of steps.
-/// The move counter is set to zero.
+/// The counters are set to zero. Other move parameters are initialized.
 /// </summary>
 /// <param name="value">The number of steps.</param>
 void   LinearActuator::moveAbsolute(long value)
 {
-    _delay = _getIntervalsFromSpeed(_speed);
     _count = 0;
+    _speed = 0;
     _target = value;
     _steps = abs(_target - _position);
+    _totalSteps = _steps;
+    Serial.print("Steps: "); Serial.println(_steps); Serial.flush();
+
+    if (_constFlag)
+    {
+        _speed = _constSpeed;
+        _intervals = _getIntervalsFromSpeed(_speed);
+        Serial.print("Total Steps: "); Serial.println(_totalSteps); Serial.flush();
+        Serial.print("Speed:       "); Serial.println(_speed); Serial.flush();
+    }
+    else
+    {
+        _rampSteps = (_maxSpeed - _minSpeed) * (_maxSpeed - _minSpeed) / _acceleration;
+        _deltaSpeed = (_maxSpeed - _minSpeed) / _rampSteps;
+        _speed = _minSpeed;
+
+        // Adjust ramp count if ramping takes longer than total steps.
+        if ((2 * _rampSteps) > _totalSteps)
+        {
+            _rampSteps = _totalSteps / 2;
+            _constSteps = 0;
+        }
+        else
+        {
+            _constSteps = _totalSteps - 2 * _rampSteps;
+        }
+        Serial.print("Total Steps: "); Serial.println(_totalSteps); Serial.flush();
+        Serial.print("Const Steps: "); Serial.println(_constSteps); Serial.flush();
+        Serial.print("Ramps Steps: "); Serial.println(_rampSteps); Serial.flush();
+        Serial.print("Delta Speed: "); Serial.println(_deltaSpeed); Serial.flush();
+        Serial.print("Speed:       "); Serial.println(_speed); Serial.flush();
+    }
 }
 
 /// <summary>
@@ -365,6 +470,24 @@ void   LinearActuator::moveAbsoluteDistance(float value)
 void   LinearActuator::moveRelativeDistance(float value)
 {
     moveRelative(_getStepsFromDistance(value));
+}
+
+/// <summary>
+/// Enables constant speed mode (disables acceleration and deceleration).
+/// </summary>
+void LinearActuator::rampEnable()
+{
+    _constFlag = false;
+    _speed = _minSpeed;
+}
+
+/// <summary>
+/// Disables constant speed mode (enables acceleration and deceleration).
+/// </summary>
+void LinearActuator::rampDisable()
+{
+    _constFlag = true;
+    _speed = _constSpeed;
 }
 
 /// <summary>
@@ -470,6 +593,7 @@ void LinearActuator::switchOff(uint8_t pin)
         if (_calibratingFlag)
         {
             reset();
+            rampEnable();
             _calibratedFlag = true;
             _calibratingFlag = false;
         }
@@ -493,6 +617,7 @@ void LinearActuator::switchOff(uint8_t pin)
 /// </summary>
 void LinearActuator::calibrate()
 {
+    rampDisable();
     moveRelativeDistance(-Settings.Actuator.Length);
     _calibratingFlag = true;
 }
@@ -552,12 +677,41 @@ void LinearActuator::onTimer()
                 {
                     --_position;
                 }
-            }            
+
+                if (!_constFlag)
+                {
+                    if (_steps > _totalSteps - _rampSteps)
+                    {
+                        _speed += _deltaSpeed;
+                    }
+                    else if (_steps < _rampSteps)
+                    {
+                        _speed -= _deltaSpeed;
+                    }
+                    else
+                    {
+                        _speed = _maxSpeed;
+                    }
+                    _intervals = _getIntervalsFromSpeed(_speed);
+                }
+            }
+            else
+            {
+                if (!_constFlag)
+                {
+                    _speed = _minSpeed;
+                }
+                else
+                {
+                    _speed = _constSpeed;
+                }
+            }
         }
         // If the total interval count has been reached (delay according to current speed) reset count.
-        else if (_count >= _delay)
+        else
         {
-            _count = 0;
+            if (_count >= _intervals)
+                _count = 0;
         }
     }
 }

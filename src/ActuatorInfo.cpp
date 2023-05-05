@@ -22,21 +22,21 @@ extern LinearActuator Actuator;
 /// </summary>
 ActuatorInfo::ActuatorInfo()
 {
-    CalibratedFlag  = Actuator.getCalibratedFlag();     // Flag indicating the calibration has been completed.
-    CalibratingFlag = Actuator.getCalibratingFlag();    // Flag indicating the calibration routine is running.
-    EnabledFlag     = Actuator.getEnabledFlag();        // Flag indicating the stepper motor is enabled.
-    RunningFlag     = Actuator.getRunningFlag();        // Flag indicating that stepper motor is moving.
-    LimitFlag       = Actuator.getLimitFlag();          // Flag indicating that a limit switch has been hit.
-    AlarmFlag       = Actuator.getAlarmFlag();          // Flag indicating that the stepper alarm has been turned on.
+    CalibratedFlag  = Actuator.getCalibratedFlag();     // Flag indicating that the calibration routine is running.
+    CalibratingFlag = Actuator.getCalibratingFlag();    // Flag indicating that the calibration has been completed.
+    EnabledFlag     = Actuator.getEnabledFlag();        // Flag indicating that the motor is enabled.
+    RunningFlag     = Actuator.getRunningFlag();        // Flag indicating that the motor is running.
+    ConstFlag       = Actuator.getConstFlag();          // Flag indicating that no acceleration/deceleration is performed.
+    LimitFlag       = Actuator.getLimitFlag();          // Flag indicating that a limit switch has turned on.
+    AlarmFlag       = Actuator.getAlarmFlag();          // Flag indicating that the stepper driver alarm has been turned on.
     Delta           = Actuator.getDelta();              // The remaining steps from the current position to the target position.
     Steps           = Actuator.getSteps();              // The current motor position in steps.
     Target          = Actuator.getTarget();             // The target position in steps.
     Direction       = Actuator.getDirection();          // The current stepper direction (CW: 1, CCW: -1).
     Position        = Actuator.getPosition();           // The current motor position in mm.
     Delay           = Actuator.getDelay();              // The current pulse delay in microseconds.
+    RPM             = Actuator.getRPM();                // The current speed in RPM.
     Speed           = Actuator.getSpeed();              // The current speed in steps per second.
-    SpeedRPM        = Actuator.getSpeedRPM();           // The current speed in RPM.
-    Microsteps      = Actuator.getMicrosteps();         // The currently configured microsteps.
 }
 
 /// <summary>
@@ -52,6 +52,7 @@ String ActuatorInfo::toJsonString()
     _doc["CalibratedFlag"]  = CalibratedFlag;
     _doc["EnabledFlag"]     = EnabledFlag;
     _doc["RunningFlag"]     = RunningFlag;
+    _doc["ConstFlag"]       = ConstFlag;
     _doc["LimitFlag"]       = LimitFlag;
     _doc["AlarmFlag"]       = AlarmFlag;
     _doc["Delta"]           = Delta;
@@ -60,9 +61,8 @@ String ActuatorInfo::toJsonString()
     _doc["Direction"]       = Direction;
     _doc["Position"]        = Position;
     _doc["Delay"]           = Delay;
+    _doc["RPM"]             = RPM;
     _doc["Speed"]           = Speed;
-    _doc["SpeedRPM"]        = SpeedRPM;
-    _doc["Microsteps"]      = Microsteps;
     serializeJsonPretty(_doc, json);
 
     return json;
@@ -79,6 +79,7 @@ String ActuatorInfo::toString()
                   "    CalibratedFlag:  " + CalibratedFlag  + "\r\n" +
                   "    EnabledFlag:     " + EnabledFlag     + "\r\n" +
                   "    RunningFlag:     " + RunningFlag     + "\r\n" +
+                  "    ConstFlag:       " + ConstFlag       + "\r\n" +
                   "    LimitFlag:       " + LimitFlag       + "\r\n" +
                   "    AlarmFlag:       " + AlarmFlag       + "\r\n" +
                   "    Delta:           " + Delta           + "\r\n" +
@@ -87,8 +88,7 @@ String ActuatorInfo::toString()
                   "    Direction:       " + Direction       + "\r\n" +
                   "    Position:        " + Position        + "\r\n" +
                   "    Delay:           " + Delay           + "\r\n" +
+                  "    RPM:             " + RPM             + "\r\n" +
                   "    Speed:           " + Speed           + "\r\n" +
-                  "    SpeedRPM:        " + SpeedRPM        + "\r\n" +
-                  "    Microsteps:      " + Microsteps      + "\r\n" +
                   "\r\n";
 }

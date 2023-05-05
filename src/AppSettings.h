@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>30-4-2023 6:48 AM</modified>
+// <modified>4-5-2023 1:33 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -92,7 +92,10 @@ public:
         uint8_t  PinENA              = 2;       // The output pin number for driver ENA input (enable).
         uint8_t  PinALM              = 3;       // The input pin number for driver ALM output (alarm).
 
-        float    Speed               = 1000.0;  // The stepper speed in steps per seconds.
+        float    MinSpeed            = 100.0;   // The minimum stepper speed in steps per second.
+        float    MaxSpeed            = 5000.0;  // The maximum stepper speed in steps per second.
+        float    ConstSpeed          = 1000.0;  // The constant stepper speed in steps per second.
+        float    Acceleration        = 500.0;   // The acceleration in speed per second.
         uint8_t  MicroSteps          = 1;       // The multiplication factor for steps (microsteps).
         uint16_t StepsPerRotation    = 200;     // The number of steps per rotation (360°).
         float    DistancePerRotation = 1.0;     // The distance in mm per rotation (360°).

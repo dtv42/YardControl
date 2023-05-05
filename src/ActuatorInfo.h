@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>1-5-2023 7:18 AM</modified>
+// <modified>5-5-2023 11:03 AM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -29,10 +29,11 @@ private:
 public:
     ActuatorInfo();
 
-    bool  CalibratingFlag;      // Flag indicating the calibration routine is running.
-    bool  CalibratedFlag;       // Flag indicating the calibration has been completed.
-    bool  EnabledFlag;          // Flag indicating if motor is enabled.
-    bool  RunningFlag;          // Flag indicating if motor is running.
+    bool  CalibratingFlag;      // Flag indicating that the calibration routine is running.
+    bool  CalibratedFlag;       // Flag indicating that the calibration has been completed.
+    bool  EnabledFlag;          // Flag indicating that the motor is enabled.
+    bool  RunningFlag;          // Flag indicating that the motor is running.
+    bool  ConstFlag;            // Flag indicating that no acceleration/deceleration is performed.
     bool  LimitFlag;            // Flag indicating that a limit switch has turned on.
     bool  AlarmFlag;            // Flag indicating that the stepper driver alarm has been turned on.
 
@@ -43,9 +44,8 @@ public:
     int   Direction;            // The current stepper direction (CW: 1, CCW: -1).
     float Position;             // The current motor position in mm.
     long  Delay;                // The current pulse delay in microseconds.
+    float RPM;                  // The current motor speed in RPM.
     float Speed;                // The current speed in steps per second.
-    float SpeedRPM;             // The current motor speed in RPM.
-    long  Microsteps;           // The currently configured microsteps.
 
     String toJsonString();      // Get a serialized JSON representation.
     String toString();          // Get a string representation.

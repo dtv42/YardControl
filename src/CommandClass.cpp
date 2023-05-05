@@ -6,12 +6,12 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>21-4-2023 12:55 PM</created>
-// <modified>2-5-2023 6:40 AM</modified>
+// <modified>5-5-2023 12:06 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 
 // Disable all traces when set to 0.
-#define ARDUINOTRACE_ENABLE 1
+#define ARDUINOTRACE_ENABLE 0
 
 #include <ArduinoTrace.h>
 #include <StringSplitter.h>

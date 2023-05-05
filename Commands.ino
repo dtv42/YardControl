@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>21-4-2023 12:56 PM</created>
-// <modified>3-5-2023 11:40 AM</modified>
+// <modified>4-5-2023 7:24 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -244,13 +244,23 @@ void gpio()
 }
 
 /// <summary>
+/// Toggle the constant speed flag.
+/// </summary>
+void ramp()
+{
+    TRACE();
+    if (Commands.VerboseOutput) Telnet.println("ramp()");
+    Actuator.getConstFlag() ? Actuator.rampEnable() : Actuator.rampDisable();
+}
+
+/// <summary>
 /// Print the current speed [RPM].
 /// </summary>
 void rpm()
 {
     TRACE();
     if (Commands.VerboseOutput) Telnet.println("rpm()");
-    Telnet.println(String(Actuator.getSpeedRPM()));
+    Telnet.println(String(Actuator.getRPM()));
 }
 
 /// <summary>
@@ -261,6 +271,46 @@ void speed()
     TRACE();
     if (Commands.VerboseOutput) Telnet.println("speed()");
     Telnet.println(String(Actuator.getSpeed()));
+}
+
+/// <summary>
+/// Print the minimum speed [steps per second].
+/// </summary>
+void minspeed()
+{
+    TRACE();
+    if (Commands.VerboseOutput) Telnet.println("minspeed()");
+    Telnet.println(String(Actuator.getMinSpeed()));
+}
+
+/// <summary>
+/// Print the maximum speed [steps per second].
+/// </summary>
+void maxspeed()
+{
+    TRACE();
+    if (Commands.VerboseOutput) Telnet.println("maxspeed()");
+    Telnet.println(String(Actuator.getMaxSpeed()));
+}
+
+/// <summary>
+/// Print the constant speed [steps per second].
+/// </summary>
+void constspeed()
+{
+    TRACE();
+    if (Commands.VerboseOutput) Telnet.println("constspeed()");
+    Telnet.println(String(Actuator.getConstSpeed()));
+}
+
+/// <summary>
+/// Print the acceleration [speed per second].
+/// </summary>
+void acceleration()
+{
+    TRACE();
+    if (Commands.VerboseOutput) Telnet.println("acceleration()");
+    Telnet.println(String(Actuator.getAcceleration()));
 }
 
 /// <summary>
@@ -344,25 +394,47 @@ void moveToTrack(long value)
 }
 
 /// <summary>
-/// Set the speed [RPM].
+/// Set the minimum speed [steps per seconds].
 /// </summary>
 /// <param name="value">The new speed value.</param>
-void rpm(float value)
+void minspeed(float value)
 {
     TRACE(); DUMP(value);
-    if (Commands.VerboseOutput) Telnet.println(String("rpm(") + value + ")");
-    Actuator.setSpeedRPM(value);
+    if (Commands.VerboseOutput) Telnet.println(String("minSpeed(") + value + ")");
+    Actuator.setMinSpeed(value);
 }
 
 /// <summary>
-/// Set the speed [steps per seconds].
+/// Set the maximum speed [steps per seconds].
 /// </summary>
 /// <param name="value">The new speed value.</param>
-void speed(float value)
+void maxspeed(float value)
 {
     TRACE(); DUMP(value);
-    if (Commands.VerboseOutput) Telnet.println(String("speed(") + value + ")");
-    Actuator.setSpeed(value);
+    if (Commands.VerboseOutput) Telnet.println(String("maxSpeed(") + value + ")");
+    Actuator.setMaxSpeed(value);
+}
+
+/// <summary>
+/// Set the constant speed [steps per seconds].
+/// </summary>
+/// <param name="value">The new speed value.</param>
+void constspeed(float value)
+{
+    TRACE(); DUMP(value);
+    if (Commands.VerboseOutput) Telnet.println(String("constSpeed(") + value + ")");
+    Actuator.setConstSpeed(value);
+}
+
+/// <summary>
+/// Set the acceleration [speed per seconds].
+/// </summary>
+/// <param name="value">The new acceleration value.</param>
+void acceleration(float value)
+{
+    TRACE(); DUMP(value);
+    if (Commands.VerboseOutput) Telnet.println(String("acceleration(") + value + ")");
+    Actuator.setMaxSpeed(value);
 }
 
 /// <summary>
