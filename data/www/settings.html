@@ -168,8 +168,16 @@
                         <td><span id="stepperPinALM"></span></td>
                     </tr>
                     <tr>
-                        <td class="col-2">Speed:</td>
-                        <td><span id="stepperSpeed"></span></td>
+                        <td class="col-2">Min.&nbsp;Speed:</td>
+                        <td><span id="stepperMinSpeed"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="col-2">Max.&nbsp;Speed:</td>
+                        <td><span id="stepperMaxSpeed"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="col-2">Const.&nbsp;Speed:</td>
+                        <td><span id="stepperConstSpeed"></span></td>
                     </tr>
                     <tr>
                         <td class="col-2">Microsteps:</td>
@@ -343,7 +351,9 @@
         const stepperPinDIR              = document.getElementById('stepperPinDIR');
         const stepperPinENA              = document.getElementById('stepperPinENA');
         const stepperPinALM              = document.getElementById('stepperPinALM');
-        const stepperSpeed               = document.getElementById('stepperSpeed');
+        const stepperMinSpeed            = document.getElementById('stepperMinSpeed');
+        const stepperMaxSpeed            = document.getElementById('stepperMaxSpeed');
+        const stepperContSpeed           = document.getElementById('stepperConstSpeed');
         const stepperMicroSteps          = document.getElementById('stepperMicroSteps');
         const stepperStepsPerRotation    = document.getElementById('stepperStepsPerRotation');
         const stepperDistancePerRotation = document.getElementById('stepperDistancePerRotation');
@@ -399,7 +409,9 @@
                     stepperPinDIR.textContent              = json.Stepper.PinDIR;
                     stepperPinENA.textContent              = json.Stepper.PinENA;
                     stepperPinALM.textContent              = json.Stepper.PinALM;
-                    stepperSpeed.textContent               = json.Stepper.Speed;
+                    stepperMinSpeed.textContent            = json.Stepper.MinSpeed;
+                    stepperMaxSpeed.textContent            = json.Stepper.MaxSpeed;
+                    stepperConstSpeed.textContent          = json.Stepper.ConstSpeed;
                     stepperMicroSteps.textContent          = json.Stepper.MicroSteps;
                     stepperStepsPerRotation.textContent    = json.Stepper.StepsPerRotation;
                     stepperDistancePerRotation.textContent = json.Stepper.DistancePerRotation;

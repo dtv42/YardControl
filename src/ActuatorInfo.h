@@ -33,9 +33,10 @@ public:
     bool  CalibratedFlag;       // Flag indicating that the calibration has been completed.
     bool  EnabledFlag;          // Flag indicating that the motor is enabled.
     bool  RunningFlag;          // Flag indicating that the motor is running.
-    bool  ConstFlag;            // Flag indicating that no acceleration/deceleration is performed.
+    bool  RampingFlag;          // Flag indicating that acceleration/deceleration is performed.
     bool  LimitFlag;            // Flag indicating that a limit switch has turned on.
     bool  AlarmFlag;            // Flag indicating that the stepper driver alarm has been turned on.
+    bool  VerboseFlag;          // Flag indicating that verbose output has been turned on.
 
     long  Delta;                // The remaining steps from the current position to the target position.
     long  Steps;                // The current motor position in steps.

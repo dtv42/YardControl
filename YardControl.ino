@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:44 PM</created>
-// <modified>3-5-2023 3:23 PM</modified>
+// <modified>5-5-2023 7:26 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 #if !(defined(ARDUINO_RASPBERRY_PI_PICO_W))
@@ -308,6 +308,8 @@ void setup()
     HttpServer.on("/disable",   postBaseCommand);
     HttpServer.on("/home",      postBaseCommand);
     HttpServer.on("/stop",      postBaseCommand);
+    HttpServer.on("/ramp",      postBaseCommand);
+    HttpServer.on("/noramp",    postBaseCommand);
     HttpServer.on("/release",   postBaseCommand);
     HttpServer.on("/reboot",    postReboot);
 

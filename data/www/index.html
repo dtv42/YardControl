@@ -67,9 +67,16 @@
             <div class="row mb-2">
                 <div class="col-lg-5 mx-auto">
                     <h1 class="font-weight-bold">Yard Control</h1>
-                    <div class="form-check form-switch d-flex justify-content-center">
-                        <input class="form-check-input" type="checkbox" id="onoffSwitch" onclick="onoff()" />
-                        <label class="form-check-label ms-3" for="onoffSwitch" id="onoffLabel">Disabled</label>
+                    <div class="row form-check form-switch d-flex justify-content-center">
+                        <div class="col-lg-2">
+                            <input class="form-check-input" type="checkbox" id="onoffSwitch" onclick="onoff()" />
+                            <label class="form-check-label" for="onoffSwitch" id="onoffLabel">Disabled</label>
+                        </div>
+                        <div class="col-lg-2">&nbsp;</div>
+                        <div class="col-lg-2">
+                            <input class="form-check-input" type="checkbox" id="rampSwitch" onclick="ramp()" />
+                            <label class="form-check-label" for="rampSwitch" id="rampLabel">Ramping</label>
+                        </div>
                     </div>
                     <p class="text-muted">Select the track number or move forward or backward.</p>
                 </div>
@@ -149,7 +156,8 @@
 
         // Various elements.
         const onoffSwitch = document.getElementById('onoffSwitch');
-        const onoffLabel = document.getElementById('onoffLabel');
+        const onoffLabel  = document.getElementById('onoffLabel');
+        const rampSwitch  = document.getElementById('rampSwitch');
 
         const buttonOne      = document.getElementById('buttonOne');
         const buttonTwo      = document.getElementById('buttonTwo');
@@ -245,6 +253,15 @@
             updateDisplay();
         }
 
+        function ramp() {
+            if (rampSwitch.checked) {
+                postRequest("/ramp");
+            } else {
+                postRequest("/noramp");
+            }
+            updateDisplay();
+        }
+
         function track(t) {
             if (!Enabled) {
                 message.innerText = "Yard Control not enabled!";
@@ -314,15 +331,18 @@
         Calibrated = false;
         Enabled = false;
         Running = false;
-        Limited = false;
+        Const = false;
+        Limit = false;
         Alarm = false;
         Online = false;
         Delta = 0;
         Steps = 0;
         Target = 0;
+        Direction = 1;
         Position = 0.0;
         Delay = 0;
-        Speed = 0;
+        Speed = 0.0;
+        RPM = 0.0
 
         // Get the actuator status.
         async function getStatus() {
@@ -336,14 +356,18 @@
                     Calibrated  = json.CalibratedFlag; 
                     Calibrating = json.CalibratingFlag;
                     Enabled     = json.EnabledFlag;    
-                    Running     = json.RunningFlag;  
-                    Limited     = json.LimitedFlag;  
+                    Running     = json.RunningFlag;
+                    Const       = json.ConstFlag;
+                    Limit       = json.LimitFlag;  
                     Alarm       = json.AlarmFlag;
                     Delta       = json.Delta;
                     Steps       = json.Steps;
+                    Target      = json.Target;
+                    Direction   = json.Direction;
                     Position    = json.Position;
                     Delay       = json.Delay;
                     Speed       = json.Speed;
+                    RPM         = json.RPM;
                     Online      = true;
                 })
                 .catch((error) => {
@@ -392,6 +416,17 @@
                 if (onoffSwitch.checked) {
                     onoffSwitch.checked = false;
                     onoffLabel.textContent = "Disabled";
+                }
+            }
+
+            if (Const) {
+                if (rampSwitch.checked) {
+                    rampSwitch.checked = false;
+                }
+            }
+            else {
+                if (!rampSwitch.checked) {
+                    rampSwitch.checked = true;
                 }
             }
 

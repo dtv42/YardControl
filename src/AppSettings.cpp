@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>4-5-2023 1:36 PM</modified>
+// <modified>6-5-2023 10:52 AM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 #include <StringSplitter.h>
@@ -476,9 +476,9 @@ String AppSettings::APSettings::toJsonString()
 String AppSettings::APSettings::toString()
 {
     return String("AP :") + "\r\n" +
-                    "    SSID:     " + SSID     + "\r\n" +
-                    "    Password: " + Password + "\r\n" +
-                    "    Hostname: " + Hostname + "\r\n";
+                  "    SSID:     " + SSID     + "\r\n" +
+                  "    Password: " + Password + "\r\n" +
+                  "    Hostname: " + Hostname + "\r\n";
 }
 
 /// <summary>
@@ -553,12 +553,12 @@ String AppSettings::toString()
 {
     _update();
 
-    return String("Application ") +
-           _addTab(Yard.toString()) +
-           _addTab(Actuator.toString()) +
-           _addTab(Stepper.toString()) +
-           _addTab(Http.toString()) +
-           _addTab(Telnet.toString()) +
-           _addTab(WiFi.toString()) +
-           _addTab(AP.toString());
+    return String("Application Settings:") + "\r\n" +
+        _addTab(Yard.toString())      + "\r\n" +
+        _addTab(Actuator.toString())  + "\r\n" +
+        _addTab(Stepper.toString())   + "\r\n" +
+        _addTab(Http.toString())      + "\r\n" +
+        _addTab(Telnet.toString())    + "\r\n" +
+        _addTab(WiFi.toString())      + "\r\n" +
+        _addTab(AP.toString())        + "\r\n";
 }

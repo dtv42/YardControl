@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>4-5-2023 7:29 PM</modified>
+// <modified>6-5-2023 9:24 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -28,18 +28,22 @@ void minus();
 void forward();
 void backward();
 void calibrate();
+void verbose();
 void enable();
 void disable();
 void stop();
 void home();
 void gpio();
 void ramp();
+void noramp();
 
 void yard();
 void pico();
 void wifi();
 void server();
 void system();
+void stepper();
+void actuator();
 void settings();
 void appsettings();
 void reboot();
@@ -159,7 +163,7 @@ class CommandsClass
 private:
     String _padTo(String str, const size_t num, const char paddingChar = ' ');
 
-    static const int MAX_BASE_COMMANDS = 33;
+    static const int MAX_BASE_COMMANDS = 36;
     static const int MAX_LONG_COMMANDS = 5;
     static const int MAX_FLOAT_COMMANDS = 6;
 
@@ -173,10 +177,10 @@ private:
     /// The list of supported base commands (no arguments).
     /// </summary>
     BaseCommand _baseCommands[MAX_BASE_COMMANDS] = {
-        { "help",         "?", "Shows this help information.",                 help         },  // Built-in help command.
-        { "quit",         "q", "Terminates the program.",                      quit         },  // Quit command (awaiting confirmation).
-        { "json",         "j", "Toggle JSON output mode.",                     json         },  // Output mode command.
-        { "verbose",      "v", "Toggle verbose output.",                       verbose      },  // Output verbose command.
+        { "help",         "?", "Shows this help information.",                 help         },
+        { "quit",         "q", "Terminates the program.",                      quit         },
+        { "json",         "j", "Toggle JSON output mode.",                     json         },
+        { "verbose",      "v", "Toggle verbose output.",                       verbose      },
                                                                                             
         { "status",       "s", "Shows the current state of the motor driver.", status       },
         { "position",     "p", "Shows the current position.",                  position     },
@@ -190,14 +194,17 @@ private:
         { "stop",         "x", "Stops the running motor (decelerating).",      stop         },
         { "home",         "h", "Moves to home position (position = 0).",       home         },
         { "gpio",         "g", "Shows the GPIO input and output pin values.",  gpio         },
-        { "ramp",         "r", "Toggles the constant speed flag.",             ramp         },
-                                                                                            
+        { "ramp",         "r", "Enables acceleration and deceleration.",       ramp         },
+        { "noramp",       "n", "Disables acceleration and deceleration.",      noramp       },
+
         { "yard",         "",  "Show yard track settings.",                    yard         },
         { "pico",         "",  "Show Pico W pin layout.",                      pico         },
         { "wifi",         "",  "Shows the WiFi information.",                  wifi         },
         { "server",       "",  "Shows the server information.",                server       },
         { "system",       "",  "Shows the system information.",                system       },
-        { "settings",     "",  "Shows the settings information.",              settings     },
+        { "stepper",      "",  "Shows the stepper settings.",                  stepper      },
+        { "actuator",     "",  "Shows the actuator settings.",                 actuator     },
+        { "settings",     "",  "Shows all settings information.",              settings     },
         { "appsettings",  "",  "Shows the appsettings file.",                  appsettings  },
         { "reboot",       "",  "Reboots the RP2040.",                          reboot       },
         { "reset",        "",  "Resets the current position to zero.",         reset        },
@@ -252,7 +259,6 @@ private:
 
 public:
     bool JsonOutput = false;                            // Flag indicating JSON output.
-    bool VerboseOutput = false;                         // Flag indicating verbose output.
     bool WaitForResponse = false;                       // Flag indicating that a command response is expected.
 
     void parse(String command);                         // Parses the input line and runs the command.

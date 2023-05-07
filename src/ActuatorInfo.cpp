@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>1-5-2023 7:20 AM</modified>
+// <modified>6-5-2023 7:59 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 #include "ActuatorInfo.h"
@@ -26,9 +26,10 @@ ActuatorInfo::ActuatorInfo()
     CalibratingFlag = Actuator.getCalibratingFlag();    // Flag indicating that the calibration has been completed.
     EnabledFlag     = Actuator.getEnabledFlag();        // Flag indicating that the motor is enabled.
     RunningFlag     = Actuator.getRunningFlag();        // Flag indicating that the motor is running.
-    ConstFlag       = Actuator.getConstFlag();          // Flag indicating that no acceleration/deceleration is performed.
+    RampingFlag     = Actuator.getRampingFlag();        // Flag indicating that acceleration/deceleration is performed.
     LimitFlag       = Actuator.getLimitFlag();          // Flag indicating that a limit switch has turned on.
     AlarmFlag       = Actuator.getAlarmFlag();          // Flag indicating that the stepper driver alarm has been turned on.
+    VerboseFlag     = Actuator.getVerboseFlag();        // Flag indicating that verbose output has been turned on.
     Delta           = Actuator.getDelta();              // The remaining steps from the current position to the target position.
     Steps           = Actuator.getSteps();              // The current motor position in steps.
     Target          = Actuator.getTarget();             // The target position in steps.
@@ -52,9 +53,10 @@ String ActuatorInfo::toJsonString()
     _doc["CalibratedFlag"]  = CalibratedFlag;
     _doc["EnabledFlag"]     = EnabledFlag;
     _doc["RunningFlag"]     = RunningFlag;
-    _doc["ConstFlag"]       = ConstFlag;
+    _doc["RampingFlag"]     = RampingFlag;
     _doc["LimitFlag"]       = LimitFlag;
     _doc["AlarmFlag"]       = AlarmFlag;
+    _doc["VerboseFlag"]     = VerboseFlag;
     _doc["Delta"]           = Delta;
     _doc["Steps"]           = Steps;
     _doc["Target"]          = Target;
@@ -79,9 +81,10 @@ String ActuatorInfo::toString()
                   "    CalibratedFlag:  " + CalibratedFlag  + "\r\n" +
                   "    EnabledFlag:     " + EnabledFlag     + "\r\n" +
                   "    RunningFlag:     " + RunningFlag     + "\r\n" +
-                  "    ConstFlag:       " + ConstFlag       + "\r\n" +
+                  "    RampingFlag:     " + RampingFlag     + "\r\n" +
                   "    LimitFlag:       " + LimitFlag       + "\r\n" +
                   "    AlarmFlag:       " + AlarmFlag       + "\r\n" +
+                  "    VerboseFlag:     " + VerboseFlag     + "\r\n" +
                   "    Delta:           " + Delta           + "\r\n" +
                   "    Steps:           " + Steps           + "\r\n" +
                   "    Target:          " + Target          + "\r\n" +
