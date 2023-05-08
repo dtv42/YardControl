@@ -50,6 +50,10 @@ void reboot();
 void reset();
 void save();
 
+void smallstep();
+void minstep();
+void retract();
+
 void rpm();
 void speed();
 void minspeed();
@@ -65,6 +69,10 @@ void retract(long value);
 
 void moveAbsoluteDistance(float value);
 void moveRelativeDistance(float value);
+
+void smallstep(float value);
+void minstep(float value);
+void retract(float value);
 
 void minspeed(float value);
 void maxspeed(float value);
@@ -163,9 +171,9 @@ class CommandsClass
 private:
     String _padTo(String str, const size_t num, const char paddingChar = ' ');
 
-    static const int MAX_BASE_COMMANDS = 36;
+    static const int MAX_BASE_COMMANDS = 39;
     static const int MAX_LONG_COMMANDS = 5;
-    static const int MAX_FLOAT_COMMANDS = 6;
+    static const int MAX_FLOAT_COMMANDS = 9;
 
     static const int MAX_BASE_COMMAND_LENGTH = 12;
     static const int MAX_BASE_SHORTCUT_COMMAND_LENGTH = 9;
@@ -209,7 +217,11 @@ private:
         { "reboot",       "",  "Reboots the RP2040.",                          reboot       },
         { "reset",        "",  "Resets the current position to zero.",         reset        },
         { "save",         "",  "Saves the updated application settings.",      save         },
-                                                                                            
+
+        { "smallstep",    "",  "Gets the small move distance (mm).",           smallstep    },
+        { "minstep",      "",  "Gets the min move distance (mm).",             minstep      },
+        { "retract",      "",  "Gets the retract distance (mm).",              retract      },
+
         { "rpm",          "",  "Gets the speed RPM.",                          rpm          },
         { "speed",        "",  "Gets the speed (steps per second).",           speed        },
         { "minspeed",     "",  "Gets the minimum speed (steps per second).",   minspeed     },
@@ -244,6 +256,10 @@ private:
     FloatCommand _floatCommands[MAX_FLOAT_COMMANDS] = {
         { "moveto", "a", "Moves to absolute position (mm).",   moveAbsoluteDistance },
         { "move",   "r", "Moves the number of mm (relative).", moveRelativeDistance },
+
+        { "smallstep",    "",  "Sets the small move distance (mm).",          smallstep    },
+        { "minstep",      "",  "Sets the min move distance (mm).",            minstep      },
+        { "retract",      "",  "Sets the retract distance (mm).",             retract      },
 
         { "minspeed",     "",  "Sets the minimum speed (steps per second).",  minspeed     },
         { "maxspeed",     "",  "Sets the maximum speed (steps per second).",  maxspeed     },

@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>21-4-2023 12:56 PM</created>
-// <modified>6-5-2023 1:56 PM</modified>
+// <modified>8-5-2023 11:25 AM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -18,7 +18,6 @@
 #include "src/Actuator.h"
 #include "src/GpioInputs.h"
 
-#include "src/ActuatorInfo.h"
 #include "src/ServerInfo.h"
 #include "src/SystemInfo.h"
 #include "src/WiFiInfo.h"
@@ -102,8 +101,7 @@ void nop()
 void status()
 {
     TRACE();
-    ActuatorInfo info;
-    Commands.JsonOutput ? Telnet.print(info.toJsonString()) : Telnet.print(info.toString());
+    Commands.JsonOutput ? Telnet.print(Actuator.toJsonString()) : Telnet.print(Actuator.toString());
 }
 
 /// <summary>
@@ -121,7 +119,7 @@ void position()
 void plus()
 {
     TRACE();
-    Actuator.moveRelative(1);
+    Actuator.moveRelativeDistance(Settings.Actuator.MinStep);
 }
 
 /// <summary>
@@ -130,7 +128,7 @@ void plus()
 void minus()
 {
     TRACE();
-    Actuator.moveRelative(-1);
+    Actuator.moveRelativeDistance(-Settings.Actuator.MinStep);
 }
 
 /// <summary>
@@ -139,7 +137,7 @@ void minus()
 void forward()
 {
     TRACE();
-    Actuator.moveRelativeDistance(0.1);
+    Actuator.moveRelativeDistance(Settings.Actuator.SmallStep);
 }
 
 /// <summary>
@@ -148,7 +146,7 @@ void forward()
 void backward()
 {
     TRACE();
-    Actuator.moveRelativeDistance(-0.1);
+    Actuator.moveRelativeDistance(-Settings.Actuator.SmallStep);
 }
 
 /// <summary>
@@ -239,6 +237,33 @@ void noramp()
 {
     TRACE();
     Actuator.rampDisable();
+}
+
+/// <summary>
+/// Print the small step distance [mm].
+/// </summary>
+void smallstep()
+{
+    TRACE();
+    Telnet.println(String(Settings.Actuator.SmallStep));
+}
+
+/// <summary>
+/// Print the min step distance [mm].
+/// </summary>
+void minstep()
+{
+    TRACE();
+    Telnet.println(String(Settings.Actuator.MinStep));
+}
+
+/// <summary>
+/// Print the retract distance [mm].
+/// </summary>
+void retract()
+{
+    TRACE();
+    Telnet.println(String(Settings.Actuator.Retract));
 }
 
 /// <summary>
@@ -369,6 +394,36 @@ void moveToTrack(long value)
 }
 
 /// <summary>
+/// Set the small step distance [mm].
+/// </summary>
+/// <param name="value">The new speed value.</param>
+void smallstep(float value)
+{
+    TRACE(); DUMP(value);
+    Settings.Actuator.SmallStep = value;
+}
+
+/// <summary>
+/// Set the min step distance [mm].
+/// </summary>
+/// <param name="value">The new speed value.</param>
+void minstep(float value)
+{
+    TRACE(); DUMP(value);
+    Settings.Actuator.MinStep = value;
+}
+
+/// <summary>
+/// Set the retract distance [mm].
+/// </summary>
+/// <param name="value">The new speed value.</param>
+void retract(float value)
+{
+    TRACE(); DUMP(value);
+    Settings.Actuator.Retract;
+}
+
+/// <summary>
 /// Set the minimum speed [steps per seconds].
 /// </summary>
 /// <param name="value">The new speed value.</param>
@@ -415,7 +470,6 @@ void acceleration(float value)
 void microsteps(long value)
 {
     TRACE(); DUMP(value);
-    Settings.Stepper.MicroSteps = value;
     Actuator.setMicrosteps(value);
 }
 

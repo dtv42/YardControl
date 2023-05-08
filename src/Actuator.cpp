@@ -6,9 +6,11 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>7-5-2023 11:54 AM</modified>
+// <modified>8-5-2023 8:03 AM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
+#include <ArduinoJson.h>
+
 #include "Actuator.h"
 #include "Commands.h"
 #include "AppSettings.h"
@@ -49,7 +51,7 @@ void LinearActuator::init()
 /// </summary>
 void LinearActuator::_ccw()
 {
-    digitalWrite(_DIR, LOW);
+    digitalWrite(_DIR, HIGH);
     _direction = LinearActuator::Direction::CCW;
 }
 
@@ -58,7 +60,7 @@ void LinearActuator::_ccw()
 /// </summary>
 void LinearActuator::_cw()
 {
-    digitalWrite(_DIR, HIGH);
+    digitalWrite(_DIR, LOW);
     _direction = LinearActuator::Direction::CW;
 }
 
@@ -780,4 +782,68 @@ void LinearActuator::onTimer()
         if (_count >= _intervals)
             _count = 0;
     }
+}
+
+/// <summary>
+/// Returns a (pretty) string representation of the updated JSON document.
+/// </summary>
+/// <returns>The serialized JSON document.</returns>
+String LinearActuator::toJsonString()
+{
+    String json;
+
+    _doc.clear();
+    _doc["Calibrating"]  = getCalibratingFlag();
+    _doc["Calibrated"]   = getCalibratedFlag();
+    _doc["Verbose"]      = getVerboseFlag();
+    _doc["Enabled"]      = getEnabledFlag();
+    _doc["Running"]      = getRunningFlag();
+    _doc["Ramping"]      = getRampingFlag();
+    _doc["Limit"]        = getLimitFlag();
+    _doc["Alarm"]        = getAlarmFlag();
+    _doc["Delta"]        = getDelta();
+    _doc["Steps"]        = getSteps();
+    _doc["Target"]       = getTarget();
+    _doc["Direction"]    = getDirection();
+    _doc["Position"]     = getPosition();
+    _doc["Delay"]        = getDelay();
+    _doc["RPM"]          = getRPM();
+    _doc["Speed"]        = getSpeed();
+    _doc["MinSpeed"]     = getMinSpeed();
+    _doc["MaxSpeed"]     = getMaxSpeed();
+    _doc["ConstSpeed"]   = getConstSpeed();
+    _doc["Acceleration"] = getAcceleration();
+    serializeJsonPretty(_doc, json);
+
+    return json;
+}
+
+/// <summary>
+/// Returns a printable string representation of the actuator info.
+/// </summary>
+/// <returns>The printable string.</returns>
+String LinearActuator::toString()
+{
+    return String("Actuator Info:") + "\r\n" +
+                  "    Calibrating:  " + getCalibratingFlag() + "\r\n" +
+                  "    Calibrated:   " + getCalibratedFlag()  + "\r\n" +
+                  "    Verbose:      " + getVerboseFlag()     + "\r\n" +
+                  "    Enabled:      " + getEnabledFlag()     + "\r\n" +
+                  "    Running:      " + getRunningFlag()     + "\r\n" +
+                  "    Ramping:      " + getRampingFlag()     + "\r\n" +
+                  "    Limit:        " + getLimitFlag()       + "\r\n" +
+                  "    Alarm:        " + getAlarmFlag()       + "\r\n" +
+                  "    Delta:        " + getDelta()           + "\r\n" +
+                  "    Steps:        " + getSteps()           + "\r\n" +
+                  "    Target:       " + getTarget()          + "\r\n" +
+                  "    Direction:    " + getDirection()       + "\r\n" +
+                  "    Position:     " + getPosition()        + "\r\n" +
+                  "    Delay:        " + getDelay()           + "\r\n" +
+                  "    RPM:          " + getRPM()             + "\r\n" +
+                  "    Speed:        " + getSpeed()           + "\r\n" +
+                  "    MinSpeed:     " + getMinSpeed()        + "\r\n" +
+                  "    MaxSpeed:     " + getMaxSpeed()        + "\r\n" +
+                  "    ConstSpeed:   " + getConstSpeed()      + "\r\n" +
+                  "    Acceleration: " + getAcceleration()    + "\r\n" +
+                  "\r\n";
 }

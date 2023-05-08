@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>6-5-2023 10:52 AM</modified>
+// <modified>8-5-2023 11:35 AM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 #include <StringSplitter.h>
@@ -142,6 +142,8 @@ void AppSettings::ActuatorSettings::fromJson(JsonObject json)
         LedInLimit = json["LedInLimit"] | LedInLimit;
         LedAlarmOn = json["LedAlarmOn"] | LedAlarmOn;
 
+        SmallStep = json["SmallStep"] | SmallStep;
+        MinStep   = json["MinStep"]   | MinStep;
         Retract   = json["Retract"]   | Retract;
         Length    = json["Length"]    | Length;
     }
@@ -162,6 +164,8 @@ JsonObject AppSettings::ActuatorSettings::toJson()
     _doc["LedInLimit"] = LedInLimit;
     _doc["LedAlarmOn"] = LedAlarmOn;
 
+    _doc["SmallStep"] = SmallStep;
+    _doc["MinStep"]   = MinStep;
     _doc["Retract"]   = Retract;
     _doc["Length"]    = Length;
 
@@ -192,6 +196,8 @@ String AppSettings::ActuatorSettings::toString()
                   "    LedRunning:   " + LedRunning   + "\r\n" +
                   "    LedInLimit:   " + LedInLimit   + "\r\n" +
                   "    LedAlarmOn:   " + LedAlarmOn   + "\r\n" +
+                  "    SmallStep:    " + SmallStep    + "\r\n" +
+                  "    MinStep:      " + MinStep      + "\r\n" +
                   "    Retract:      " + Retract      + "\r\n" +
                   "    Length:       " + Length       + "\r\n";
 }

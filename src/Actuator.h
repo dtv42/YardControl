@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>6-5-2023 12:00 PM</modified>
+// <modified>8-5-2023 7:29 AM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -69,6 +69,8 @@ public:
     };
 
 private:
+    StaticJsonDocument<256> _doc;                   // The Json document representing the status data.
+
     uint8_t _PUL;                                   // GPIO pin number for the pulse (PUL+) pin.
     uint8_t _DIR;                                   // GPIO pin number for the direction (DIR+) pin.
     uint8_t _ENA;                                   // GPIO pin number for the enable (ENA+) pin.
@@ -171,4 +173,7 @@ public :
 
     void calibrate();                               // Run the calibration routine.
     void onTimer();                                 // Delay timer callback routine.
+
+    String toJsonString();                          // Get a serialized JSON representation.
+    String toString();                              // Get a string representation.
 };

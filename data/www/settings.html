@@ -137,6 +137,14 @@
                         <td><span id="actuatorLedAlarmOn"></span></td>
                     </tr>
                     <tr>
+                        <td class="col-2">Small&nbsp;Step:</td>
+                        <td><span id="actuatorSmallStep"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="col-2">Min&nbsp;Step:</td>
+                        <td><span id="actuatorMinStep"></span></td>
+                    </tr>
+                    <tr>
                         <td class="col-2">Retract:</td>
                         <td><span id="actuatorRetract"></span></td>
                     </tr>
@@ -344,6 +352,8 @@
         const actuatorLedRunning         = document.getElementById('actuatorLedRunning');
         const actuatorLedInLimit         = document.getElementById('actuatorLedInLimit');
         const actuatorLedAlarmOn         = document.getElementById('actuatorLedAlarmOn');
+        const actuatorSmallStep          = document.getElementById('actuatorSmallStep');
+        const actuatorMinStep            = document.getElementById('actuatorMinStep');
         const actuatorRetract            = document.getElementById('actuatorRetract');
         const actuatorLength             = document.getElementById('actuatorLength');
 
@@ -402,6 +412,8 @@
                     actuatorLedRunning.textContent = json.Actuator.LedRunning;
                     actuatorLedInLimit.textContent = json.Actuator.LedInLimit;
                     actuatorLedAlarmOn.textContent = json.Actuator.LedAlarmOn;
+                    actuatorSmallStep.textContent  = json.Actuator.SmallStep;
+                    actuatorMinStep.textContent    = json.Actuator.MinStep;
                     actuatorRetract.textContent    = json.Actuator.Retract;
                     actuatorLength.textContent     = json.Actuator.Length;
 

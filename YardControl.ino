@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:44 PM</created>
-// <modified>5-5-2023 7:26 PM</modified>
+// <modified>8-5-2023 8:31 AM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 #if !(defined(ARDUINO_RASPBERRY_PI_PICO_W))
@@ -32,7 +32,6 @@
 #include "src/SystemInfo.h"
 #include "src/ServerInfo.h"
 #include "src/TelnetServer.h"
-#include "src/ActuatorInfo.h"
 #include "src/GpioInputs.h"
 #include "src/Wireless.h"
 #include "src/Commands.h"
@@ -206,8 +205,7 @@ void setup()
 #pragma region Initialize Actuator
 
     Actuator.init();
-    ActuatorInfo actuatorInfo;
-    Serial.print(actuatorInfo.toString());
+    Serial.print(Actuator.toString());
 
 #pragma endregion
 

@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>24-4-2023 10:32 AM</created>
-// <modified>28-4-2023 12:04 PM</modified>
+// <modified>8-5-2023 8:22 AM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -154,7 +154,11 @@ void getInfo()
         String json;
         String info = HttpServer.uri().substring(1);
 
-        if (info == "settings")
+        if (info == "status")
+        {
+            json = Actuator.toJsonString();
+        }
+        else if (info == "settings")
         {
             json = Settings.toJsonString();
         }
@@ -167,11 +171,6 @@ void getInfo()
         {
             ServerInfo serverInfo;
             json = serverInfo.toJsonString();
-        }
-        else if (info == "status")
-        {
-            ActuatorInfo actuatorInfo;
-            json = actuatorInfo.toJsonString();
         }
         else if (info == "wifi")
         {

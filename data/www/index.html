@@ -329,6 +329,7 @@
         // Various status data.
         Calibrating = false;
         Calibrated = false;
+        Verbose = false;
         Enabled = false;
         Running = false;
         Const = false;
@@ -341,8 +342,12 @@
         Direction = 1;
         Position = 0.0;
         Delay = 0;
-        Speed = 0.0;
         RPM = 0.0
+        Speed = 0.0;
+        MinSpeed = 0.0;
+        MaxSpeed = 0.0;
+        ConstSpeed = 0.0;
+        Acceleration = 0.0;
 
         // Get the actuator status.
         async function getStatus() {
@@ -353,21 +358,26 @@
                     return response.json();
                 })
                 .then((json) => {
-                    Calibrated  = json.CalibratedFlag; 
-                    Calibrating = json.CalibratingFlag;
-                    Enabled     = json.EnabledFlag;    
-                    Running     = json.RunningFlag;
-                    Const       = json.ConstFlag;
-                    Limit       = json.LimitFlag;  
-                    Alarm       = json.AlarmFlag;
-                    Delta       = json.Delta;
-                    Steps       = json.Steps;
-                    Target      = json.Target;
-                    Direction   = json.Direction;
-                    Position    = json.Position;
-                    Delay       = json.Delay;
-                    Speed       = json.Speed;
-                    RPM         = json.RPM;
+                    Calibrated   = json.Calibrated; 
+                    Calibrating  = json.Calibrating;
+                    Verbose      = json.Enabled;    
+                    Enabled      = json.Enabled;    
+                    Running      = json.Running;
+                    Const        = json.Const;
+                    Limit        = json.Limit;  
+                    Alarm        = json.Alarm;
+                    Delta        = json.Delta;
+                    Steps        = json.Steps;
+                    Target       = json.Target;
+                    Direction    = json.Direction;
+                    Position     = json.Position;
+                    Delay        = json.Delay;
+                    RPM          = json.RPM;
+                    Speed        = json.Speed;
+                    MinSpeed     = json.MinSpeed;
+                    MaxSpeed     = json.MaxSpeed;
+                    ConstSpeed   = json.ConstSpeed;
+                    Acceleration = json.Acceleration;
                     Online      = true;
                 })
                 .catch((error) => {

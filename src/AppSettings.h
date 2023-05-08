@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>4-5-2023 1:33 PM</modified>
+// <modified>8-5-2023 11:08 AM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -34,7 +34,7 @@ public:
     class YardSettings
     {
     private:
-        StaticJsonDocument<192> _doc;           // The Json document representing the settings.
+        StaticJsonDocument<256> _doc;           // The Json document representing the settings.
 
     public:
         static const int MAX_TRACKS = 10;       // The number of supported tracks.
@@ -61,7 +61,7 @@ public:
     class ActuatorSettings
     {
     private:
-        StaticJsonDocument<128> _doc;           // The Json document representing the settings.
+        StaticJsonDocument<256> _doc;           // The Json document representing the settings.
 
     public:
         uint8_t  SwitchStop   = 7;              // The emergency stop input pin number.
@@ -72,6 +72,8 @@ public:
         uint8_t  LedInLimit   = 5;              // Led output pin number (limit hit).
         uint8_t  LedAlarmOn   = 6;              // Led output pin number (alarm on).
 
+        float    SmallStep    = 1;              // Small move distance (mm).
+        float    MinStep      = 2.5;            // Minimal move distance (mm).
         float    Retract      = 5.0;            // Retract distance when limit is hit (mm).
         float    Length       = 500.0;          // Length of the linear actuator (mm).
 
@@ -84,7 +86,7 @@ public:
     class StepperSettings
     {
     private:
-        StaticJsonDocument<192> _doc; // The Json document representing the settings.
+        StaticJsonDocument<256> _doc;           // The Json document representing the settings.
 
     public:
         uint8_t  PinPUL              = 0;       // The output pin number for driver PUL input (step).
@@ -159,7 +161,7 @@ public:
     class APSettings
     {
     private:
-        StaticJsonDocument<192> _doc; // The Json document representing the settings.
+        StaticJsonDocument<192> _doc;           // The Json document representing the settings.
 
     public:
         String SSID;	                        // The WiFi Access Point SSID.
@@ -172,17 +174,17 @@ public:
         String toString();                      // Get a string representation.
     };
 
-    YardSettings     Yard;
-    ActuatorSettings Actuator;
-    StepperSettings  Stepper;
-    HttpSettings     Http;
-    TelnetSettings   Telnet;
-    WiFiSettings     WiFi;
-    APSettings       AP;
+    YardSettings     Yard;                      // 
+    ActuatorSettings Actuator;                  // 
+    StepperSettings  Stepper;                   // 
+    HttpSettings     Http;                      // 
+    TelnetSettings   Telnet;                    // 
+    WiFiSettings     WiFi;                      // 
+    APSettings       AP;                        // 
 
-    bool init();            // Initializes the settings from the appsettings.json file.
-    bool save();            // Updates and saves the settings to the appsettings.json file.
+    bool init();                                // Initializes the settings from the appsettings.json file.
+    bool save();                                // Updates and saves the settings to the appsettings.json file.
 
-    String toJsonString(); 	// Get a serialized JSON representation.
-    String toString(); 		// Get a string representation.
+    String toJsonString(); 	                    // Get a serialized JSON representation.
+    String toString(); 		                    // Get a string representation.
 };
