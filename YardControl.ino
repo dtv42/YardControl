@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:44 PM</created>
-// <modified>8-5-2023 8:31 AM</modified>
+// <modified>11-5-2023 4:46 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 #if !(defined(ARDUINO_RASPBERRY_PI_PICO_W))
@@ -168,7 +168,7 @@ void setup()
 
     // Initialize the file system and the application settings.
     LittleFS.begin();
-    Settings.init();
+    Settings.load();
 
     // Print system info.
     SystemInfo systemInfo;
@@ -306,8 +306,6 @@ void setup()
     HttpServer.on("/disable",   postBaseCommand);
     HttpServer.on("/home",      postBaseCommand);
     HttpServer.on("/stop",      postBaseCommand);
-    HttpServer.on("/ramp",      postBaseCommand);
-    HttpServer.on("/noramp",    postBaseCommand);
     HttpServer.on("/release",   postBaseCommand);
     HttpServer.on("/reboot",    postReboot);
 
@@ -336,13 +334,7 @@ void setup()
     Telnet.onDisconnect(onTelnetDisconnect);
     Telnet.onInputReceived(onTelnetInput);
 
-    if (Telnet.begin(Settings.Telnet.Port))
-    {
-        // Show TCP server info.
-        ServerInfo serverInfo;
-        Serial.print(serverInfo.toString());
-    }
-    else
+    if (!Telnet.begin(Settings.Telnet.Port))
     {
         Serial.println("Setup failed!");
 
@@ -352,6 +344,10 @@ void setup()
         while (true)
             Led.update();
     }
+
+    // Show TCP server info.
+    ServerInfo serverInfo;
+    Serial.print(serverInfo.toString());
 
 #pragma endregion
 

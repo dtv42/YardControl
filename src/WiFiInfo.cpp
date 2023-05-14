@@ -126,8 +126,7 @@ String WiFiInfo::toString()
                       "    Gateway:  " + Gateway  + "\r\n" +
                       "    Subnet:   " + Subnet   + "\r\n" +
                       "    MAC:      " + MAC      + "\r\n" +
-                      "    Clients:  " + Clients  + "\r\n" +
-                      "\r\n";
+                      "    Clients:  " + Clients  + "\r\n";
 	}
     else if (Mode == "STA")
     {
@@ -141,8 +140,7 @@ String WiFiInfo::toString()
                       "    Subnet:   " + Subnet   + "\r\n" +
                       "    DNS:      " + DNS      + "\r\n" +
                       "    RSSI:     " + RSSI     + "\r\n" +
-                      "    MAC:      " + MAC      + "\r\n" +
-                      "\r\n";
+                      "    MAC:      " + MAC      + "\r\n";
     }
     else 
     {

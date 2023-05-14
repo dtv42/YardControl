@@ -6,11 +6,10 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>17-4-2023 7:35 AM</created>
-// <modified>17-4-2023 8:43 AM</modified>
+// <modified>11-5-2023 5:40 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
-// Disable all traces when set to 0.
-#define ARDUINOTRACE_ENABLE 1
+#define ARDUINOTRACE_ENABLE 0
 
 #include <ArduinoTrace.h>
 #include "AppSettings.h"

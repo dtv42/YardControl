@@ -183,14 +183,6 @@
                         <td>Stops the stepper motor.</td>
                     </tr>
                     <tr>
-                        <td><a href="#postRamp" id="postRamp" onclick="postRamp()">/ramp</a></td>
-                        <td>Enables acceleration and deceleration.</td>
-                    </tr>
-                    <tr>
-                        <td><a href="#postNoRamp" id="postNoRamp" onclick="postNoRamp()">/noramp</a></td>
-                        <td>Disables acceleration and deceleration</td>
-                    </tr>
-                    <tr>
                         <td><a href="#postReboot" id="postReboot" onclick="postReboot()">/reboot</a></td>
                         <td>Reboots the machine.</td>
                     </tr>
@@ -298,14 +290,6 @@
 
         function postStop() {
             postRequest("/stop");
-        }
-
-        function postRamp() {
-            postRequest("/ramp");
-        }
-
-        function postNoRamp() {
-            postRequest("/noramp");
         }
       
         function postReboot() {

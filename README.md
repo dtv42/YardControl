@@ -158,7 +158,7 @@ wireless interface and the following key features:
 
 ### Logic Level Shifter
 Since the Raspberry Pi Pico W GPIO support 3.3V and 
-the TB6600 motor driver provides 5V inputs, the TXS0108 logic level shifter is used.
+the DM542T stepper motor driver provides 5V inputs, the TXS0108 logic level shifter is used.
 
 ![S-L1600](documents/s-l1600.jpg)
 
@@ -182,8 +182,6 @@ Support of the Raspberry Pi Pico W is available via the Raspberry Pi Pico Arduin
 ## Additional Libraries
 Additional libraries are used. They can be found and installed via the Arduino library manager.
 
-- AccelStepperWithDistance
-- AccelStepper
 - TelnetLib
 - WebServer
 - LittelFS
@@ -201,7 +199,6 @@ The local modules implement the application settings (read from a JSON file), su
 - Commands.h, Commands.cpp
 - ServerInfo.h, ServerInfo.cpp
 - AppSettings.h, AppSettings.cpp
-- ActuatorInfo.h, ActuatorInfo.cpp
 - SystemInfo.h, SystemInfo.cpp
 - WiFiInfo.h, WiFiInfo.cpp
 - Wireless.h, Wireless.cpp
@@ -252,7 +249,6 @@ The following command types are supported:
 Public Fields:
 ~~~ txt
     JsonOutput      - Flag indicating JSON output (telnet).
-    VerboseOutput   - Flag indicating verbose serial output.
     WaitForResponse - Flag indicating that we wait for a (Yes/No) response.
 ~~~
 Public Methods:
@@ -267,7 +263,6 @@ Public Methods:
 The follwing info classes are implemented
 
 - ServerInfo
-- ActuatorInfo
 - SystemInfo
 - WiFiInfo
 - GpioPins
@@ -290,16 +285,16 @@ All application settings are maintained here. The settings classses provided are
 {
     "Yard": {
         "Tracks": [
-            1600,
-            68800,
-            121600,
-            174400,
-            227200,
-            280000,
-            332800,
-            385600,
-            438400,
-            491200
+            10000,
+            23200,
+            36400,
+            49600,
+            62800,
+            76000,
+            89200,
+           102400,
+           115600,
+           128800
         ]
     },
     "Actuator": {
@@ -309,20 +304,22 @@ All application settings are maintained here. The settings classses provided are
         "SwitchStop": 7,
         "SwitchLimit1": 8,
         "SwitchLimit2": 9,
-        "MoveSpeed": 1000.0,
-        "Retract": 3200
+        "SmallStep": 1.0,
+        "MinStep": 0.1,
+        "Retract": 4.0
     },
     "Stepper": {
         "PinPUL": 0,
         "PinDIR": 1,
         "PinENA": 2,
         "PinALM": 6,
+        "MinSpeed": 200.0,
+        "MaxSpeed": 4000.0,
+        "ConstSpeed": 2000.0,
+        "Acceleration": 400.0,
         "MicroSteps": 16,
-        "MaxSpeed": 2000.0,
-        "Acceleration": 300.0,
         "StepsPerRotation": 200,
-        "DistancePerRotation": 2.0,
-        "MinPulseWidth": 20
+        "DistancePerRotation": 8.0
     },
     "Http": {
         "Port": 80
@@ -333,19 +330,20 @@ All application settings are maintained here. The settings classses provided are
     },
     "WiFi": {
         "DHCP": true,
-        "SSID": "<SSID>",
-        "Password": "<Password>",
-        "Hostname": "<Hostname>",
-        "Address": "<IP-Adress>",
-        "Gateway": "<IP-Adress>",
+        "SSID": "Home Lan 42",
+        "Password": "Yellow31Red21Green41",
+        "Hostname": "YardControl",
+        "Address": "10.0.1.222",
+        "Gateway": "10.0.1.254",
         "Subnet": "255.255.255.0",
-        "DNS": "<IP-Adress>"
+        "DNS": "10.0.1.254"
     },
     "AP": {
         "SSID": "YARD_CONTROL",
-        "Password": "<Password>",
-        "Hostname": "<Hostname>"
+        "Password": "Yellow31",
+        "Hostname": "YardControl"
     }
+}
 ~~~
 
 ### Telnet Commands
@@ -359,45 +357,67 @@ Allows to control the linear actuator providing a set of commands.
 
 The following commands with no argument are available:
 
-    + | plus      - Moves a step forward.
-    - | minus     - Moves a step backward.
-    ? | help      - Shows this help information.
-    b | backward  - Moves a 0.1 mm distance backward.
-    c | calibrate - Run a calibration sequence.
-    d | disable   - Stops the motor by disabling the output.
-    e | enable    - Enabling the output (after disable).
-    f | forward   - Moves a 0.1 mm distance forward.
-    g | gpio      - Shows the GPIO input and output pin values.
-    h | home      - Moves to home position (position = 0).
-    j | json      - Toggle JSON output.
-    p | position  - Shows the current position.
-    q | quit      - Terminates the program.
-    s | status    - Shows the current state of the motor driver.
-    r | release   - Release the stopped motor.
-    x | stop      - Stops the running motor.
+    ? | help         - Shows this help information.                 
+    q | quit         - Terminates the program.                      
+    j | json         - Toggle JSON output mode.                     
+    v | verbose      - Toggle verbose output.                       
+                     -                                                
+    s | status       - Shows the current state of the motor driver. 
+    p | position     - Shows the current position.                  
+    + | plus         - Moves a step forward.                        
+    - | minus        - Moves a step backward.                       
+    f | forward      - Moves a 0.1 mm distance forward.             
+    b | backward     - Moves a 0.1 mm distance backward.            
+    c | calibrate    - Run a calibration sequence.                  
+    e | enable       - Enabling the output (after disable).         
+    d | disable      - Stops the motor by disabling the output.     
+    x | stop         - Stops the running motor (decelerating).      
+    h | home         - Moves to home position (position = 0).       
+    g | gpio         - Shows the GPIO input and output pin values.  
+    r | ramp         - Enables acceleration and deceleration.       
+    n | noramp       - Disables acceleration and deceleration.      
 
-    acceleration - Gets the acceleration (steps/(sec*sec)).
-    maxspeed     - Gets the maximum speed (steps/sec).
-    speed        - Gets the current speed (steps/(sec*sec)).
-    reset        - Resets the current positio to zero.
-    reboot       - Reboots the RP2040.
-    server       - Shows the server information.
-    settings     - Shows the settings information.
-    system       - Shows the system information.
-    verbose      - Toggle verbose Serial output.
-    wifi         - Shows the WiFi information.
+    yard             - Show yard track settings.                    
+    pico             - Show Pico W pin layout.                      
+    wifi             - Shows the WiFi information.                  
+    server           - Shows the server information.                
+    system           - Shows the system information.                
+    stepper          - Shows the stepper settings.                  
+    actuator         - Shows the actuator settings.                 
+    settings         - Shows all settings information.              
+    appsettings      - Shows the appsettings file.                  
+    reboot           - Reboots the RP2040.                          
+    reset            - Resets the current position to zero.         
+    save             - Saves the updated application settings.      
+    load             - (Re)loads the application settings.          
+    
+    smallstep        - Gets the small move distance (mm).           
+    minstep          - Gets the min move distance   (mm).             
+    retract          - Gets the retract distance    (mm).              
+    
+    rpm              - Gets the speed RPM.                          
+    speed            - Gets the speed (steps per second).           
+    minspeed         - Gets the minimum speed  (steps per second).   
+    maxspeed         - Gets the maximum speed  (steps per second).   
+    constspeed       - Gets the constant speed (steps per second).  
+    acceleration     - Gets the acceleration   (speed per second).    
 
 The following commands require an argument:
 
-    s | step   <integer> - Moves the number of steps (relative).
-    m | stepto <integer> - Moves to absolute position (steps).
-    t | track  <integer> - Moves to track number.
-    r | move   <number>  - Moves the number of mm (relative).
-    a | moveto <number>  - Moves to absolute position (mm).
-
-    acceleration <number>  - Sets the acceleration (steps/(sec*sec)).
-    maxspeed     <number>  - Sets the maximum speed. (steps/sec).
-    speed        <number>  - Sets the current speed. (steps/sec).
+    m | stepto <number>   - Moves to absolute position (steps). 
+    s | step <number>     - Moves relative the number of steps.
+    t | track <number>    - Moves to track number (0-9).              
+    a | moveto <number>   - Moves to absolute position  (mm).
+    r | move <number>     - Moves the relative distance (mm).
+                          
+    smallstep <number>    - Sets the small move distance (mm).          
+    minstep <number>      - Sets the min move distance   (mm).            
+    retract <number>      - Sets the retract distance    (mm).             
+                         
+    minspeed <number>     - Sets the minimum speed  (steps per second).  
+    maxspeed <number>     - Sets the maximum speed  (steps per second).  
+    constspeed <number>   - Sets the constant speed (steps per second). 
+    acceleration <number> - Sets the acceleration   (speed per second).
 ~~~
 
 ### Web Pages
@@ -450,6 +470,8 @@ The following list summarizes the conventions adopted by the RESTful implementat
 | /disable	        | Disables the stepper motor.                           |
 | /home	            | Move ro the home position.                            |
 | /stop	            | Stops the stepper motor.                              |
+| /ramp	            | Move with ramping speed.                              |
+| /noramp	        | Move with constant speed.                             |
 | /release          | Relase the stopped motor.                             |
 | /reboot	        | Reboots the machine.                                  |
 
@@ -459,9 +481,6 @@ The following list summarizes the conventions adopted by the RESTful implementat
 | /move	            | Move the number of mm (relative).                     |
 | /stepto	        | Move to absolute position (steps).                    |
 | /moveto	        | Move to absolute position (mm).                       |
-| /speed	        | Sets the maximum speed (steps per second).            |
-| /maxspeed	        | Sets the maximum speed (steps per second).            |
-| /acceleration	    | Sets the acceleration (steps per second per second).  |
 
 ### GPIO Mapping
 The Raspberry Pi Pico W and the GPIO pins (output from 'pico' command).
@@ -545,13 +564,13 @@ Since the number of intervals has to be an integer number, the set speed will be
 However, the stepper driver is moving for the required number of steps with the set speed.
 The maximum speed is a delay of 10 us (2 intervals) resulting in a 20 us period or 50 kHz.
 
-For a typical stepper motor driver with 200 steps per revolution and a linear actuator with a lead screw providing 2 mm travel distance per revolution, this results in 100 steps per mm.
+For a typical stepper motor driver with 200 steps per revolution and a linear actuator with a lead screw providing 8 mm travel distance per revolution, this results in 400 steps per mm.
 When microstepping is used, the number of steps / mm is increased acordingly. The attainable speed for a stepper motor is in the range of 1000 rpm.
 With higher speed, the torque is considerable decreased, and the motor has to ramp up the speed slowly.
 Assuming a maximum frequency of 50 kHz, the resulting maximum RPM is as follows:
 
 ~~~
-2.00    mm per rotation
+8.00    mm per rotation
 200     steps per rotation
 100000  timer frequency (100 kHz)
 50000   max steps per second (2 cycles)

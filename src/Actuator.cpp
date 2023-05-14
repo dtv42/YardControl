@@ -5,10 +5,11 @@
 // <license>
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
-// <created>9-4-2023 7:45 PM</created>
-// <modified>8-5-2023 8:03 AM</modified>
+// <created>10-5-2023 6:48 AM</created>
+// <modified>13-5-2023 11:33 AM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
+
 #include <ArduinoJson.h>
 
 #include "Actuator.h"
@@ -22,29 +23,6 @@ extern TelnetServer Telnet;
 extern CommandsClass Commands;
 extern LinearActuator Actuator;
 extern bool TimerHandler(struct repeating_timer* t);
-
-/// <summary>
-/// Initialize the stepper instance using the application settings.
-/// Enable the driver and allow acceleration and deceleration.
-/// </summary>
-void LinearActuator::init()
-{
-    _PUL = Settings.Stepper.PinPUL;
-    _DIR = Settings.Stepper.PinDIR;
-    _ENA = Settings.Stepper.PinENA;
-    _ALM = Settings.Stepper.PinALM;
-
-    setMaxSpeed(Settings.Stepper.MaxSpeed);
-    setConstSpeed(Settings.Stepper.ConstSpeed);
-    setAcceleration(Settings.Stepper.Acceleration);
-    setMicrosteps(Settings.Stepper.MicroSteps);
-    _stepsPerRotation = max(1, Settings.Stepper.StepsPerRotation);
-    _distancePerRotation = max(1.0, Settings.Stepper.DistancePerRotation);
-
-    reset();
-    enable();
-    rampEnable();
-}
 
 /// <summary>
 /// Set the stepper driver direction to counter clockwise.
@@ -73,7 +51,7 @@ void LinearActuator::_cw()
 float LinearActuator::_getSpeedFromIntervals(uint value)
 {
     float speed = (value > 0) ? float(LinearActuator::FREQUENCY / value) : 0;
-    return max(float(LinearActuator::FREQUENCY / INT_MAX), min(float(LinearActuator::MAXSPEED), speed));
+    return max(LinearActuator::FREQUENCY / INT_MAX, min(LinearActuator::MAX_SPEED, speed));
 }
 
 /// <summary>
@@ -92,7 +70,7 @@ uint LinearActuator::_getIntervalsFromSpeed(float value)
 /// </summary>
 /// <param name="value">The speed in steps per second.</param>
 /// <returns>The speed in RPM.</returns>
-float  LinearActuator::_getRPMFromSpeed(float value)
+float LinearActuator::_getRPMFromSpeed(float value)
 {
     return 60.0 * value / (_microsteps * _stepsPerRotation);
 }
@@ -102,7 +80,7 @@ float  LinearActuator::_getRPMFromSpeed(float value)
 /// </summary>
 /// <param name="value">The speed in RPM.</param>
 /// <returns>The speed in steps per second.</returns>
-float  LinearActuator::_getSpeedFromRPM(float value)
+float LinearActuator::_getSpeedFromRPM(float value)
 {
     return value * (_microsteps * _stepsPerRotation) / 60.0;
 }
@@ -112,7 +90,7 @@ float  LinearActuator::_getSpeedFromRPM(float value)
 /// </summary>
 /// <param name="value">The distance [mm].</param>
 /// <returns>The number of steps.</returns>
-long   LinearActuator::_getStepsFromDistance(float value)
+long LinearActuator::_getStepsFromDistance(float value)
 {
     return long(value * (_stepsPerRotation * _microsteps) / _distancePerRotation);
 }
@@ -122,18 +100,50 @@ long   LinearActuator::_getStepsFromDistance(float value)
 /// </summary>
 /// <param name="value">The number of steps.</param>
 /// <returns>The distance [mm].</returns>
-float  LinearActuator::_getDistanceFromSteps(long value)
+float LinearActuator::_getDistanceFromSteps(long value)
 {
     return float(value * _distancePerRotation / (_stepsPerRotation * _microsteps));
 }
 
 /// <summary>
-/// Converts the speed to the delay in microseconds.
+/// Checks the input value against allowed microstep values.
 /// </summary>
-/// <returns>The delay [usec].</returns>
-float  LinearActuator::getDelay()
+/// <param name="value">The microstep value.</param>
+/// <returns>True if microstep value is valid.</returns>
+bool LinearActuator::_isValidMicrostep(ushort value)
 {
-    return  _getIntervalsFromSpeed(_speed) * LinearActuator::INTERVAL;
+    switch (value)
+    {
+    case 1:
+    case 2:
+    case 4:
+    case 8:
+    case 16:
+    case 32:
+    case 64:
+    case 128:
+    case 5:
+    case 10:
+    case 20:
+    case 25:
+    case 40:
+    case 50:
+    case 100:
+    case 125:
+        return true;
+    default:
+        return false;
+    }
+}
+
+/// <summary>
+/// Updates the settings with current values.
+/// </summary>
+void LinearActuator::_updateSettings()
+{
+    Settings.Stepper.MaxSpeed   = getMaxSpeed();
+    Settings.Stepper.MaxSteps   = getMaxSteps();
+    Settings.Stepper.MicroSteps = getMicrosteps();
 }
 
 /// <summary>
@@ -157,149 +167,95 @@ float  LinearActuator::getSpeed()
 /// <summary>
 /// Gets the maximum speed.
 /// </summary>
-/// <returns>The minimum speed.</returns>
-float  LinearActuator::getMinSpeed()
-{
-    return _minSpeed;
-}
-
-/// <summary>
-/// Sets the minimum speed in steps per second.
-/// Note this also updates the settings.
-/// </summary>
-/// <param name="value">The minimum speed [steps per second].</param>
-void   LinearActuator::setMinSpeed(float value)
-{
-    _minSpeed = min(_maxSpeed, max(MINSPEED, value));
-    Settings.Stepper.MinSpeed = _minSpeed;
-    if (_verbose) Telnet.println(String("Minimum speed set to ") + _minSpeed);
-}
-
-/// <summary>
-/// Gets the maximum speed.
-/// </summary>
 /// <returns>The maximum speed.</returns>
 float  LinearActuator::getMaxSpeed()
 {
-    return _maxSpeed;
+    return _maxspeed;
 }
 
 /// <summary>
 /// Sets the maximum speed in steps per second.
-/// Note this also updates the settings.
 /// </summary>
 /// <param name="value">The maximum speed [steps per second].</param>
 void   LinearActuator::setMaxSpeed(float value)
 {
-    _maxSpeed = min(MAXSPEED, max(_minSpeed, value));
-    Settings.Stepper.MaxSpeed = _maxSpeed;
-    if (_verbose) Telnet.println(String("Maximum speed set to ") + _maxSpeed);
+    if (getRunningFlag())
+    {
+        if (_verbose) Telnet.println("Still moving - ignoring set maximum speed request");
+    }
+    else
+    {
+        _maxspeed = min(MAX_SPEED, value);
+        if (_verbose) Telnet.println(String("Maximum speed set to ") + _maxspeed);
+    }
 }
 
 /// <summary>
-/// Gets the constant speed.
+/// Gets the ramp steps to maximum speed.
 /// </summary>
-/// <returns>The constant speed.</returns>
-float  LinearActuator::getConstSpeed()
+/// <returns>The ramp steps.</returns>
+long LinearActuator::getMaxSteps()
 {
-    return _constSpeed;
+    return _maxsteps;
 }
 
 /// <summary>
-/// Sets the constant speed in steps per second.
-/// Note this also updates the settings.
+/// Sets the ramp steps to maximum speed.
 /// </summary>
-/// <param name="value">The constant speed [steps per second].</param>
-void   LinearActuator::setConstSpeed(float value)
+/// <param name="value">The ramp steps.</param>
+void LinearActuator::setMaxSteps(long value)
 {
-    _constSpeed = min(MAXSPEED, max(MINSPEED, value));
-    Settings.Stepper.ConstSpeed = _constSpeed;
-    if (_verbose) Telnet.println(String("Constant speed set to ") + _constSpeed);
+    if (getRunningFlag())
+    {
+        if (_verbose) Telnet.println("Still moving - ignoring set maximum steps request");
+    }
+    else
+    {
+        _maxsteps = max(1, value);
+        if (_verbose) Telnet.println(String("Maximum steps set to ") + _maxsteps);
+    }
 }
 
 /// <summary>
-/// Gets the acceleration in speed per second.
+/// Gets the microsteps.
 /// </summary>
-/// <returns>The acceleration.</returns>
-float  LinearActuator::getAcceleration()
-{
-    return _acceleration;
-}
-
-/// <summary>
-/// Sets the acceleration in speed per second.
-/// Note this also updates the settings.
-/// </summary>
-/// <param name="value">The acceleration.</param>
-void   LinearActuator::setAcceleration(float value)
-{
-    _acceleration = min(MAXSPEED, max(0, value));
-    Settings.Stepper.Acceleration = _acceleration;
-    if (_verbose) Telnet.println(String("Acceleration set to ") + _acceleration);
-}
-
-/// <summary>
-/// Gets the stepper driver microsteps.
-/// </summary>
-/// <returns>The number of microsteps.</returns>
-ushort LinearActuator::getMicrosteps()
+/// <returns>The microsteps.</returns>
+ushort  LinearActuator::getMicrosteps()
 {
     return _microsteps;
 }
 
 /// <summary>
-/// Sets the stepper driver microsteps.
-/// Note this also updates the settings.
-/// The stepper driver DIP switches have to be set accordingly.
+/// Sets the microsteps.
 /// </summary>
-/// <param name="value">The number of microsteps.</param>
+/// <param name="value">The microsteps.</param>
 void   LinearActuator::setMicrosteps(ushort value)
 {
-    switch (value)
+    if (getRunningFlag())
     {
-    case 1:
-    case 2:
-    case 4:
-    case 8:
-    case 16:
-    case 32:
-    case 64:
-    case 128:
-    case 5:
-    case 10:
-    case 20:
-    case 25:
-    case 40:
-    case 50:
-    case 100:
-    case 125:
-        _microsteps = value;
-        if (_verbose) Telnet.println(String("Microsteps set to ") + _microsteps);
-        break;
-    default:
-        if (_verbose) Telnet.println("Microsteps not set (invalid value)");
-        break;
+        if (_verbose) Telnet.println("Still moving - ignoring set microsteps request");
     }
-
-    Settings.Stepper.MicroSteps = _microsteps;
+    else
+    {
+        if (_isValidMicrostep(value))
+        {
+            _microsteps = max(1, value);
+            if (_verbose) Telnet.println(String("Microsteps set to ") + _microsteps);
+        }
+        else
+        {
+            if (_verbose) Telnet.println(String("Invalid microsteps value: ") + _microsteps);
+        }
+    }
 }
 
 /// <summary>
 /// Gets the current position in steps.
 /// </summary>
-/// <returns>The current steps.</returns>
-long   LinearActuator::getSteps()
+/// <returns>The current position.</returns>
+long   LinearActuator::getPosition()
 {
     return _position;
-}
-
-/// <summary>
-/// Gets the current target position in steps.
-/// </summary>
-/// <returns>The current target.</returns>
-long   LinearActuator::getTarget()
-{
-    return _target;
 }
 
 /// <summary>
@@ -312,10 +268,31 @@ long   LinearActuator::getDelta()
 }
 
 /// <summary>
+/// Gets the current target position in steps.
+/// </summary>
+/// <returns>The current target.</returns>
+long   LinearActuator::getTarget()
+{
+    return _target;
+}
+
+
+/// <summary>
+/// Sets the target in steps.
+/// </summary>
+/// <param name="value">The new target.</param>
+void   LinearActuator::setTarget(long value)
+{
+    _target = value;
+
+    if (_verbose) Telnet.println(String("Target set to ") + _target);
+}
+
+/// <summary>
 /// Gets the current position in mm.
 /// </summary>
 /// <returns>The position [mm].</returns>
-float  LinearActuator::getPosition()
+float  LinearActuator::getDistance()
 {
     return  _getDistanceFromSteps(_position);
 }
@@ -364,16 +341,7 @@ bool   LinearActuator::getEnabledFlag()
 /// <returns>The flag value.</returns>
 bool   LinearActuator::getRunningFlag()
 {
-    return _steps > 0;
-}
-
-/// <summary>
-/// Gets the ramping mode flag.
-/// </summary>
-/// <returns>The flag value.</returns>
-bool   LinearActuator::getRampingFlag()
-{
-    return _ramping;
+    return _position != _target;
 }
 
 /// <summary>
@@ -411,7 +379,69 @@ bool   LinearActuator::getCalibratedFlag()
 {
     return _calibrated;
 }
-            
+
+/// <summary>
+/// Initialize the stepper instance using the application settings.
+/// Enable the driver and allow acceleration and deceleration.
+/// </summary>
+void LinearActuator::init()
+{
+    // Set output and inut pin numbers.
+    _PUL = Settings.Stepper.PinPUL;
+    _DIR = Settings.Stepper.PinDIR;
+    _ENA = Settings.Stepper.PinENA;
+    _ALM = Settings.Stepper.PinALM;
+
+    // Set stepper settings.
+    setMaxSpeed(Settings.Stepper.MaxSpeed);
+    setMaxSteps(Settings.Stepper.MaxSteps);
+    setMicrosteps(Settings.Stepper.MicroSteps);
+
+    // Set fixed stepper settings.
+    if (Settings.Stepper.StepsPerRotation > 0) _stepsPerRotation = Settings.Stepper.StepsPerRotation;
+    if (Settings.Stepper.DistancePerRotation > 0) _distancePerRotation = Settings.Stepper.DistancePerRotation;
+
+    // Reset position and enable outputs.
+    reset();
+    enable();
+}
+
+/// <summary>
+/// Enable the stepper driver outputs.
+/// </summary>
+void LinearActuator::enable()
+{
+    digitalWrite(_ENA, LOW);
+    _enabled = true;
+}
+
+/// <summary>
+/// Disables the stepper driver outputs, stops moving and resets the target to current position.
+/// </summary>
+void LinearActuator::disable()
+{
+    sleep_us(10);
+    digitalWrite(_ENA, HIGH);
+    digitalWrite(_PUL, LOW);
+    _target = _position;
+    _steps = 0;
+    _start = 0;
+    _enabled = false;
+}
+
+
+/// <summary>
+/// Stops the move.
+/// </summary>
+void LinearActuator::stop()
+{
+    sleep_us(10);
+    digitalWrite(_PUL, LOW);
+    _target = _position;
+    _steps = 0;
+    _start = 0;
+}
+
 /// <summary>
 /// Sets the target to zero (home).
 /// </summary>
@@ -421,26 +451,37 @@ void   LinearActuator::home()
 }
 
 /// <summary>
-/// Resets the interval counter, the target, the steps, and the position to zero.
+/// Resets the move parameter, the target, and the position to zero.
 /// </summary>
 void   LinearActuator::reset()
 {
-    _count = 0;
-    _steps = 0;
-    _target = 0;
-    _position = 0;
-    _totalSteps = 0;
-    _speed = _ramping ? _minSpeed : _constSpeed;
+    _start     = 0;
+    _changing  = 0;
+    _intervals = 1;
+    _count     = 0;
+
+    _target    = 0;
+    _position  = 0;
+    _steps     = 0;
+    _speed     = 0.0f;
 
     if (_verbose)
     {
         Telnet.print(String("Reset:") + "\r\n" +
-                            "    Steps:    " + _steps    + "\r\n" +
-                            "    Target:   " + _target   + "\r\n" +
-                            "    Position: " + _position + "\r\n" +
-                            "    Speed:    " + _speed    + "\r\n" +
+                            "    Speed:       " + _speed    + "\r\n" +
+                            "    Steps:       " + _steps    + "\r\n" +
+                            "    Target:      " + _target   + "\r\n" +
+                            "    Position:    " + _position + "\r\n" +
                             "\r\n");
     }
+}
+
+/// <summary>
+/// Retracts a short distance (CW: 1, CCW: -1).
+/// </summary>
+void LinearActuator::retract(Direction value)
+{
+    moveRelativeDistance(value * Settings.Actuator.Retract);
 }
 
 /// <summary>
@@ -450,71 +491,83 @@ void   LinearActuator::reset()
 /// <param name="value">The number of steps.</param>
 void   LinearActuator::moveAbsolute(long value)
 {
-    _count = 0;
-    _speed = 0;
-    _target = value;
-    _steps = abs(_target - _position);
-    _totalSteps = _steps;
-
-    if (_ramping)
+    // Do not move if still moving.
+    if (getRunningFlag())
     {
-        auto rampIntervals = Actuator.FREQUENCY * (_maxSpeed - _minSpeed) / _acceleration;
-        auto rampMaxSteps = (rampIntervals / Actuator.FREQUENCY) * (_maxSpeed - _minSpeed) / 2;
-        _deltaSpeed = _acceleration / Actuator.FREQUENCY;
-        _speed = _minSpeed;
-
-        // Adjust ramp count if ramping takes longer than total steps.
-        if ((2 * rampMaxSteps) > _totalSteps)
-        {
-            _rampSteps = _totalSteps / 2;
-            _constSteps = 0;
-        }
-        else
-        {
-            _rampSteps = rampMaxSteps;
-            _constSteps = _totalSteps - 2 * _rampSteps;
-        }
-
-        auto rampSpeed = (_maxSpeed - _minSpeed) * _rampSteps / (2 * rampMaxSteps);
-        auto rampTime = _rampSteps / rampSpeed;
-        auto speedTime = _constSteps / _maxSpeed;
-        auto totalTime = 2 * rampTime + speedTime;
-
         if (_verbose)
         {
-            Telnet.print(String("Move Info:") + "\r\n" +
-                                "    Target (steps):     " + _target                + "\r\n" +
-                                "    Position (steps):   " + _position              + "\r\n" +
-                                "    Ramp Intervals:     " + rampIntervals          + "\r\n" +
-                                "    Ramp Steps max:     " + rampMaxSteps           + "\r\n" +
-                                "    Ramp Steps:         " + _rampSteps             + "\r\n" +
-                                "    Const. Speed Steps: " + _constSteps            + "\r\n" +
-                                "    Ramp Speed avg:     " + rampSpeed              + "\r\n" +
-                                "    Ramp Time:          " + rampTime               + "\r\n" +
-                                "    Const Speed Time:   " + speedTime              + "\r\n" +
-                                "    Total Time:         " + totalTime              + "\r\n" +
-                                "    Speed Delta:        " + String(_deltaSpeed, 3) + "\r\n" +
-                                "    Speed:              " + _speed                 + "\r\n" +
-                                "\r\n");
+            Telnet.println("Still moving - ignoring move request");
         }
+
+        return;
+    }
+
+    long  n = 0;
+    long  count = 0;
+    long  target = value;
+    long  position = getPosition();
+    long  steps = abs(target - position);
+    long  rampsteps = 0;
+    long  conststeps = 0;
+    float maxtime = 0.0f;
+    float ramptime = 0.0f;
+    float consttime = 0.0f;
+    float totaltime = 0.0f;
+
+    _deltaspeed = _maxspeed / _maxsteps;
+
+    if (2 * _maxsteps > _steps)
+    {
+        rampsteps = steps / 2;
+        conststeps = 0;
     }
     else
     {
-        _speed = _constSpeed;
-        _intervals = _getIntervalsFromSpeed(_speed);
-        auto totalTime = _totalSteps / _constSpeed;
-
-        if (_verbose)
-        {
-            Telnet.print(String("Move Info:") + "\r\n" +
-                                "    Target (steps):     " + _target + "\r\n" +
-                                "    Position (steps):   " + _position + "\r\n" +
-                                "    Total Time:         " + totalTime + "\r\n" +
-                                "    Intervals:          " + _intervals + "\r\n" +
-                                "    Speed:              " + _speed + "\r\n" +
-                                "\r\n");
-        }
+        rampsteps = _maxsteps;
+        conststeps = steps - 2 * rampsteps;
     }
+
+    for (int i = 1; i <= _maxsteps; ++i)
+    {
+        maxtime += 1 / (i * _deltaspeed);
+    }
+
+    for (int i = 1; i <= rampsteps; ++i)
+    {
+        ramptime += 1 / (i * _deltaspeed);
+    }
+
+    consttime = conststeps / _maxspeed;
+    totaltime = 2 * ramptime + consttime;
+
+    _rampsteps = rampsteps;
+    _target = target;
+    _steps = steps;
+    _speed = 0;
+    _count = 0;
+    _n = 0;
+
+    if (_verbose)
+    {
+        Telnet.print(String("Move Info:") + "\r\n" +
+                            "    Position (steps): " + position     + "\r\n" +
+                            "    Target (steps):   " + target       + "\r\n" +
+                            "    Total steps:      " + steps        + "\r\n" +
+                            "    Ramp Steps (max): " + _maxsteps    + "\r\n" +
+                            "    Ramp Steps:       " + rampsteps    + "\r\n" +
+                            "    Max. Speed Steps: " + conststeps   + "\r\n" +
+                            "    Delta Speed:      " + _deltaspeed  + "\r\n" +
+                            "    Ramp Time (max):  " + maxtime      + "\r\n" +
+                            "    Ramp Time:        " + ramptime     + "\r\n" +
+                            "    Max. Speed Steps: " + conststeps   + "\r\n" +
+                            "    Max. Speed Time:  " + consttime    + "\r\n" +
+                            "    Total Time:       " + totaltime    + "\r\n" +
+                            "\r\n");
+    }
+
+    _start = millis();
+
+    interrupts();
 }
 
 /// <summary>
@@ -545,72 +598,13 @@ void   LinearActuator::moveRelativeDistance(float value)
 }
 
 /// <summary>
-/// Enables constant speed mode (disables acceleration and deceleration).
-/// </summary>
-void LinearActuator::rampEnable()
-{
-    _ramping = true;
-    _speed = _minSpeed;
-}
-
-/// <summary>
-/// Disables constant speed mode (enables acceleration and deceleration).
-/// </summary>
-void LinearActuator::rampDisable()
-{
-    _ramping = false;
-    _speed = _constSpeed;
-}
-
-/// <summary>
-/// Enable the stepper driver outputs and resets the target to current position.
-/// </summary>
-void LinearActuator::enable()
-{
-    digitalWrite(_ENA, LOW);
-    delayMicroseconds(200);
-    moveAbsolute(_position);
-    _enabled = true;
-}
-
-/// <summary>
-/// Disables the stepper driver outputs and the target to current position.
-/// </summary>
-void LinearActuator::disable()
-{
-    digitalWrite(_ENA, HIGH);
-    digitalWrite(_PUL, LOW);
-    delayMicroseconds(200);
-    moveAbsolute(_position);
-    _enabled = false;
-}
-
-/// <summary>
-/// Retracts a short distance (CW: 1, CCW: -1).
-/// </summary>
-void LinearActuator::retract(Direction value)
-{
-    moveRelativeDistance(value * Settings.Actuator.Retract);
-}
-
-/// <summary>
-/// Stops the motor immediately by disabling the outputs.
-/// If calibration is running.
-/// </summary>
-void LinearActuator::stop()
-{
-    _calibrating = false;
-    disable();
-}
-
-/// <summary>
 /// Callback routine for the stepper alarm on event (over voltage or over current).
 /// The stepper motor is stopped (disabled).
 /// </summary>
 void LinearActuator::alarmOn(uint8_t pin)
 {
     _alarm = true;
-    stop();
+    disable();
 }
 
 /// <summary>
@@ -637,12 +631,14 @@ void LinearActuator::switchOn(uint8_t pin)
     else if (pin == Settings.Actuator.SwitchLimit1)
     {
         _limit = true;
+        stop();
         retract(Direction::CW);
     }
     // If the second limit switch has been hit retract (negative direction).
     else if (pin == Settings.Actuator.SwitchLimit2)
     {
         _limit = true;
+        stop();
         retract(Direction::CCW);
     }
 }
@@ -665,15 +661,12 @@ void LinearActuator::switchOff(uint8_t pin)
         if (_calibrating)
         {
             reset();
-            rampEnable();
             _calibrated = true;
             _calibrating = false;
         }
     }
     else if (pin == Settings.Actuator.SwitchLimit2)
     {
-        moveAbsolute(_steps);
-
         // If calibrating stop calibrating (this should not happen).
         if (_calibrating)
         {
@@ -689,7 +682,6 @@ void LinearActuator::switchOff(uint8_t pin)
 /// </summary>
 void LinearActuator::calibrate()
 {
-    rampDisable();
     moveRelativeDistance(-Settings.Actuator.Length);
     _calibrating = true;
 }
@@ -707,62 +699,56 @@ void LinearActuator::onTimer()
         return;
     }
 
-    // // Generate stepper driver output pulses only if enabled and the target has not yet beeen reached.
+    // // Generate stepper driver output pulses only if enabled.
     if (_enabled)
     {
-        // Check for direction and start delay if necessary.
-        if (_count == 0)
+        // If the target has not yet been reached generate stepper pulse.
+        if (_position != _target)
         {
-            if (_position < _target)
+            // First check for direction and start direction change delay if necessary.
+            if (_count == 0)
             {
-                if (_direction != LinearActuator::Direction::CW)
+                if (_position < _target)
                 {
-                    _cw();
-                    _changing = CHANGING;
-                    return;
+                    if (_direction != LinearActuator::Direction::CW)
+                    {
+                        _cw();
+                        _changing = CHANGING;
+                        return;
+                    }
                 }
-            }
-            else if (_position > _target)
-            {
-                if (_direction != LinearActuator::Direction::CCW)
+                else if (_position > _target)
                 {
-                    _ccw();
-                    _changing = CHANGING;
-                    return;
-                }
-            }
-        }
-
-        // Increment interval count (delay between steps).
-        ++_count;
-
-        // If the step count has not been reached generate pulse output.
-        if (_steps > 0)
-        {
-            // If ramping update the speed.
-            if (_ramping)
-            {
-                if (_steps > _totalSteps - _rampSteps)
-                {
-                    _speed += _deltaSpeed;
-                }
-                else if (_steps <= _rampSteps)
-                {
-                    _speed -= _deltaSpeed;
+                    if (_direction != LinearActuator::Direction::CCW)
+                    {
+                        _ccw();
+                        _changing = CHANGING;
+                        return;
+                    }
                 }
             }
 
-            // Start pulse and update the interval.
+            // Increment interval count (delay between steps).
+            ++_count;
+
+            // Start pulse at the first interval and increment step count.
             if (_count == 1)
             {
                 digitalWrite(_PUL, HIGH);
+                ++_n;
+
+                // Calculate speed from step count.
+                if (_n < _rampsteps) _speed = _deltaspeed * _n;
+                else if (_n > (_steps - _rampsteps)) _speed = _deltaspeed * (_steps - _n);
+                else _speed = _maxspeed;
+
                 _intervals = _getIntervalsFromSpeed(_speed);
             }
-            // Turn output low (end pulse) and update remaining steps and position.
-            else if (_count == 2)
+
+            // Turn output low (end pulse) update speed, intervals, and position.
+            if (_count == 2)
             {
                 digitalWrite(_PUL, LOW);
-                --_steps;
 
                 if (_position < _target)
                 {
@@ -774,13 +760,30 @@ void LinearActuator::onTimer()
                 }
             }
         }
-        else if (_steps == 0)
+        else
         {
-            _speed = _ramping ? _minSpeed : _constSpeed;
+            // If the move has finished set start time to zero and reset move parameter.
+            if (_start > 0)
+            {
+                // Print elapsed time (sec) when verbose output is enabled.
+                if (_verbose)
+                {
+                    auto elapsed = float(millis() - _start) / 1000.0;
+                    Telnet.println(String("Moving time: ") + elapsed + " sec");
+                }
+
+                _intervals = 0;
+                _speed = 0.0f;
+                _start = 0;
+                _n = 0;
+            }
         }
 
+        // When the interval count has been reached, reset count and start again.
         if (_count >= _intervals)
+        {
             _count = 0;
+        }
     }
 }
 
@@ -793,26 +796,22 @@ String LinearActuator::toJsonString()
     String json;
 
     _doc.clear();
-    _doc["Calibrating"]  = getCalibratingFlag();
-    _doc["Calibrated"]   = getCalibratedFlag();
-    _doc["Verbose"]      = getVerboseFlag();
-    _doc["Enabled"]      = getEnabledFlag();
-    _doc["Running"]      = getRunningFlag();
-    _doc["Ramping"]      = getRampingFlag();
-    _doc["Limit"]        = getLimitFlag();
-    _doc["Alarm"]        = getAlarmFlag();
-    _doc["Delta"]        = getDelta();
-    _doc["Steps"]        = getSteps();
-    _doc["Target"]       = getTarget();
-    _doc["Direction"]    = getDirection();
-    _doc["Position"]     = getPosition();
-    _doc["Delay"]        = getDelay();
-    _doc["RPM"]          = getRPM();
-    _doc["Speed"]        = getSpeed();
-    _doc["MinSpeed"]     = getMinSpeed();
-    _doc["MaxSpeed"]     = getMaxSpeed();
-    _doc["ConstSpeed"]   = getConstSpeed();
-    _doc["Acceleration"] = getAcceleration();
+    _doc["Calibrating"] = getCalibratingFlag();
+    _doc["Calibrated"]  = getCalibratedFlag();
+    _doc["Verbose"]     = getVerboseFlag();
+    _doc["Enabled"]     = getEnabledFlag();
+    _doc["Running"]     = getRunningFlag();
+    _doc["Limit"]       = getLimitFlag();
+    _doc["Alarm"]       = getAlarmFlag();
+    _doc["Delta"]       = getDelta();
+    _doc["Target"]      = getTarget();
+    _doc["Position"]    = getPosition();
+    _doc["Distance"]    = getDistance();
+    _doc["Direction"]   = getDirection();
+    _doc["RPM"]         = getRPM();
+    _doc["Speed"]       = getSpeed();
+    _doc["MaxSpeed"]    = getMaxSpeed();
+    _doc["MaxSteps"]    = getMaxSteps();
     serializeJsonPretty(_doc, json);
 
     return json;
@@ -824,26 +823,22 @@ String LinearActuator::toJsonString()
 /// <returns>The printable string.</returns>
 String LinearActuator::toString()
 {
-    return String("Actuator Info:") + "\r\n" +
-                  "    Calibrating:  " + getCalibratingFlag() + "\r\n" +
-                  "    Calibrated:   " + getCalibratedFlag()  + "\r\n" +
-                  "    Verbose:      " + getVerboseFlag()     + "\r\n" +
-                  "    Enabled:      " + getEnabledFlag()     + "\r\n" +
-                  "    Running:      " + getRunningFlag()     + "\r\n" +
-                  "    Ramping:      " + getRampingFlag()     + "\r\n" +
-                  "    Limit:        " + getLimitFlag()       + "\r\n" +
-                  "    Alarm:        " + getAlarmFlag()       + "\r\n" +
-                  "    Delta:        " + getDelta()           + "\r\n" +
-                  "    Steps:        " + getSteps()           + "\r\n" +
-                  "    Target:       " + getTarget()          + "\r\n" +
-                  "    Direction:    " + getDirection()       + "\r\n" +
-                  "    Position:     " + getPosition()        + "\r\n" +
-                  "    Delay:        " + getDelay()           + "\r\n" +
-                  "    RPM:          " + getRPM()             + "\r\n" +
-                  "    Speed:        " + getSpeed()           + "\r\n" +
-                  "    MinSpeed:     " + getMinSpeed()        + "\r\n" +
-                  "    MaxSpeed:     " + getMaxSpeed()        + "\r\n" +
-                  "    ConstSpeed:   " + getConstSpeed()      + "\r\n" +
-                  "    Acceleration: " + getAcceleration()    + "\r\n" +
+    return String("Actuator Status:") + "\r\n" +
+                  "    Calibrating: " + getCalibratingFlag() + "\r\n" +
+                  "    Calibrated:  " + getCalibratedFlag()  + "\r\n" +
+                  "    Verbose:     " + getVerboseFlag()     + "\r\n" +
+                  "    Enabled:     " + getEnabledFlag()     + "\r\n" +
+                  "    Running:     " + getRunningFlag()     + "\r\n" +
+                  "    Limit:       " + getLimitFlag()       + "\r\n" +
+                  "    Alarm:       " + getAlarmFlag()       + "\r\n" +
+                  "    Delta:       " + getDelta()           + "\r\n" +
+                  "    Target:      " + getTarget()          + "\r\n" +
+                  "    Position:    " + getPosition()        + "\r\n" +
+                  "    Distance:    " + getDistance()        + "\r\n" +
+                  "    Direction:   " + getDirection()       + "\r\n" +
+                  "    RPM:         " + getRPM()             + "\r\n" +
+                  "    Speed:       " + getSpeed()           + "\r\n" +
+                  "    MaxSpeed:    " + getMaxSpeed()        + "\r\n" +
+                  "    MaxSteps:    " + getMaxSteps()        + "\r\n" +
                   "\r\n";
 }

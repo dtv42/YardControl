@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>8-5-2023 7:29 AM</modified>
+// <modified>12-5-2023 8:45 AM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -58,9 +58,10 @@ class LinearActuator
 public:
     static constexpr const uint  FREQUENCY = 100000;                        // The timer frequency 100 kHz (pulsewidth = 10 usec).
     static constexpr const uint  INTERVAL  = 1000000 / FREQUENCY;           // The time between callbacks (microseconds).
-    static constexpr const float MINSPEED  = float(FREQUENCY) / INT_MAX;    // The minimum speed (ca. 4 steps per day).
-    static constexpr const float MAXSPEED  = FREQUENCY / 2.0;               // The maximum speed (50000 steps per second).
-    static constexpr const float CHANGING  = FREQUENCY / 50;                // The number of intervals for direction change.
+    static constexpr const float MIN_SPEED = float(FREQUENCY) / INT_MAX;    // The minimum speed (ca. 4 steps per day).
+    static constexpr const float MAX_SPEED = FREQUENCY / 2.0;               // The maximum speed (50000 steps per second).
+    static constexpr const float MIN_RAMP  = 10 * INTERVAL;                 // The minimum ramp time to maximum speed (10 intervals).
+    static constexpr const float CHANGING  = 0.2f * FREQUENCY;              // The number of intervals for direction change (delay = 200 ms).
 
     enum Direction
     {
@@ -81,89 +82,85 @@ private:
     uint8_t _ledAlarmOn;                            // GPIO pin number for the alarm LED.
 
     bool _calibrating = false;                      // Flag indicating that the calibration routine is running.
-    bool _calibrated = false;                       // Flag indicating that the calibration has been completed.
-    bool _enabled = false;                          // Flag indicating that the motor is enabled.
-    bool _ramping = false;                          // Flag indicating that acceleration/deceleration is performed.
-    bool _limit = false;                            // Flag indicating that a limit switch has turned on.
-    bool _alarm = false;                            // Flag indicating that the stepper driver alarm has been turned on.
-    bool _verbose = false;                          // Flag indicating verbose output turned on.
+    bool _calibrated  = false;                      // Flag indicating that the calibration has been completed.
+    bool _enabled     = false;                      // Flag indicating that the motor is enabled.
+    bool _limit       = false;                      // Flag indicating that a limit switch has turned on.
+    bool _alarm       = false;                      // Flag indicating that the stepper driver alarm has been turned on.
+    bool _verbose     = false;                      // Flag indicating verbose output turned on.
 
     Direction _direction = Direction::CW;           // Stepper driver direction (CW: 1, CCW: -1).
-    float     _distancePerRotation = 2;             // Distance per full rotation (mm).
-    ushort    _stepsPerRotation = 200;              // Steps per full rotation (360°).
-    ushort    _microsteps = 1;                      // Stepper driver microstep settings.
-    float     _acceleration = 100.0;                // The acceleration in speed per second.
-    float     _deltaSpeed = 100.0;                  // Speed delta for acceleration and deceleration.
-    float     _constSpeed = 1000.0;                 // The constant stepper speed in steps per second.
-    float     _minSpeed = 1000.0;                   // The minimum stepper speed in steps per second.
-    float     _maxSpeed = 5000.0;                   // The maximum stepper speed in steps per second.
-    float     _speed = 1000.0;                      // Stepper speed (steps per second).
-    long      _position = 0;                        // Absolute stepper position (steps).
-    long      _target = 0;                          // Absolute target position (steps).
 
-    long      _changing = 0;                        // delay (intervals) for direction change.
+    float     _distancePerRotation = 8.0f;          // Distance per full rotation (mm).
+    ushort    _stepsPerRotation    = 200;           // Steps per full rotation (360°).
+    ushort    _microsteps          = 1;             // Stepper driver microstep settings.
+    float     _maxspeed            = 5000.0f;       // The maximum stepper speed in steps per second.
+    float     _maxsteps            = 1.0f;          // The number of steps for a ramp to maximum speed.
+
+    long      _rampsteps  = 0;                      // The number of steps for ramping.
+    float     _deltaspeed = 0.0f;                   // The speed delta for every step.
+
+    long      _position = 0;                        // Absolute stepper position (steps).
+    long      _target   = 0;                        // Absolute target position (steps).
+    long      _steps    = 0;                        // Number of total steps requested in move.
+    float     _speed    = 0.0f;                     // Current stepper speed (steps per second).
+
+    long      _start     = 0;                       // Time at start of move.
+    long      _changing  = 0;                       // delay (intervals) for direction change.
     long      _intervals = 1;                       // Number of intervals required for delay between steps.
-    long      _totalSteps = 0;                      // Number of total steps (ramp + constant speed +  ramp).
-    long      _constSteps = 0;                      // Number of steps at maximum speed.
-    long      _rampSteps = 0;                       // Number of steps for ramping the speed.
-    long      _count = 0;                           // Interval counter.
-    long      _steps = 0;                           // Steps counter.
+    long      _count     = 0;                       // Interval count (0..Intervals).
+    long      _n         = 0;                       // Number of step.
 
     void  _ccw();                                   // Turn off the direction pin.
     void  _cw();                                    // Turn on the direction pin.
 
     float _getSpeedFromIntervals(uint intervals);   // Convert the intervals to speed.
     uint  _getIntervalsFromSpeed(float speed);      // Convert the speed to intervals.
+
     float _getSpeedFromRPM(float speed);            // Convert the RPM in speed (steps per second).
     float _getRPMFromSpeed(float speed);            // Convert the speed (steps per second) in RPM.
 
     long  _getStepsFromDistance(float value);       // Convert distance [mm] to steps.
     float _getDistanceFromSteps(long value);        // Convert steps to distance [mm].
 
+    bool  _isValidMicrostep(ushort value);          // Returns true if microstep value is valid.
+    void  _updateSettings();                        // Update stepper settings with current values.
+
 public : 
-    float     getDelay();                           // Gets the current pulse delay.
     float     getRPM();                             // Gets the current speed in RPM.
     float     getSpeed();                           // Gets the current speed in steps per second.
-    float     getMinSpeed();                        // Gets the minimum speed in steps per second.
-    void      setMinSpeed(float value);             // Sets the minimum speed in steps per second.
     float     getMaxSpeed();                        // Gets the maximum speed in steps per second.
     void      setMaxSpeed(float value);             // Sets the maximum speed in steps per second.
-    float     getConstSpeed();                      // Gets the constant speed in steps per second.
-    void      setConstSpeed(float value);           // Sets the constant speed in steps per second.
-    float     getAcceleration();                    // Gets the acceleration for the stepper driver.
-    void      setAcceleration(float value);         // Sets the acceleration for the stepper driver.
+    long      getMaxSteps();                        // Gets the ramp steps to maximum speed.
+    void      setMaxSteps(long value);              // Sets the ramp steps to maximum speed.
     ushort    getMicrosteps();                      // Gets the microsteps for the stepper driver.
     void      setMicrosteps(ushort value);          // Sets the microsteps for the stepper driver.
-    long      getSteps();                           // Gets the current position in steps.
+    long      getPosition();                        // Gets the current position in steps.
     long      getDelta();                           // Gets the remaining steps to the target position.
     long      getTarget();                          // Gets the target position in steps.
-    float     getPosition();                        // Gets the current position in mm.
+    void      setTarget(long value);                // Sets the target position in steps.
+    float     getDistance();                        // Gets the current position in mm.
     Direction getDirection();                       // Gets the current direction.
 
-    void  setVerboseFlag(bool value);               // Set verbose output flag.
-    bool  getVerboseFlag();                         // True if verbose output has been enabled.
-    bool  getEnabledFlag();                         // True if acceleration and deceleration have been enabled.
-    bool  getRunningFlag();                         // True if the stepper is running (position != target).
-    bool  getRampingFlag();                         // True if ramping is enabled.
-    bool  getLimitFlag();                           // True if the stepper has hit a limit switch.
-    bool  getAlarmFlag();                           // True if the stepper alarm signal is on.
-    bool  getCalibratingFlag();                     // True if calibrating.
-    bool  getCalibratedFlag();                      // True if calibration was successful.
-
-    void  rampEnable();                             // Enables acceleration and deceleration.
-    void  rampDisable();                            // Disables acceleration and deceleration.
-    void  enable();                                 // Enables the stepper outputs.
-    void  disable();                                // Disables the stepper outputs.
-    void  home();                                   // Move to position zero (home).
-    void  reset();                                  // Reset the current position to zero.
-    void  retract(Direction value);                 // Retract a short distance.
-    void  moveAbsolute(long value);                 // Move to absolute position [steps].
-    void  moveRelative(long value);                 // Move relative distance [steps].
-    void  moveAbsoluteDistance(float value);        // Move to absolute position [mm].
-    void  moveRelativeDistance(float value);        // Move relative distance [mm].
+    void setVerboseFlag(bool value);                // Set verbose output flag.
+    bool getVerboseFlag();                          // True if verbose output has been enabled.
+    bool getEnabledFlag();                          // True if acceleration and deceleration have been enabled.
+    bool getRunningFlag();                          // True if the stepper is running (position != target).
+    bool getLimitFlag();                            // True if the stepper has hit a limit switch.
+    bool getAlarmFlag();                            // True if the stepper alarm signal is on.
+    bool getCalibratingFlag();                      // True if calibrating.
+    bool getCalibratedFlag();                       // True if calibration was successful.
 
     void init();                                    // Initialize the stepper instance.
+    void enable();                                  // Enables the stepper outputs.
+    void disable();                                 // Disables the stepper outputs.
     void stop();                                    // Stop moving (resetting target position, disable output).
+    void home();                                    // Move to position zero (home).
+    void reset();                                   // Reset the current position to zero.
+    void retract(Direction value);                  // Retract a short distance.
+    void moveAbsolute(long value);                  // Move to absolute position [steps].
+    void moveRelative(long value);                  // Move relative distance [steps].
+    void moveAbsoluteDistance(float value);         // Move to absolute position [mm].
+    void moveRelativeDistance(float value);         // Move relative distance [mm].
 
     void alarmOn(uint8_t pin);                      // Alarm callback routine (on event).
     void alarmOff(uint8_t pin);                     // Alarm callback routine (off event).

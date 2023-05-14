@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>8-5-2023 11:08 AM</modified>
+// <modified>13-5-2023 9:30 AM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -94,10 +94,8 @@ public:
         uint8_t  PinENA              = 2;       // The output pin number for driver ENA input (enable).
         uint8_t  PinALM              = 3;       // The input pin number for driver ALM output (alarm).
 
-        float    MinSpeed            = 100.0;   // The minimum stepper speed in steps per second.
         float    MaxSpeed            = 5000.0;  // The maximum stepper speed in steps per second.
-        float    ConstSpeed          = 1000.0;  // The constant stepper speed in steps per second.
-        float    Acceleration        = 500.0;   // The acceleration in speed per second.
+        long     MaxSteps            = 2500.0;  // The ramp steps to maximum speed.
         uint8_t  MicroSteps          = 1;       // The multiplication factor for steps (microsteps).
         uint16_t StepsPerRotation    = 200;     // The number of steps per rotation (360°).
         float    DistancePerRotation = 1.0;     // The distance in mm per rotation (360°).
@@ -182,7 +180,7 @@ public:
     WiFiSettings     WiFi;                      // 
     APSettings       AP;                        // 
 
-    bool init();                                // Initializes the settings from the appsettings.json file.
+    bool load();                                // Loads the settings from the appsettings.json file.
     bool save();                                // Updates and saves the settings to the appsettings.json file.
 
     String toJsonString(); 	                    // Get a serialized JSON representation.

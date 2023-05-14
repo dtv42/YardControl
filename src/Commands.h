@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>6-5-2023 9:24 PM</modified>
+// <modified>8-5-2023 8:04 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -34,8 +34,6 @@ void disable();
 void stop();
 void home();
 void gpio();
-void ramp();
-void noramp();
 
 void yard();
 void pico();
@@ -49,6 +47,7 @@ void appsettings();
 void reboot();
 void reset();
 void save();
+void load();
 
 void smallstep();
 void minstep();
@@ -56,10 +55,8 @@ void retract();
 
 void rpm();
 void speed();
-void minspeed();
 void maxspeed();
-void constspeed();
-void acceleration();
+void maxsteps();
 void microsteps();
 
 void moveAbsolute(long value);
@@ -74,10 +71,8 @@ void smallstep(float value);
 void minstep(float value);
 void retract(float value);
 
-void minspeed(float value);
 void maxspeed(float value);
-void constspeed(float value);
-void acceleration(float value);
+void maxsteps(long value);
 void microsteps(long value);
 
 #pragma endregion
@@ -171,9 +166,9 @@ class CommandsClass
 private:
     String _padTo(String str, const size_t num, const char paddingChar = ' ');
 
-    static const int MAX_BASE_COMMANDS = 39;
+    static const int MAX_BASE_COMMANDS = 37;
     static const int MAX_LONG_COMMANDS = 5;
-    static const int MAX_FLOAT_COMMANDS = 9;
+    static const int MAX_FLOAT_COMMANDS = 6;
 
     static const int MAX_BASE_COMMAND_LENGTH = 12;
     static const int MAX_BASE_SHORTCUT_COMMAND_LENGTH = 9;
@@ -185,49 +180,47 @@ private:
     /// The list of supported base commands (no arguments).
     /// </summary>
     BaseCommand _baseCommands[MAX_BASE_COMMANDS] = {
-        { "help",         "?", "Shows this help information.",                 help         },
-        { "quit",         "q", "Terminates the program.",                      quit         },
-        { "json",         "j", "Toggle JSON output mode.",                     json         },
-        { "verbose",      "v", "Toggle verbose output.",                       verbose      },
+        { "help",         "?", "Shows this help information.",                 help         },  // 1
+        { "quit",         "q", "Terminates the program.",                      quit         },  // 2
+        { "json",         "j", "Toggle JSON output mode.",                     json         },  // 3
+        { "verbose",      "v", "Toggle verbose output.",                       verbose      },  // 4
                                                                                             
-        { "status",       "s", "Shows the current state of the motor driver.", status       },
-        { "position",     "p", "Shows the current position.",                  position     },
-        { "plus",         "+", "Moves a step forward.",                        plus         },
-        { "minus",        "-", "Moves a step backward.",                       minus        },
-        { "forward",      "f", "Moves a 0.1 mm distance forward.",             forward      },
-        { "backward",     "b", "Moves a 0.1 mm distance backward.",            backward     },
-        { "calibrate",    "c", "Run a calibration sequence.",                  calibrate    },
-        { "enable",       "e", "Enabling the output (after disable).",         enable       },
-        { "disable",      "d", "Stops the motor by disabling the output.",     disable      },
-        { "stop",         "x", "Stops the running motor (decelerating).",      stop         },
-        { "home",         "h", "Moves to home position (position = 0).",       home         },
-        { "gpio",         "g", "Shows the GPIO input and output pin values.",  gpio         },
-        { "ramp",         "r", "Enables acceleration and deceleration.",       ramp         },
-        { "noramp",       "n", "Disables acceleration and deceleration.",      noramp       },
+        { "status",       "s", "Shows the current state of the motor driver.", status       },  // 5
+        { "position",     "p", "Shows the current position.",                  position     },  // 6
+        { "plus",         "+", "Moves a step forward.",                        plus         },  // 7
+        { "minus",        "-", "Moves a step backward.",                       minus        },  // 8
+        { "forward",      "f", "Moves a 0.1 mm distance forward.",             forward      },  // 9
+        { "backward",     "b", "Moves a 0.1 mm distance backward.",            backward     },  // 10
+        { "calibrate",    "c", "Run a calibration sequence.",                  calibrate    },  // 11
+        { "enable",       "e", "Enabling the output (after disable).",         enable       },  // 12
+        { "disable",      "d", "Stops the motor by disabling the output.",     disable      },  // 13
+        { "stop",         "x", "Stops the running motor (decelerating).",      stop         },  // 14
+        { "home",         "h", "Moves to home position (position = 0).",       home         },  // 15
+        { "gpio",         "g", "Shows the GPIO input and output pin values.",  gpio         },  // 16
 
-        { "yard",         "",  "Show yard track settings.",                    yard         },
-        { "pico",         "",  "Show Pico W pin layout.",                      pico         },
-        { "wifi",         "",  "Shows the WiFi information.",                  wifi         },
-        { "server",       "",  "Shows the server information.",                server       },
-        { "system",       "",  "Shows the system information.",                system       },
-        { "stepper",      "",  "Shows the stepper settings.",                  stepper      },
-        { "actuator",     "",  "Shows the actuator settings.",                 actuator     },
-        { "settings",     "",  "Shows all settings information.",              settings     },
-        { "appsettings",  "",  "Shows the appsettings file.",                  appsettings  },
-        { "reboot",       "",  "Reboots the RP2040.",                          reboot       },
-        { "reset",        "",  "Resets the current position to zero.",         reset        },
-        { "save",         "",  "Saves the updated application settings.",      save         },
+        { "yard",         "",  "Show yard track settings.",                    yard         },  // 17
+        { "pico",         "",  "Show Pico W pin layout.",                      pico         },  // 18
+        { "wifi",         "",  "Shows the WiFi information.",                  wifi         },  // 19
+        { "server",       "",  "Shows the server information.",                server       },  // 20
+        { "system",       "",  "Shows the system information.",                system       },  // 21
+        { "stepper",      "",  "Shows the stepper settings.",                  stepper      },  // 22
+        { "actuator",     "",  "Shows the actuator settings.",                 actuator     },  // 23
+        { "settings",     "",  "Shows all settings information.",              settings     },  // 24
+        { "appsettings",  "",  "Shows the appsettings file.",                  appsettings  },  // 25
+        { "reboot",       "",  "Reboots the RP2040.",                          reboot       },  // 26
+        { "reset",        "",  "Resets the current position to zero.",         reset        },  // 27
+        { "save",         "",  "Saves the updated application settings.",      save         },  // 28
+        { "load",         "",  "(Re)loads the application settings.",          load         },  // 29
 
-        { "smallstep",    "",  "Gets the small move distance (mm).",           smallstep    },
-        { "minstep",      "",  "Gets the min move distance (mm).",             minstep      },
-        { "retract",      "",  "Gets the retract distance (mm).",              retract      },
+        { "smallstep",    "",  "Gets the small move distance (mm).",           smallstep    },  // 30
+        { "minstep",      "",  "Gets the min move distance (mm).",             minstep      },  // 31
+        { "retract",      "",  "Gets the retract distance (mm).",              retract      },  // 32
 
-        { "rpm",          "",  "Gets the speed RPM.",                          rpm          },
-        { "speed",        "",  "Gets the speed (steps per second).",           speed        },
-        { "minspeed",     "",  "Gets the minimum speed (steps per second).",   minspeed     },
-        { "maxspeed",     "",  "Gets the maximum speed (steps per second).",   maxspeed     },
-        { "constspeed",   "",  "Gets the constant speed (steps per second).",  constspeed   },
-        { "acceleration", "",  "Gets the acceleration (speed per second).",    acceleration },
+        { "rpm",          "",  "Gets the speed RPM.",                          rpm          },  // 33
+        { "speed",        "",  "Gets the speed (steps per second).",           speed        },  // 34
+        { "maxspeed",     "",  "Gets the maximum speed (steps per second).",   maxspeed     },  // 35
+        { "maxsteps",     "",  "Gets the ramp steps to maximum speed.",        maxsteps     },  // 36
+        { "microsteps",   "",  "Gets the microsteps settings.",                microsteps   },  // 37
     };
 
     int _findBaseCommandByShortcut(String shortcut);
@@ -238,12 +231,12 @@ private:
     /// The list of supported long commands (one long argument).
     /// </summary>
     LongCommand _longCommands[MAX_LONG_COMMANDS] = {
-        { "stepto",      "m", "Moves to absolute position (steps).",   moveAbsolute },
-        { "step",        "s", "Moves the number of steps (relative).", moveRelative },
-        { "track",       "t", "Moves to track number.",                moveToTrack  },
+        { "stepto",     "m", "Moves to absolute position (steps).",   moveAbsolute },           // 1
+        { "step",       "s", "Moves the number of steps (relative).", moveRelative },           // 2
+        { "track",      "t", "Moves to track number.",                moveToTrack  },           // 3
 
-        { "retract",     "",  "Retracts a short distance.", retract    },
-        { "microsteps",  "",  "Sets the microsteps.",       microsteps },
+        { "maxsteps",   "",  "Sets the ramp steps to maximum speed.", maxsteps     },           // 4
+        { "microsteps", "",  "Sets the microsteps.",                  microsteps   },           // 5
     };
 
     int _findLongCommandByShortcut(String shortcut);    // Returns the command index (or -1 if not found).
@@ -254,17 +247,14 @@ private:
     /// The list of supported float commands (one float argument).
     /// </summary>
     FloatCommand _floatCommands[MAX_FLOAT_COMMANDS] = {
-        { "moveto", "a", "Moves to absolute position (mm).",   moveAbsoluteDistance },
-        { "move",   "r", "Moves the number of mm (relative).", moveRelativeDistance },
+        { "moveto",       "a", "Moves to absolute position (mm).",    moveAbsoluteDistance },   // 1
+        { "move",         "r", "Moves the number of mm (relative).",  moveRelativeDistance },   // 2
 
-        { "smallstep",    "",  "Sets the small move distance (mm).",          smallstep    },
-        { "minstep",      "",  "Sets the min move distance (mm).",            minstep      },
-        { "retract",      "",  "Sets the retract distance (mm).",             retract      },
+        { "smallstep",    "",  "Sets the small move distance (mm).",          smallstep    },   // 3
+        { "minstep",      "",  "Sets the min move distance (mm).",            minstep      },   // 4
+        { "retract",      "",  "Sets the retract distance (mm).",             retract      },   // 5
 
-        { "minspeed",     "",  "Sets the minimum speed (steps per second).",  minspeed     },
-        { "maxspeed",     "",  "Sets the maximum speed (steps per second).",  maxspeed     },
-        { "constspeed",   "",  "Sets the constant speed (steps per second).", constspeed   },
-        { "acceleration", "",  "Sets the acceleration (speed per second).",   acceleration },
+        { "maxspeed",     "",  "Sets the maximum speed (steps per second).",  maxspeed     },   // 6
     };
 
     int _findFloatCommandByShortcut(String shortcut);   // Returns the command index (or -1 if not found).

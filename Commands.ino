@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>21-4-2023 12:56 PM</created>
-// <modified>8-5-2023 11:25 AM</modified>
+// <modified>10-5-2023 9:41 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -195,12 +195,21 @@ void reset()
 }
 
 /// <summary>
-/// Save the current application settings updating max. speed and acceleration.
+/// Saves the current application settings.
 /// </summary>
 void save()
 {
     TRACE();
     Settings.save();
+}
+
+/// <summary>
+/// (Re)loads the application settings.
+/// </summary>
+void load()
+{
+    TRACE();
+    Settings.load();
 }
 
 /// <summary>
@@ -219,24 +228,6 @@ void gpio()
 {
     TRACE();
     Commands.JsonOutput ? Telnet.print(Pins.toJsonString()) : Telnet.print(Pins.toString());
-}
-
-/// <summary>
-/// Enables acceleration and deceleration (ramping speed).
-/// </summary>
-void ramp()
-{
-    TRACE();
-    Actuator.rampEnable();
-}
-
-/// <summary>
-/// Disables acceleration and deceleration (constant speed).
-/// </summary>
-void noramp()
-{
-    TRACE();
-    Actuator.rampDisable();
 }
 
 /// <summary>
@@ -285,15 +276,6 @@ void speed()
 }
 
 /// <summary>
-/// Print the minimum speed [steps per second].
-/// </summary>
-void minspeed()
-{
-    TRACE();
-    Telnet.println(String(Actuator.getMinSpeed()));
-}
-
-/// <summary>
 /// Print the maximum speed [steps per second].
 /// </summary>
 void maxspeed()
@@ -303,21 +285,12 @@ void maxspeed()
 }
 
 /// <summary>
-/// Print the constant speed [steps per second].
+/// Print the maximum ramp steps.
 /// </summary>
-void constspeed()
+void maxsteps()
 {
     TRACE();
-    Telnet.println(String(Actuator.getConstSpeed()));
-}
-
-/// <summary>
-/// Print the acceleration [speed per second].
-/// </summary>
-void acceleration()
-{
-    TRACE();
-    Telnet.println(String(Actuator.getAcceleration()));
+    Telnet.println(String(Actuator.getMaxSteps()));
 }
 
 /// <summary>
@@ -396,7 +369,7 @@ void moveToTrack(long value)
 /// <summary>
 /// Set the small step distance [mm].
 /// </summary>
-/// <param name="value">The new speed value.</param>
+/// <param name="value">The new distance value.</param>
 void smallstep(float value)
 {
     TRACE(); DUMP(value);
@@ -406,7 +379,7 @@ void smallstep(float value)
 /// <summary>
 /// Set the min step distance [mm].
 /// </summary>
-/// <param name="value">The new speed value.</param>
+/// <param name="value">The new distance value.</param>
 void minstep(float value)
 {
     TRACE(); DUMP(value);
@@ -416,21 +389,11 @@ void minstep(float value)
 /// <summary>
 /// Set the retract distance [mm].
 /// </summary>
-/// <param name="value">The new speed value.</param>
+/// <param name="value">The new distance value.</param>
 void retract(float value)
 {
     TRACE(); DUMP(value);
-    Settings.Actuator.Retract;
-}
-
-/// <summary>
-/// Set the minimum speed [steps per seconds].
-/// </summary>
-/// <param name="value">The new speed value.</param>
-void minspeed(float value)
-{
-    TRACE(); DUMP(value);
-    Actuator.setMinSpeed(value);
+    Settings.Actuator.Retract = value;
 }
 
 /// <summary>
@@ -444,29 +407,19 @@ void maxspeed(float value)
 }
 
 /// <summary>
-/// Set the constant speed [steps per seconds].
+/// Set the maximum ramp steps.
 /// </summary>
-/// <param name="value">The new speed value.</param>
-void constspeed(float value)
+/// <param name="value">The new ramp steps value.</param>
+void maxsteps(long value)
 {
     TRACE(); DUMP(value);
-    Actuator.setConstSpeed(value);
+    Actuator.setMaxSteps(value);
 }
 
 /// <summary>
-/// Set the acceleration [speed per seconds].
+/// Set the microsteps.
 /// </summary>
-/// <param name="value">The new acceleration value.</param>
-void acceleration(float value)
-{
-    TRACE(); DUMP(value);
-    Actuator.setMaxSpeed(value);
-}
-
-/// <summary>
-/// Sets the microsteps.
-/// </summary>
-/// <param name="value">The new microsteps.</param>
+/// <param name="value">The new microsteps value.</param>
 void microsteps(long value)
 {
     TRACE(); DUMP(value);

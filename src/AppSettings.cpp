@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>8-5-2023 11:35 AM</modified>
+// <modified>14-5-2023 9:52 AM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 #include <StringSplitter.h>
@@ -214,10 +214,8 @@ void AppSettings::StepperSettings::fromJson(JsonObject json)
         PinDIR              = json["PinDIR"]              | PinDIR;
         PinENA              = json["PinENA"]              | PinENA;
         PinALM              = json["PinALM"]              | PinALM;
-        MinSpeed            = json["MinSpeed"]            | MinSpeed;
         MaxSpeed            = json["MaxSpeed"]            | MaxSpeed;
-        ConstSpeed          = json["ConstSpeed"]          | ConstSpeed;
-        Acceleration        = json["Acceleration"]        | Acceleration;
+        MaxSteps            = json["MaxSteps"]            | MaxSteps;
         MicroSteps          = json["MicroSteps"]          | MicroSteps;
         StepsPerRotation    = json["StepsPerRotation"]    | StepsPerRotation;
         DistancePerRotation = json["DistancePerRotation"] | DistancePerRotation;
@@ -235,10 +233,8 @@ JsonObject AppSettings::StepperSettings::toJson()
     _doc["PinDIR"]              = PinDIR;
     _doc["PinENA"]              = PinENA;
     _doc["PinALM"]              = PinALM;
-    _doc["MinSpeed"]            = MinSpeed;
     _doc["MaxSpeed"]            = MaxSpeed;
-    _doc["ConstSpeed"]          = ConstSpeed;
-    _doc["Acceleration"]        = Acceleration;
+    _doc["MaxSteps"]            = MaxSteps;
     _doc["MicroSteps"]          = MicroSteps;
     _doc["StepsPerRotation"]    = StepsPerRotation;
     _doc["DistancePerRotation"] = DistancePerRotation;
@@ -268,10 +264,8 @@ String AppSettings::StepperSettings::toString()
                   "    PinDIR:              " + PinDIR              + "\r\n" +
                   "    PinENA:              " + PinENA              + "\r\n" +
                   "    PinALM:              " + PinALM              + "\r\n" +
-                  "    MinSpeed:            " + MinSpeed            + "\r\n" +
                   "    MaxSpeed:            " + MaxSpeed            + "\r\n" +
-                  "    ConstSpeed:          " + ConstSpeed          + "\r\n" +
-                  "    Acceleration:        " + Acceleration        + "\r\n" +
+                  "    MaxSteps:            " + MaxSteps            + "\r\n" +
                   "    MicroSteps:          " + MicroSteps          + "\r\n" +
                   "    StepsPerRotation:    " + StepsPerRotation    + "\r\n" +
                   "    DistancePerRotation: " + DistancePerRotation + "\r\n";
@@ -488,11 +482,11 @@ String AppSettings::APSettings::toString()
 }
 
 /// <summary>
-/// Initializes all application settings reading from the 'appsettings.json' file.
+/// Loads all application settings reading from the 'appsettings.json' file.
 /// The default values are preserved if the particular setting is not found.
 /// </summary>
 /// <returns>True if successful.</returns>
-bool AppSettings::init()
+bool AppSettings::load()
 {
     File file = LittleFS.open(SETTINGS_FILE, "r");
     DeserializationError error = deserializeJson(_doc, file);
@@ -560,11 +554,11 @@ String AppSettings::toString()
     _update();
 
     return String("Application Settings:") + "\r\n" +
-        _addTab(Yard.toString())      + "\r\n" +
-        _addTab(Actuator.toString())  + "\r\n" +
-        _addTab(Stepper.toString())   + "\r\n" +
-        _addTab(Http.toString())      + "\r\n" +
-        _addTab(Telnet.toString())    + "\r\n" +
-        _addTab(WiFi.toString())      + "\r\n" +
-        _addTab(AP.toString())        + "\r\n";
+        _addTab(Yard.toString()) +
+        _addTab(Actuator.toString()) +
+        _addTab(Stepper.toString()) +
+        _addTab(Http.toString()) +
+        _addTab(Telnet.toString()) +
+        _addTab(WiFi.toString()) +
+        _addTab(AP.toString());
 }

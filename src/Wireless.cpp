@@ -6,10 +6,9 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:49 PM</created>
-// <modified>25-4-2023 4:24 PM</modified>
+// <modified>11-5-2023 4:36 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
-
 #include <Arduino.h>
 #include <String.h>
 #include <WiFi.h>
@@ -149,7 +148,7 @@ void Wireless::setClock()
     time_t now = time(nullptr);
     struct tm timeinfo;
     gmtime_r(&now, &timeinfo);
-    Serial.print("Current time: ");
+    Serial.print("Current UTC time: ");
     String time = String(asctime(&timeinfo));
     Serial.println(time.substring(0, time.length() - 2));
 }

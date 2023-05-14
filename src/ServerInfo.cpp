@@ -1,4 +1,4 @@
-// --------------------------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ServerInfo.cpp" company="DTV-Online">
 //   Copyright (c) 2023 Dr. Peter Trimmel. All rights reserved.
 // </copyright>
@@ -6,10 +6,9 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:49 PM</created>
-// <modified>10-4-2023 10:29 AM</modified>
+// <modified>9-5-2023 9:08 AM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
-
 #include <WiFi.h>
 
 #include "AppSettings.h"
@@ -81,6 +80,5 @@ String ServerInfo::toString()
 	              "    Mode:    " + Mode    + "\r\n" +
 	              "    Port:    " + Port    + "\r\n" +
                   "    Telnet:  " + Telnet  + "\r\n" +
-	              "    Prompt:  " + Prompt  + "\r\n" +
-                  "\r\n";
+	              "    Prompt:  " + Prompt  + "\r\n";
 }

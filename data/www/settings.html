@@ -176,16 +176,12 @@
                         <td><span id="stepperPinALM"></span></td>
                     </tr>
                     <tr>
-                        <td class="col-2">Min.&nbsp;Speed:</td>
-                        <td><span id="stepperMinSpeed"></span></td>
-                    </tr>
-                    <tr>
                         <td class="col-2">Max.&nbsp;Speed:</td>
                         <td><span id="stepperMaxSpeed"></span></td>
                     </tr>
                     <tr>
-                        <td class="col-2">Const.&nbsp;Speed:</td>
-                        <td><span id="stepperConstSpeed"></span></td>
+                        <td class="col-2">Max.&nbsp;Steps:</td>
+                        <td><span id="stepperMaxSteps"></span></td>
                     </tr>
                     <tr>
                         <td class="col-2">Microsteps:</td>
@@ -361,9 +357,8 @@
         const stepperPinDIR              = document.getElementById('stepperPinDIR');
         const stepperPinENA              = document.getElementById('stepperPinENA');
         const stepperPinALM              = document.getElementById('stepperPinALM');
-        const stepperMinSpeed            = document.getElementById('stepperMinSpeed');
         const stepperMaxSpeed            = document.getElementById('stepperMaxSpeed');
-        const stepperContSpeed           = document.getElementById('stepperConstSpeed');
+        const stepperMaxSteps            = document.getElementById('stepperMaxSteps');
         const stepperMicroSteps          = document.getElementById('stepperMicroSteps');
         const stepperStepsPerRotation    = document.getElementById('stepperStepsPerRotation');
         const stepperDistancePerRotation = document.getElementById('stepperDistancePerRotation');
@@ -412,21 +407,20 @@
                     actuatorLedRunning.textContent = json.Actuator.LedRunning;
                     actuatorLedInLimit.textContent = json.Actuator.LedInLimit;
                     actuatorLedAlarmOn.textContent = json.Actuator.LedAlarmOn;
-                    actuatorSmallStep.textContent  = json.Actuator.SmallStep;
-                    actuatorMinStep.textContent    = json.Actuator.MinStep;
-                    actuatorRetract.textContent    = json.Actuator.Retract;
-                    actuatorLength.textContent     = json.Actuator.Length;
+                    actuatorSmallStep.textContent  = json.Actuator.SmallStep.toFixed(2);
+                    actuatorMinStep.textContent    = json.Actuator.MinStep.toFixed(2);
+                    actuatorRetract.textContent    = json.Actuator.Retract.toFixed(2);
+                    actuatorLength.textContent     = json.Actuator.Length.toFixed(1);
 
                     stepperPinPUL.textContent              = json.Stepper.PinPUL;
                     stepperPinDIR.textContent              = json.Stepper.PinDIR;
                     stepperPinENA.textContent              = json.Stepper.PinENA;
                     stepperPinALM.textContent              = json.Stepper.PinALM;
-                    stepperMinSpeed.textContent            = json.Stepper.MinSpeed;
-                    stepperMaxSpeed.textContent            = json.Stepper.MaxSpeed;
-                    stepperConstSpeed.textContent          = json.Stepper.ConstSpeed;
+                    stepperMaxSpeed.textContent            = json.Stepper.MaxSpeed.toFixed(0);
+                    stepperMaxSteps.textContent            = json.Stepper.MaxSteps;
                     stepperMicroSteps.textContent          = json.Stepper.MicroSteps;
                     stepperStepsPerRotation.textContent    = json.Stepper.StepsPerRotation;
-                    stepperDistancePerRotation.textContent = json.Stepper.DistancePerRotation;
+                    stepperDistancePerRotation.textContent = json.Stepper.DistancePerRotation.toFixed(1);
 
                     httpPort.textContent = json.Http.Port;
 

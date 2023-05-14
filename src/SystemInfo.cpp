@@ -73,6 +73,5 @@ String SystemInfo::toString()
 	              "    CpuFreqMHz: " + CpuFreqMHz + "\r\n" +
 	              "    HeapSize:   " + HeapSize   + "\r\n" +
 	              "    FreeHeap:   " + FreeHeap   + "\r\n" +
-	              "    UsedHeap:   " + UsedHeap   + "\r\n" +
-                  "\r\n";
+	              "    UsedHeap:   " + UsedHeap   + "\r\n";
 }
