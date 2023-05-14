@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>8-5-2023 8:04 PM</modified>
+// <modified>14-5-2023 12:53 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -55,6 +55,7 @@ void retract();
 
 void rpm();
 void speed();
+void minspeed();
 void maxspeed();
 void maxsteps();
 void microsteps();
@@ -71,6 +72,7 @@ void smallstep(float value);
 void minstep(float value);
 void retract(float value);
 
+void minspeed(float value);
 void maxspeed(float value);
 void maxsteps(long value);
 void microsteps(long value);
@@ -166,9 +168,9 @@ class CommandsClass
 private:
     String _padTo(String str, const size_t num, const char paddingChar = ' ');
 
-    static const int MAX_BASE_COMMANDS = 37;
+    static const int MAX_BASE_COMMANDS = 38;
     static const int MAX_LONG_COMMANDS = 5;
-    static const int MAX_FLOAT_COMMANDS = 6;
+    static const int MAX_FLOAT_COMMANDS = 7;
 
     static const int MAX_BASE_COMMAND_LENGTH = 12;
     static const int MAX_BASE_SHORTCUT_COMMAND_LENGTH = 9;
@@ -218,9 +220,10 @@ private:
 
         { "rpm",          "",  "Gets the speed RPM.",                          rpm          },  // 33
         { "speed",        "",  "Gets the speed (steps per second).",           speed        },  // 34
-        { "maxspeed",     "",  "Gets the maximum speed (steps per second).",   maxspeed     },  // 35
-        { "maxsteps",     "",  "Gets the ramp steps to maximum speed.",        maxsteps     },  // 36
-        { "microsteps",   "",  "Gets the microsteps settings.",                microsteps   },  // 37
+        { "minspeed",     "",  "Gets the minimum speed (steps per second).",   minspeed     },  // 35
+        { "maxspeed",     "",  "Gets the maximum speed (steps per second).",   maxspeed     },  // 36
+        { "maxsteps",     "",  "Gets the ramp steps to maximum speed.",        maxsteps     },  // 37
+        { "microsteps",   "",  "Gets the microsteps settings.",                microsteps   },  // 38
     };
 
     int _findBaseCommandByShortcut(String shortcut);
@@ -254,7 +257,8 @@ private:
         { "minstep",      "",  "Sets the min move distance (mm).",            minstep      },   // 4
         { "retract",      "",  "Sets the retract distance (mm).",             retract      },   // 5
 
-        { "maxspeed",     "",  "Sets the maximum speed (steps per second).",  maxspeed     },   // 6
+        { "minspeed",     "",  "Sets the minimum speed (steps per second).",  minspeed     },   // 6
+        { "maxspeed",     "",  "Sets the maximum speed (steps per second).",  maxspeed     },   // 7
     };
 
     int _findFloatCommandByShortcut(String shortcut);   // Returns the command index (or -1 if not found).

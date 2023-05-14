@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>21-4-2023 12:56 PM</created>
-// <modified>10-5-2023 9:41 PM</modified>
+// <modified>14-5-2023 1:03 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -276,6 +276,15 @@ void speed()
 }
 
 /// <summary>
+/// Print the minimum speed [steps per second].
+/// </summary>
+void minspeed()
+{
+    TRACE();
+    Telnet.println(String(Actuator.getMinSpeed()));
+}
+
+/// <summary>
 /// Print the maximum speed [steps per second].
 /// </summary>
 void maxspeed()
@@ -394,6 +403,16 @@ void retract(float value)
 {
     TRACE(); DUMP(value);
     Settings.Actuator.Retract = value;
+}
+
+/// <summary>
+/// Set the minimum speed [steps per seconds].
+/// </summary>
+/// <param name="value">The new speed value.</param>
+void minspeed(float value)
+{
+    TRACE(); DUMP(value);
+    Actuator.setMinSpeed(value);
 }
 
 /// <summary>

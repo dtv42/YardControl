@@ -176,6 +176,10 @@
                         <td><span id="stepperPinALM"></span></td>
                     </tr>
                     <tr>
+                        <td class="col-2">Min.&nbsp;Speed:</td>
+                        <td><span id="stepperMinSpeed"></span></td>
+                    </tr>
+                    <tr>
                         <td class="col-2">Max.&nbsp;Speed:</td>
                         <td><span id="stepperMaxSpeed"></span></td>
                     </tr>
@@ -357,6 +361,7 @@
         const stepperPinDIR              = document.getElementById('stepperPinDIR');
         const stepperPinENA              = document.getElementById('stepperPinENA');
         const stepperPinALM              = document.getElementById('stepperPinALM');
+        const stepperMinSpeed            = document.getElementById('stepperMinSpeed');
         const stepperMaxSpeed            = document.getElementById('stepperMaxSpeed');
         const stepperMaxSteps            = document.getElementById('stepperMaxSteps');
         const stepperMicroSteps          = document.getElementById('stepperMicroSteps');
@@ -416,6 +421,7 @@
                     stepperPinDIR.textContent              = json.Stepper.PinDIR;
                     stepperPinENA.textContent              = json.Stepper.PinENA;
                     stepperPinALM.textContent              = json.Stepper.PinALM;
+                    stepperMinSpeed.textContent            = json.Stepper.MinSpeed.toFixed(0);
                     stepperMaxSpeed.textContent            = json.Stepper.MaxSpeed.toFixed(0);
                     stepperMaxSteps.textContent            = json.Stepper.MaxSteps;
                     stepperMicroSteps.textContent          = json.Stepper.MicroSteps;

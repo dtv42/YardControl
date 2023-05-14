@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>12-5-2023 8:45 AM</modified>
+// <modified>14-5-2023 12:51 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -58,7 +58,7 @@ class LinearActuator
 public:
     static constexpr const uint  FREQUENCY = 100000;                        // The timer frequency 100 kHz (pulsewidth = 10 usec).
     static constexpr const uint  INTERVAL  = 1000000 / FREQUENCY;           // The time between callbacks (microseconds).
-    static constexpr const float MIN_SPEED = float(FREQUENCY) / INT_MAX;    // The minimum speed (ca. 4 steps per day).
+    static constexpr const float MIN_SPEED = 1;                             // The minimum speed (1 step per second).
     static constexpr const float MAX_SPEED = FREQUENCY / 2.0;               // The maximum speed (50000 steps per second).
     static constexpr const float MIN_RAMP  = 10 * INTERVAL;                 // The minimum ramp time to maximum speed (10 intervals).
     static constexpr const float CHANGING  = 0.2f * FREQUENCY;              // The number of intervals for direction change (delay = 200 ms).
@@ -93,6 +93,7 @@ private:
     float     _distancePerRotation = 8.0f;          // Distance per full rotation (mm).
     ushort    _stepsPerRotation    = 200;           // Steps per full rotation (360°).
     ushort    _microsteps          = 1;             // Stepper driver microstep settings.
+    float     _minspeed            = 2000.0f;       // The minimum stepper speed in steps per second.
     float     _maxspeed            = 5000.0f;       // The maximum stepper speed in steps per second.
     float     _maxsteps            = 1.0f;          // The number of steps for a ramp to maximum speed.
 
@@ -128,6 +129,8 @@ private:
 public : 
     float     getRPM();                             // Gets the current speed in RPM.
     float     getSpeed();                           // Gets the current speed in steps per second.
+    float     getMinSpeed();                        // Gets the minimum speed in steps per second.
+    void      setMinSpeed(float value);             // Sets the minimum speed in steps per second.
     float     getMaxSpeed();                        // Gets the maximum speed in steps per second.
     void      setMaxSpeed(float value);             // Sets the maximum speed in steps per second.
     long      getMaxSteps();                        // Gets the ramp steps to maximum speed.

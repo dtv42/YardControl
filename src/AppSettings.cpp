@@ -214,6 +214,7 @@ void AppSettings::StepperSettings::fromJson(JsonObject json)
         PinDIR              = json["PinDIR"]              | PinDIR;
         PinENA              = json["PinENA"]              | PinENA;
         PinALM              = json["PinALM"]              | PinALM;
+        MinSpeed            = json["MinSpeed"]            | MinSpeed;
         MaxSpeed            = json["MaxSpeed"]            | MaxSpeed;
         MaxSteps            = json["MaxSteps"]            | MaxSteps;
         MicroSteps          = json["MicroSteps"]          | MicroSteps;
@@ -233,6 +234,7 @@ JsonObject AppSettings::StepperSettings::toJson()
     _doc["PinDIR"]              = PinDIR;
     _doc["PinENA"]              = PinENA;
     _doc["PinALM"]              = PinALM;
+    _doc["MinSpeed"]            = MinSpeed;
     _doc["MaxSpeed"]            = MaxSpeed;
     _doc["MaxSteps"]            = MaxSteps;
     _doc["MicroSteps"]          = MicroSteps;
@@ -264,6 +266,7 @@ String AppSettings::StepperSettings::toString()
                   "    PinDIR:              " + PinDIR              + "\r\n" +
                   "    PinENA:              " + PinENA              + "\r\n" +
                   "    PinALM:              " + PinALM              + "\r\n" +
+                  "    MinSpeed:            " + MinSpeed            + "\r\n" +
                   "    MaxSpeed:            " + MaxSpeed            + "\r\n" +
                   "    MaxSteps:            " + MaxSteps            + "\r\n" +
                   "    MicroSteps:          " + MicroSteps          + "\r\n" +

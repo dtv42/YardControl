@@ -6,10 +6,9 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>10-5-2023 6:48 AM</created>
-// <modified>13-5-2023 11:33 AM</modified>
+// <modified>14-5-2023 12:38 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
-
 #include <ArduinoJson.h>
 
 #include "Actuator.h"
@@ -164,6 +163,33 @@ float  LinearActuator::getSpeed()
     return _speed;
 }
 
+
+/// <summary>
+/// Gets the minimum speed.
+/// </summary>
+/// <returns>The minimum speed.</returns>
+float  LinearActuator::getMinSpeed()
+{
+    return _minspeed;
+}
+
+/// <summary>
+/// Sets the minimum speed in steps per second.
+/// </summary>
+/// <param name="value">The minimum speed [steps per second].</param>
+void   LinearActuator::setMinSpeed(float value)
+{
+    if (getRunningFlag())
+    {
+        if (_verbose) Telnet.println("Still moving - ignoring set minimum speed request");
+    }
+    else
+    {
+        _maxspeed = max(MIN_SPEED, min(MAX_SPEED, value));
+        if (_verbose) Telnet.println(String("Minimum speed set to ") + _maxspeed);
+    }
+}
+
 /// <summary>
 /// Gets the maximum speed.
 /// </summary>
@@ -185,7 +211,7 @@ void   LinearActuator::setMaxSpeed(float value)
     }
     else
     {
-        _maxspeed = min(MAX_SPEED, value);
+        _maxspeed = max(MIN_SPEED, min(MAX_SPEED, value));
         if (_verbose) Telnet.println(String("Maximum speed set to ") + _maxspeed);
     }
 }
@@ -393,6 +419,7 @@ void LinearActuator::init()
     _ALM = Settings.Stepper.PinALM;
 
     // Set stepper settings.
+    setMinSpeed(Settings.Stepper.MinSpeed);
     setMaxSpeed(Settings.Stepper.MaxSpeed);
     setMaxSteps(Settings.Stepper.MaxSteps);
     setMicrosteps(Settings.Stepper.MicroSteps);
@@ -504,9 +531,13 @@ void   LinearActuator::moveAbsolute(long value)
 
     long  n = 0;
     long  count = 0;
+    float speed = 0.0f;
+    float deltaspeed = 0.0f;
+
     long  target = value;
     long  position = getPosition();
     long  steps = abs(target - position);
+
     long  rampsteps = 0;
     long  conststeps = 0;
     float maxtime = 0.0f;
@@ -514,9 +545,9 @@ void   LinearActuator::moveAbsolute(long value)
     float consttime = 0.0f;
     float totaltime = 0.0f;
 
-    _deltaspeed = _maxspeed / _maxsteps;
+    deltaspeed = (_maxspeed - _minspeed) / _maxsteps;
 
-    if (2 * _maxsteps > _steps)
+    if (2 * _maxsteps > steps)
     {
         rampsteps = steps / 2;
         conststeps = 0;
@@ -529,12 +560,14 @@ void   LinearActuator::moveAbsolute(long value)
 
     for (int i = 1; i <= _maxsteps; ++i)
     {
-        maxtime += 1 / (i * _deltaspeed);
+        if (i == 1) maxtime = 1 / _minspeed;
+        else maxtime += 1 / (i * _deltaspeed + _minspeed);
     }
 
     for (int i = 1; i <= rampsteps; ++i)
     {
-        ramptime += 1 / (i * _deltaspeed);
+        if (i == 1) ramptime = 1 / _minspeed;
+        else ramptime += 1 / (i * _deltaspeed + _minspeed);
     }
 
     consttime = conststeps / _maxspeed;
@@ -543,25 +576,27 @@ void   LinearActuator::moveAbsolute(long value)
     _rampsteps = rampsteps;
     _target = target;
     _steps = steps;
-    _speed = 0;
+    _speed = 0.0f;
     _count = 0;
     _n = 0;
 
     if (_verbose)
     {
         Telnet.print(String("Move Info:") + "\r\n" +
-                            "    Position (steps): " + position     + "\r\n" +
-                            "    Target (steps):   " + target       + "\r\n" +
-                            "    Total steps:      " + steps        + "\r\n" +
-                            "    Ramp Steps (max): " + _maxsteps    + "\r\n" +
-                            "    Ramp Steps:       " + rampsteps    + "\r\n" +
-                            "    Max. Speed Steps: " + conststeps   + "\r\n" +
-                            "    Delta Speed:      " + _deltaspeed  + "\r\n" +
-                            "    Ramp Time (max):  " + maxtime      + "\r\n" +
-                            "    Ramp Time:        " + ramptime     + "\r\n" +
-                            "    Max. Speed Steps: " + conststeps   + "\r\n" +
-                            "    Max. Speed Time:  " + consttime    + "\r\n" +
-                            "    Total Time:       " + totaltime    + "\r\n" +
+                            "    Position (steps): " + position    + "\r\n" +
+                            "    Target (steps):   " + target      + "\r\n" +
+                            "    Total Steps:      " + steps       + "\r\n" +
+                            "    Min. Speed:       " + _minspeed   + "\r\n" +
+                            "    Max. Speed:       " + _maxspeed   + "\r\n" +
+                            "    Ramp Steps (max): " + _maxsteps   + "\r\n" +
+                            "    Ramp Steps:       " + rampsteps   + "\r\n" +
+                            "    Max. Speed Steps: " + conststeps  + "\r\n" +
+                            "    Delta Speed:      " + _deltaspeed + "\r\n" +
+                            "    Ramp Time (max):  " + maxtime     + "\r\n" +
+                            "    Ramp Time:        " + ramptime    + "\r\n" +
+                            "    Max. Speed Steps: " + conststeps  + "\r\n" +
+                            "    Max. Speed Time:  " + consttime   + "\r\n" +
+                            "    Total Time:       " + totaltime   + "\r\n" +
                             "\r\n");
     }
 
@@ -738,8 +773,8 @@ void LinearActuator::onTimer()
                 ++_n;
 
                 // Calculate speed from step count.
-                if (_n < _rampsteps) _speed = _deltaspeed * _n;
-                else if (_n > (_steps - _rampsteps)) _speed = _deltaspeed * (_steps - _n);
+                if (_n < _rampsteps) _speed = _minspeed + _n * _deltaspeed;
+                else if (_n > (_steps - _rampsteps)) _speed = _minspeed + (_rampsteps - _n) * _deltaspeed;
                 else _speed = _maxspeed;
 
                 _intervals = _getIntervalsFromSpeed(_speed);
@@ -810,6 +845,7 @@ String LinearActuator::toJsonString()
     _doc["Direction"]   = getDirection();
     _doc["RPM"]         = getRPM();
     _doc["Speed"]       = getSpeed();
+    _doc["MinSpeed"]    = getMinSpeed();
     _doc["MaxSpeed"]    = getMaxSpeed();
     _doc["MaxSteps"]    = getMaxSteps();
     serializeJsonPretty(_doc, json);
@@ -838,6 +874,7 @@ String LinearActuator::toString()
                   "    Direction:   " + getDirection()       + "\r\n" +
                   "    RPM:         " + getRPM()             + "\r\n" +
                   "    Speed:       " + getSpeed()           + "\r\n" +
+                  "    MinSpeed:    " + getMinSpeed()        + "\r\n" +
                   "    MaxSpeed:    " + getMaxSpeed()        + "\r\n" +
                   "    MaxSteps:    " + getMaxSteps()        + "\r\n" +
                   "\r\n";
