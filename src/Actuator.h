@@ -51,7 +51,6 @@
 /// the number the timer callback routine is called before a new pulse is generated.
 /// The starting interval is determined by the minimum speed and decreased to reach the maximum speed.
 /// Before reaching the target, the interval is increased again until the minimum speed is reached.
-/// The interval is adjusted (for the required speed) every time the callback routine is called.
 /// </summary>
 class LinearActuator
 {
@@ -60,7 +59,6 @@ public:
     static constexpr const uint  INTERVAL  = 1000000 / FREQUENCY; // The time between callbacks (microseconds).
     static constexpr const float MIN_SPEED = 1;                   // The minimum speed (1 step per second).
     static constexpr const float MAX_SPEED = FREQUENCY / 2.0;     // The maximum speed (50000 steps per second).
-    static constexpr const float MIN_RAMP  = 10 * INTERVAL;       // The minimum ramp time to maximum speed (10 intervals).
     static constexpr const float DIR_DELAY  = 200;                // The delay (ms) for direction change.
 
     enum Direction
@@ -120,7 +118,6 @@ private:
     float _getDistanceFromSteps(long value);        // Convert steps to distance [mm].
 
     bool  _isValidMicrostep(ushort value);          // Returns true if microstep value is valid.
-    void  _updateSettings();                        // Update stepper settings with current values.
 
 public : 
     float     getRPM();                             // Gets the current speed in RPM.
@@ -150,6 +147,7 @@ public :
     bool getCalibratedFlag();                       // True if calibration was successful.
 
     void init();                                    // Initialize the stepper instance.
+    void update();                                  // Update stepper settings with current values.
     void enable();                                  // Enables the stepper outputs.
     void disable();                                 // Disables the stepper outputs.
     void stop();                                    // Stop moving (resetting target position, disable output).

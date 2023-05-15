@@ -196,15 +196,18 @@ void reset()
 
 /// <summary>
 /// Saves the current application settings.
+/// The actuator specific settings are updated before saving.
 /// </summary>
 void save()
 {
     TRACE();
+    Actuator.update();
     Settings.save();
 }
 
 /// <summary>
 /// (Re)loads the application settings.
+/// The actuator is initialized with the actuator specific settings.
 /// </summary>
 void load()
 {

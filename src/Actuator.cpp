@@ -136,17 +136,6 @@ bool LinearActuator::_isValidMicrostep(ushort value)
 }
 
 /// <summary>
-/// Updates the settings with current values.
-/// </summary>
-void LinearActuator::_updateSettings()
-{
-    Settings.Stepper.MinSpeed   = getMinSpeed();
-    Settings.Stepper.MaxSpeed   = getMaxSpeed();
-    Settings.Stepper.MaxSteps   = getMaxSteps();
-    Settings.Stepper.MicroSteps = getMicrosteps();
-}
-
-/// <summary>
 /// Gets the current speed in RPM.
 /// </summary>
 /// <returns>The speed [RPM].</returns>
@@ -435,6 +424,17 @@ void LinearActuator::init()
 }
 
 /// <summary>
+/// Updates the settings with current values.
+/// </summary>
+void LinearActuator::update()
+{
+    Settings.Stepper.MinSpeed = getMinSpeed();
+    Settings.Stepper.MaxSpeed = getMaxSpeed();
+    Settings.Stepper.MaxSteps = getMaxSteps();
+    Settings.Stepper.MicroSteps = getMicrosteps();
+}
+
+/// <summary>
 /// Enable the stepper driver outputs.
 /// </summary>
 void LinearActuator::enable()
@@ -448,21 +448,16 @@ void LinearActuator::enable()
 /// </summary>
 void LinearActuator::disable()
 {
-    noInterrupts();
-
-    sleep_us(10);
-
-    digitalWrite(_ENA, HIGH);
+    _running = false;
     digitalWrite(_PUL, LOW);
 
     _enabled = false;
-    _running = false;
+    digitalWrite(_ENA, HIGH);
+
     _target  = _position;
     _speed   = 0.0f;
     _steps   = 0;
     _start   = 0;
-
-    interrupts();
 }
 
 
@@ -471,18 +466,13 @@ void LinearActuator::disable()
 /// </summary>
 void LinearActuator::stop()
 {
-    noInterrupts();
-
-    sleep_us(10);
+    _running = false;
     digitalWrite(_PUL, LOW);
 
-    _running = false;
     _target  = _position;
     _speed   = 0.0f;
     _steps   = 0;
     _start   = 0;
-
-    interrupts();
 }
 
 /// <summary>
@@ -509,13 +499,11 @@ void   LinearActuator::reset()
         return;
     }
 
-    noInterrupts();
-
+    _speed = 0.0f;
     _steps = 0;
-    _target    = 0;
-    _position  = 0;
-
-    interrupts();
+    _start = 0;
+    _target   = 0;
+    _position = 0;
 
     if (_verbose)
     {
@@ -586,6 +574,16 @@ void   LinearActuator::moveAbsolute(long value)
     for (int i = 0; i < _maxsteps; i++)
     {
         maxtime += 1 / (_minspeed + i * _deltaspeed);
+    }
+
+    if (_rampsteps < 4)
+    {
+        if (_verbose)
+        {
+            Telnet.println("Requested move distance too small - ignoring move request");
+        }
+
+        return;
     }
 
     // Calculate the ramp time and maximum speed for the actual ramp.
