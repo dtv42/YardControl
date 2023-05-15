@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>10-5-2023 6:48 AM</created>
-// <modified>14-5-2023 12:38 PM</modified>
+// <modified>15-5-2023 3:15 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 #include <ArduinoJson.h>
@@ -140,6 +140,7 @@ bool LinearActuator::_isValidMicrostep(ushort value)
 /// </summary>
 void LinearActuator::_updateSettings()
 {
+    Settings.Stepper.MinSpeed   = getMinSpeed();
     Settings.Stepper.MaxSpeed   = getMaxSpeed();
     Settings.Stepper.MaxSteps   = getMaxSteps();
     Settings.Stepper.MicroSteps = getMicrosteps();
@@ -185,7 +186,7 @@ void   LinearActuator::setMinSpeed(float value)
     }
     else
     {
-        _maxspeed = max(MIN_SPEED, min(MAX_SPEED, value));
+        _minspeed = max(MIN_SPEED, min(MAX_SPEED, value));
         if (_verbose) Telnet.println(String("Minimum speed set to ") + _maxspeed);
     }
 }
@@ -290,7 +291,7 @@ long   LinearActuator::getPosition()
 /// <returns>The number of steps remaining.</returns>
 long   LinearActuator::getDelta()
 {
-    return _steps;
+    return abs(_target - _position);
 }
 
 /// <summary>
@@ -367,7 +368,7 @@ bool   LinearActuator::getEnabledFlag()
 /// <returns>The flag value.</returns>
 bool   LinearActuator::getRunningFlag()
 {
-    return _position != _target;
+    return _running;
 }
 
 /// <summary>
@@ -447,13 +448,21 @@ void LinearActuator::enable()
 /// </summary>
 void LinearActuator::disable()
 {
+    noInterrupts();
+
     sleep_us(10);
+
     digitalWrite(_ENA, HIGH);
     digitalWrite(_PUL, LOW);
-    _target = _position;
-    _steps = 0;
-    _start = 0;
+
     _enabled = false;
+    _running = false;
+    _target  = _position;
+    _speed   = 0.0f;
+    _steps   = 0;
+    _start   = 0;
+
+    interrupts();
 }
 
 
@@ -462,11 +471,18 @@ void LinearActuator::disable()
 /// </summary>
 void LinearActuator::stop()
 {
+    noInterrupts();
+
     sleep_us(10);
     digitalWrite(_PUL, LOW);
-    _target = _position;
-    _steps = 0;
-    _start = 0;
+
+    _running = false;
+    _target  = _position;
+    _speed   = 0.0f;
+    _steps   = 0;
+    _start   = 0;
+
+    interrupts();
 }
 
 /// <summary>
@@ -482,20 +498,28 @@ void   LinearActuator::home()
 /// </summary>
 void   LinearActuator::reset()
 {
-    _start     = 0;
-    _changing  = 0;
-    _intervals = 1;
-    _count     = 0;
+    // Do not reset if still moving.
+    if (getRunningFlag())
+    {
+        if (_verbose)
+        {
+            Telnet.println("Still moving - ignoring reset request");
+        }
 
+        return;
+    }
+
+    noInterrupts();
+
+    _steps = 0;
     _target    = 0;
     _position  = 0;
-    _steps     = 0;
-    _speed     = 0.0f;
+
+    interrupts();
 
     if (_verbose)
     {
         Telnet.print(String("Reset:") + "\r\n" +
-                            "    Speed:       " + _speed    + "\r\n" +
                             "    Steps:       " + _steps    + "\r\n" +
                             "    Target:      " + _target   + "\r\n" +
                             "    Position:    " + _position + "\r\n" +
@@ -529,80 +553,124 @@ void   LinearActuator::moveAbsolute(long value)
         return;
     }
 
-    long  n = 0;
-    long  count = 0;
-    float speed = 0.0f;
-    float deltaspeed = 0.0f;
+    // Set target and number of steps.
+    _target = value;
+    _steps = abs(_target - _position);
 
-    long  target = value;
-    long  position = getPosition();
-    long  steps = abs(target - position);
+    // Calculate the delta speed from max and min speed values.
+    _deltaspeed = (_maxspeed - _minspeed) / _maxsteps;
 
-    long  rampsteps = 0;
-    long  conststeps = 0;
-    float maxtime = 0.0f;
-    float ramptime = 0.0f;
-    float consttime = 0.0f;
-    float totaltime = 0.0f;
+    long  conststeps = 0;       // The number of steps with constant (maximum) speed. 
 
-    deltaspeed = (_maxspeed - _minspeed) / _maxsteps;
+    float maxtime = 0.0f;       // The time for a complete ramp from minimum to maximum speed.
+    float ramptime = 0.0f;      // The time for a partial ramp from minimum speed.
+    float maxspeed = 0.0f;      // The maximum speed for the partial ramp.
+    float consttime = 0.0f;     // The time for the constant speed part.
+    float totaltime = 0.0f;     // The total time moving the stepper motor (steps).
+    float acceleration = 0.0f;  // The acceleration (speed / second) for the ramp.
 
-    if (2 * _maxsteps > steps)
+
+    // Calculate the actual ramping steps.
+    if (2 * _maxsteps > _steps)
     {
-        rampsteps = steps / 2;
+        _rampsteps = _steps / 2;
         conststeps = 0;
     }
     else
     {
-        rampsteps = _maxsteps;
-        conststeps = steps - 2 * rampsteps;
+        _rampsteps = _maxsteps;
+        conststeps = _steps - 2 * _rampsteps;
     }
 
-    for (int i = 1; i <= _maxsteps; ++i)
+    // Calculate the time for the complete ramp.
+    for (int i = 0; i < _maxsteps; i++)
     {
-        if (i == 1) maxtime = 1 / _minspeed;
-        else maxtime += 1 / (i * _deltaspeed + _minspeed);
+        maxtime += 1 / (_minspeed + i * _deltaspeed);
     }
 
-    for (int i = 1; i <= rampsteps; ++i)
+    // Calculate the ramp time and maximum speed for the actual ramp.
+    if (_rampsteps < _maxsteps)
     {
-        if (i == 1) ramptime = 1 / _minspeed;
-        else ramptime += 1 / (i * _deltaspeed + _minspeed);
+        maxspeed = _minspeed + _rampsteps * _deltaspeed;
+
+        for (int i = 0; i < _rampsteps; i++)
+        {
+            ramptime += 1 / (_minspeed + i * _deltaspeed);
+        }
+    }
+    else
+    {
+        maxspeed = _maxspeed;
+        ramptime = maxtime;
     }
 
+    // Calculate the constant speed time and total time.
     consttime = conststeps / _maxspeed;
     totaltime = 2 * ramptime + consttime;
+    acceleration = (maxspeed - _minspeed) / ramptime;
 
-    _rampsteps = rampsteps;
-    _target = target;
-    _steps = steps;
-    _speed = 0.0f;
-    _count = 0;
-    _n = 0;
+    // First check for direction and delay if changing.
+    if (_position < _target)
+    {
+        if (_direction != LinearActuator::Direction::CW)
+        {
+            _cw();
+            sleep_ms(DIR_DELAY);
+        }
+    }
+    else if (_position > _target)
+    {
+        if (_direction != LinearActuator::Direction::CCW)
+        {
+            _ccw();
+            sleep_ms(DIR_DELAY);
+        }
+    }
 
     if (_verbose)
     {
-        Telnet.print(String("Move Info:") + "\r\n" +
-                            "    Position (steps): " + position    + "\r\n" +
-                            "    Target (steps):   " + target      + "\r\n" +
-                            "    Total Steps:      " + steps       + "\r\n" +
-                            "    Min. Speed:       " + _minspeed   + "\r\n" +
-                            "    Max. Speed:       " + _maxspeed   + "\r\n" +
-                            "    Ramp Steps (max): " + _maxsteps   + "\r\n" +
-                            "    Ramp Steps:       " + rampsteps   + "\r\n" +
-                            "    Max. Speed Steps: " + conststeps  + "\r\n" +
-                            "    Delta Speed:      " + _deltaspeed + "\r\n" +
-                            "    Ramp Time (max):  " + maxtime     + "\r\n" +
-                            "    Ramp Time:        " + ramptime    + "\r\n" +
-                            "    Max. Speed Steps: " + conststeps  + "\r\n" +
-                            "    Max. Speed Time:  " + consttime   + "\r\n" +
-                            "    Total Time:       " + totaltime   + "\r\n" +
-                            "\r\n");
+        if (_rampsteps < _maxsteps)
+        {
+            Telnet.print(String("Move Info:") + "\r\n" +
+                "    Position (steps):  " + _position    + "\r\n" +
+                "    Target (steps):    " + _target      + "\r\n" +
+                "    Total Steps:       " + _steps       + "\r\n" +
+                "    Direction:         " + _direction   + "\r\n" +
+                "    Min. Speed:        " + _minspeed    + "\r\n" +
+                "    Max. Speed:        " + _maxspeed    + "\r\n" +
+                "    Delta Speed:       " + _deltaspeed  + "\r\n" +
+                "    Ramp Steps (max):  " + _maxsteps    + "\r\n" +
+                "    Ramp Steps:        " + _rampsteps   + "\r\n" +
+                "    Ramp Speed (max):  " + maxspeed     + "\r\n" +
+                "    Ramp Time (max):   " + maxtime      + "\r\n" +
+                "    Ramp Time:         " + ramptime     + "\r\n" +
+                "    Acceleration:      " + acceleration + "\r\n" +
+                "    Total Time:        " + totaltime    + "\r\n" +
+                "\r\n");
+        }
+        else
+        {
+            Telnet.print(String("Move Info:") + "\r\n" +
+                "    Position (steps):  " + _position    + "\r\n" +
+                "    Target (steps):    " + _target      + "\r\n" +
+                "    Total Steps:       " + _steps       + "\r\n" +
+                "    Direction:         " + _direction   + "\r\n" +
+                "    Min. Speed:        " + _minspeed    + "\r\n" +
+                "    Max. Speed:        " + _maxspeed    + "\r\n" +
+                "    Delta Speed:       " + _deltaspeed  + "\r\n" +
+                "    Ramp Steps (max):  " + _maxsteps    + "\r\n" +
+                "    Ramp Time (max):   " + maxtime      + "\r\n" +
+                "    Acceleration:      " + acceleration + "\r\n" +
+                "    Const Speed Steps: " + conststeps   + "\r\n" +
+                "    Const Speed Time:  " + consttime    + "\r\n" +
+                "    Total Time:        " + totaltime    + "\r\n" +
+                "\r\n");
+        }
     }
 
+    // Get start time and set the running flag...
     _start = millis();
-
-    interrupts();
+    _running = true;
 }
 
 /// <summary>
@@ -727,63 +795,33 @@ void LinearActuator::calibrate()
 /// </summary>
 void LinearActuator::onTimer()
 {
-    // If the direction is changing just return.
-    if (_changing > 0)
-    {
-        --_changing;
-        return;
-    }
+    static long  n;         // Step counter.
+    static long  count;     // Counter for delay between steps.
+    static long  intervals; // Number of intervals between steps.
 
-    // // Generate stepper driver output pulses only if enabled.
-    if (_enabled)
+    // // Generate stepper driver output pulses only if the running flag is set.
+    if (_running)
     {
         // If the target has not yet been reached generate stepper pulse.
         if (_position != _target)
         {
-            // First check for direction and start direction change delay if necessary.
-            if (_count == 0)
-            {
-                if (_position < _target)
-                {
-                    if (_direction != LinearActuator::Direction::CW)
-                    {
-                        _cw();
-                        _changing = CHANGING;
-                        return;
-                    }
-                }
-                else if (_position > _target)
-                {
-                    if (_direction != LinearActuator::Direction::CCW)
-                    {
-                        _ccw();
-                        _changing = CHANGING;
-                        return;
-                    }
-                }
-            }
-
-            // Increment interval count (delay between steps).
-            ++_count;
-
-            // Start pulse at the first interval and increment step count.
-            if (_count == 1)
+            // Start pulse at the first interval and update speed and delay intervals.
+            if (count == 0)
             {
                 digitalWrite(_PUL, HIGH);
-                ++_n;
 
                 // Calculate speed from step count.
-                if (_n < _rampsteps) _speed = _minspeed + _n * _deltaspeed;
-                else if (_n > (_steps - _rampsteps)) _speed = _minspeed + (_rampsteps - _n) * _deltaspeed;
-                else _speed = _maxspeed;
+                if (n <= _rampsteps) _speed = _minspeed + n * _deltaspeed;
+                else if (n >= (_steps - _rampsteps)) _speed = _minspeed + (_steps - n) * _deltaspeed;
 
-                _intervals = _getIntervalsFromSpeed(_speed);
+                intervals = _getIntervalsFromSpeed(_speed);
             }
 
-            // Turn output low (end pulse) update speed, intervals, and position.
-            if (_count == 2)
+            // Turn output low (end pulse) update step count and position.
+            if (count == 1)
             {
                 digitalWrite(_PUL, LOW);
+                ++n;
 
                 if (_position < _target)
                 {
@@ -797,27 +835,32 @@ void LinearActuator::onTimer()
         }
         else
         {
-            // If the move has finished set start time to zero and reset move parameter.
+            // If the move has finished set start time to zero, reset move parameter and clear the running flag.
             if (_start > 0)
             {
+                _running = false;
+
                 // Print elapsed time (sec) when verbose output is enabled.
                 if (_verbose)
                 {
                     auto elapsed = float(millis() - _start) / 1000.0;
-                    Telnet.println(String("Moving time: ") + elapsed + " sec");
+                    Telnet.println(String("Moving time: ") + elapsed + " sec (" + _steps + " steps)");
                 }
 
-                _intervals = 0;
+                n = 0;
+                intervals = 0;
                 _speed = 0.0f;
                 _start = 0;
-                _n = 0;
             }
         }
 
+        // Increment interval count (delay between steps).
+        ++count;
+        
         // When the interval count has been reached, reset count and start again.
-        if (_count >= _intervals)
+        if (count >= intervals)
         {
-            _count = 0;
+            count = 0;
         }
     }
 }

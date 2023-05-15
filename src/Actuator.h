@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>14-5-2023 12:51 PM</modified>
+// <modified>15-5-2023 12:35 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -56,12 +56,12 @@
 class LinearActuator
 {
 public:
-    static constexpr const uint  FREQUENCY = 100000;                        // The timer frequency 100 kHz (pulsewidth = 10 usec).
-    static constexpr const uint  INTERVAL  = 1000000 / FREQUENCY;           // The time between callbacks (microseconds).
-    static constexpr const float MIN_SPEED = 1;                             // The minimum speed (1 step per second).
-    static constexpr const float MAX_SPEED = FREQUENCY / 2.0;               // The maximum speed (50000 steps per second).
-    static constexpr const float MIN_RAMP  = 10 * INTERVAL;                 // The minimum ramp time to maximum speed (10 intervals).
-    static constexpr const float CHANGING  = 0.2f * FREQUENCY;              // The number of intervals for direction change (delay = 200 ms).
+    static constexpr const uint  FREQUENCY = 100000;              // The timer frequency 100 kHz (pulsewidth = 10 usec).
+    static constexpr const uint  INTERVAL  = 1000000 / FREQUENCY; // The time between callbacks (microseconds).
+    static constexpr const float MIN_SPEED = 1;                   // The minimum speed (1 step per second).
+    static constexpr const float MAX_SPEED = FREQUENCY / 2.0;     // The maximum speed (50000 steps per second).
+    static constexpr const float MIN_RAMP  = 10 * INTERVAL;       // The minimum ramp time to maximum speed (10 intervals).
+    static constexpr const float DIR_DELAY  = 200;                // The delay (ms) for direction change.
 
     enum Direction
     {
@@ -81,6 +81,7 @@ private:
     uint8_t _ledInLimit;                            // GPIO pin number for the limit LED.
     uint8_t _ledAlarmOn;                            // GPIO pin number for the alarm LED.
 
+    volatile bool _running = false;                 // Flag indicating that moving is enabled (used in ISR).
     bool _calibrating = false;                      // Flag indicating that the calibration routine is running.
     bool _calibrated  = false;                      // Flag indicating that the calibration has been completed.
     bool _enabled     = false;                      // Flag indicating that the motor is enabled.
@@ -95,21 +96,16 @@ private:
     ushort    _microsteps          = 1;             // Stepper driver microstep settings.
     float     _minspeed            = 2000.0f;       // The minimum stepper speed in steps per second.
     float     _maxspeed            = 5000.0f;       // The maximum stepper speed in steps per second.
-    float     _maxsteps            = 1.0f;          // The number of steps for a ramp to maximum speed.
+    float     _maxsteps            = 1.0f;          // The number of steps for a ramp from minimum to maximum speed.
 
     long      _rampsteps  = 0;                      // The number of steps for ramping.
     float     _deltaspeed = 0.0f;                   // The speed delta for every step.
+    float     _speed = 0.0f;                        // The current speed (steps per second).
 
     long      _position = 0;                        // Absolute stepper position (steps).
     long      _target   = 0;                        // Absolute target position (steps).
     long      _steps    = 0;                        // Number of total steps requested in move.
-    float     _speed    = 0.0f;                     // Current stepper speed (steps per second).
-
-    long      _start     = 0;                       // Time at start of move.
-    long      _changing  = 0;                       // delay (intervals) for direction change.
-    long      _intervals = 1;                       // Number of intervals required for delay between steps.
-    long      _count     = 0;                       // Interval count (0..Intervals).
-    long      _n         = 0;                       // Number of step.
+    long      _start    = 0;                        // Time at start of move.
 
     void  _ccw();                                   // Turn off the direction pin.
     void  _cw();                                    // Turn on the direction pin.

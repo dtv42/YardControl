@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>21-4-2023 12:56 PM</created>
-// <modified>14-5-2023 1:03 PM</modified>
+// <modified>14-5-2023 4:11 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -210,6 +210,7 @@ void load()
 {
     TRACE();
     Settings.load();
+    Actuator.init();
 }
 
 /// <summary>
