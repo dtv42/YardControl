@@ -224,7 +224,7 @@ The main module gets the settings, connects to an wlan access point, creates the
    5. Initialize the actuator instance.
    6. Connect to a wlan access point.
       1. If not successful create local AP.
-      2. If local AP cannot be creates, stop.
+      2. If local AP cannot be created, stop.
    7. Get UTC time using NTP.
    8. Setup the HTTP requests.
    9. Start the web server.
@@ -303,6 +303,27 @@ All application settings are maintained here. The settings classses provided are
         "LedAlarmOn": 5,
         "SwitchStop": 7,
         "SwitchLimit1": 8,
+        "SwitchLimit2": 9,{
+    "Yard": {
+        "Tracks": [
+            10000,
+            23200,
+            36400,
+            49600,
+            62800,
+            76000,
+            89200,
+           102400,
+           115600,
+           128800
+        ]
+    },
+    "Actuator": {
+        "LedRunning": 3,
+        "LedInLimit": 4,
+        "LedAlarmOn": 5,
+        "SwitchStop": 7,
+        "SwitchLimit1": 8,
         "SwitchLimit2": 9,
         "SmallStep": 1.0,
         "MinStep": 0.1,
@@ -313,10 +334,9 @@ All application settings are maintained here. The settings classses provided are
         "PinDIR": 1,
         "PinENA": 2,
         "PinALM": 6,
-        "MinSpeed": 200.0,
+        "MinSpeed": 800.0,
         "MaxSpeed": 4000.0,
-        "ConstSpeed": 2000.0,
-        "Acceleration": 400.0,
+        "MaxSteps": 3200,
         "MicroSteps": 16,
         "StepsPerRotation": 200,
         "DistancePerRotation": 8.0
@@ -374,8 +394,6 @@ The following commands with no argument are available:
     x | stop         - Stops the running motor (decelerating).      
     h | home         - Moves to home position (position = 0).       
     g | gpio         - Shows the GPIO input and output pin values.  
-    r | ramp         - Enables acceleration and deceleration.       
-    n | noramp       - Disables acceleration and deceleration.      
 
     yard             - Show yard track settings.                    
     pico             - Show Pico W pin layout.                      
@@ -399,25 +417,25 @@ The following commands with no argument are available:
     speed            - Gets the speed (steps per second).           
     minspeed         - Gets the minimum speed  (steps per second).   
     maxspeed         - Gets the maximum speed  (steps per second).   
-    constspeed       - Gets the constant speed (steps per second).  
-    acceleration     - Gets the acceleration   (speed per second).    
+    maxsteps         - Gets the ramp steps to maximum speed.  
+    microsteps       - Gets the microsteps settings.    
 
 The following commands require an argument:
 
-    m | stepto <number>   - Moves to absolute position (steps). 
-    s | step <number>     - Moves relative the number of steps.
-    t | track <number>    - Moves to track number (0-9).              
-    a | moveto <number>   - Moves to absolute position  (mm).
-    r | move <number>     - Moves the relative distance (mm).
-                          
-    smallstep <number>    - Sets the small move distance (mm).          
-    minstep <number>      - Sets the min move distance   (mm).            
-    retract <number>      - Sets the retract distance    (mm).             
-                         
-    minspeed <number>     - Sets the minimum speed  (steps per second).  
-    maxspeed <number>     - Sets the maximum speed  (steps per second).  
-    constspeed <number>   - Sets the constant speed (steps per second). 
-    acceleration <number> - Sets the acceleration   (speed per second).
+    m | stepto <number> - Moves to absolute position (steps). 
+    s | step <number>   - Moves relative the number of steps.
+    t | track <number>  - Moves to track number (0-9).              
+    a | moveto <number> - Moves to absolute position (mm).
+    r | move <number>   - Moves the relative distance (mm).
+                        
+    smallstep <number>  - Sets the small move distance (mm).          
+    minstep <number>    - Sets the min move distance (mm).            
+    retract <number>    - Sets the retract distance (mm).             
+                        
+    minspeed <number>   - Sets the minimum speed (steps per second).  
+    maxspeed <number>   - Sets the maximum speed (steps per second). 
+    maxstep <number>    - Sets the ramp steps to maximum speed.           
+    microsteps <number> - Sets the microsteps.
 ~~~
 
 ### Web Pages
@@ -470,8 +488,6 @@ The following list summarizes the conventions adopted by the RESTful implementat
 | /disable	        | Disables the stepper motor.                           |
 | /home	            | Move ro the home position.                            |
 | /stop	            | Stops the stepper motor.                              |
-| /ramp	            | Move with ramping speed.                              |
-| /noramp	        | Move with constant speed.                             |
 | /release          | Relase the stopped motor.                             |
 | /reboot	        | Reboots the machine.                                  |
 
@@ -630,7 +646,6 @@ speed     = (timer frequency)/intervals
 
 
 The total number of (10 us) intervals is stored in an integer variable.
-The maximum number (32 bit integer) is 2147483647 resulting in a maximum period of 21474836470 us () or ca. 6 hours.
-The minimum speed is therefore ca. 4 steps per day.
+The minimum speed is set to 1 steps per second, the maximum speed is 50000 steps/second.
 
 
