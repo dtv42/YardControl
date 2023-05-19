@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>14-5-2023 12:50 PM</modified>
+// <modified>19-5-2023 12:04 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -74,7 +74,7 @@ public:
 
         float    SmallStep    = 1;              // Small move distance (mm).
         float    MinStep      = 2.5;            // Minimal move distance (mm).
-        float    Retract      = 5.0;            // Retract distance when limit is hit (mm).
+        float    Retract      = 5.0;            // Retract distance when limit switch is hit (mm).
         float    Length       = 500.0;          // Length of the linear actuator (mm).
 
         void fromJson(JsonObject json);         // Update from JSON representation.

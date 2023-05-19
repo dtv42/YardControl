@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:44 PM</created>
-// <modified>11-5-2023 4:46 PM</modified>
+// <modified>19-5-2023 2:43 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 #if !(defined(ARDUINO_RASPBERRY_PI_PICO_W))
@@ -356,11 +356,11 @@ void setup()
     // Initialize timer with maximum frequency (100 kHz).
     if (Timer.setFrequency(Actuator.FREQUENCY, TimerHandler))
     {
-        Serial.println("Starting  Timer OK");
+        Serial.println("Starting Stepper Timer OK");
     }
     else
     {
-        Serial.println("Can't set Timer.");
+        Serial.println("Can't set Stepper Timer.");
 
         // Don't continue, just indicate the error.
         Led.pattern(1, 5);
@@ -387,6 +387,7 @@ void loop()
     Led.update();
     Inputs.run();
     Telnet.loop();
+    Actuator.info();
     HttpServer.handleClient();
 }
 

@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>15-5-2023 12:35 PM</modified>
+// <modified>19-5-2023 2:53 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -80,6 +80,8 @@ private:
     uint8_t _ledAlarmOn;                            // GPIO pin number for the alarm LED.
 
     volatile bool _running = false;                 // Flag indicating that moving is enabled (used in ISR).
+    volatile bool _stopped = false;                 // Flag indicating that moving has ended (used in ISR).
+
     bool _calibrating = false;                      // Flag indicating that the calibration routine is running.
     bool _calibrated  = false;                      // Flag indicating that the calibration has been completed.
     bool _enabled     = false;                      // Flag indicating that the motor is enabled.
@@ -89,21 +91,23 @@ private:
 
     Direction _direction = Direction::CW;           // Stepper driver direction (CW: 1, CCW: -1).
 
-    float     _distancePerRotation = 8.0f;          // Distance per full rotation (mm).
-    ushort    _stepsPerRotation    = 200;           // Steps per full rotation (360°).
-    ushort    _microsteps          = 1;             // Stepper driver microstep settings.
-    float     _minspeed            = 2000.0f;       // The minimum stepper speed in steps per second.
-    float     _maxspeed            = 5000.0f;       // The maximum stepper speed in steps per second.
-    float     _maxsteps            = 1.0f;          // The number of steps for a ramp from minimum to maximum speed.
+    float         _distancePerRotation = 8.0f;      // Distance per full rotation (mm).
+    ushort        _stepsPerRotation    = 200;       // Steps per full rotation (360°).
+    ushort        _microsteps          = 1;         // Stepper driver microstep settings.
+    float         _minspeed            = 2000.0f;   // The minimum stepper speed in steps per second.
+    float         _maxspeed            = 5000.0f;   // The maximum stepper speed in steps per second.
+    float         _maxsteps            = 1.0f;      // The number of steps for a ramp from minimum to maximum speed.
 
-    long      _rampsteps  = 0;                      // The number of steps for ramping.
-    float     _deltaspeed = 0.0f;                   // The speed delta for every step.
-    float     _speed = 0.0f;                        // The current speed (steps per second).
+    long          _rampsteps  = 0;                  // The number of steps for ramping.
+    float         _deltaspeed = 0.0f;               // The speed delta for every step.
+    float         _speed = 0.0f;                    // The current speed (steps per second).
 
-    long      _position = 0;                        // Absolute stepper position (steps).
-    long      _target   = 0;                        // Absolute target position (steps).
-    long      _steps    = 0;                        // Number of total steps requested in move.
-    long      _start    = 0;                        // Time at start of move.
+    long          _position = 0;                    // Absolute stepper position (steps).
+    long          _target   = 0;                    // Absolute target position (steps).
+    long          _steps    = 0;                    // Number of total steps requested in move.
+
+    unsigned long _start   = 0;                     // Time at start of move (millis).
+    float         _elapsed = 0;                     // Elapsed time for last move (seconds).
 
     void  _ccw();                                   // Turn off the direction pin.
     void  _cw();                                    // Turn on the direction pin.
@@ -136,6 +140,12 @@ public :
     void      setTarget(long value);                // Sets the target position in steps.
     float     getDistance();                        // Gets the current position in mm.
     Direction getDirection();                       // Gets the current direction.
+    float     getRetract();                         // Gets the retract distance in mm.
+    void      setRetract(float value);              // Sets the retract distance in mm.
+    float     getMinStep();                         // Gets the minimum step distance in mm.
+    void      setMinStep(float value);              // Sets the minimum step distance in mm.
+    float     getSmallStep();                       // Gets the small step distance in mm.
+    void      setSmallStep(float value);            // Sets the small step distance in mm.
 
     void setVerboseFlag(bool value);                // Set verbose output flag.
     bool getVerboseFlag();                          // True if verbose output has been enabled.
@@ -147,13 +157,15 @@ public :
     bool getCalibratedFlag();                       // True if calibration was successful.
 
     void init();                                    // Initialize the stepper instance.
+    void info();                                    // Print move info on Telnet.
     void update();                                  // Update stepper settings with current values.
     void enable();                                  // Enables the stepper outputs.
     void disable();                                 // Disables the stepper outputs.
     void stop();                                    // Stop moving (resetting target position, disable output).
     void home();                                    // Move to position zero (home).
     void reset();                                   // Reset the current position to zero.
-    void retract(Direction value);                  // Retract a short distance.
+
+    void moveAway();                                // Retract a short distance in the opposite direction.
     void moveAbsolute(long value);                  // Move to absolute position [steps].
     void moveRelative(long value);                  // Move relative distance [steps].
     void moveAbsoluteDistance(float value);         // Move to absolute position [mm].

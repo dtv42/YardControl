@@ -240,7 +240,7 @@ void gpio()
 void smallstep()
 {
     TRACE();
-    Telnet.println(String(Settings.Actuator.SmallStep));
+    Telnet.println(String(Actuator.getSmallStep()));
 }
 
 /// <summary>
@@ -249,7 +249,7 @@ void smallstep()
 void minstep()
 {
     TRACE();
-    Telnet.println(String(Settings.Actuator.MinStep));
+    Telnet.println(String(Actuator.getMinStep()));
 }
 
 /// <summary>
@@ -258,7 +258,7 @@ void minstep()
 void retract()
 {
     TRACE();
-    Telnet.println(String(Settings.Actuator.Retract));
+    Telnet.println(String(Actuator.getRetract()));
 }
 
 /// <summary>
@@ -318,14 +318,12 @@ void microsteps()
 // Number command functions (callbacks).
 
 /// <summary>
-/// Retracts a short distance.
+/// Retracts a short distance in the opposite direction (used to move away from stop).
 /// </summary>
-/// <param name="value">The direction (+1 or -1).</param>
-void retract(long value)
+void moveAway()
 {
     TRACE(); DUMP(value);
-    if ((value == 1) || (value == -1))
-        Actuator.retract(static_cast<LinearActuator::Direction>(value));
+    Actuator.moveAway();
 }
 
 /// <summary>
@@ -386,7 +384,7 @@ void moveToTrack(long value)
 void smallstep(float value)
 {
     TRACE(); DUMP(value);
-    Settings.Actuator.SmallStep = value;
+    Actuator.setSmallStep(value);
 }
 
 /// <summary>
@@ -396,7 +394,7 @@ void smallstep(float value)
 void minstep(float value)
 {
     TRACE(); DUMP(value);
-    Settings.Actuator.MinStep = value;
+    Actuator.setMinStep(value);
 }
 
 /// <summary>
@@ -406,7 +404,7 @@ void minstep(float value)
 void retract(float value)
 {
     TRACE(); DUMP(value);
-    Settings.Actuator.Retract = value;
+    Actuator.setRetract(value);
 }
 
 /// <summary>

@@ -197,5 +197,14 @@
     <Image Include="documents\DM542T.png">
       <Filter>Documents</Filter>
     </Image>
+    <Image Include="documents\Step.png">
+      <Filter>Misc Files</Filter>
+    </Image>
+    <Image Include="documents\Steps.png">
+      <Filter>Misc Files</Filter>
+    </Image>
+    <Image Include="documents\Ramp.png">
+      <Filter>Misc Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

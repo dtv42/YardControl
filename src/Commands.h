@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>14-5-2023 12:53 PM</modified>
+// <modified>19-5-2023 12:27 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -28,7 +28,6 @@ void minus();
 void forward();
 void backward();
 void calibrate();
-void verbose();
 void enable();
 void disable();
 void stop();
@@ -63,7 +62,7 @@ void microsteps();
 void moveAbsolute(long value);
 void moveRelative(long value);
 void moveToTrack(long value);
-void retract(long value);
+void moveAway();
 
 void moveAbsoluteDistance(float value);
 void moveRelativeDistance(float value);
@@ -168,7 +167,7 @@ class CommandsClass
 private:
     String _padTo(String str, const size_t num, const char paddingChar = ' ');
 
-    static const int MAX_BASE_COMMANDS = 38;
+    static const int MAX_BASE_COMMANDS = 39;
     static const int MAX_LONG_COMMANDS = 5;
     static const int MAX_FLOAT_COMMANDS = 7;
 
@@ -189,41 +188,42 @@ private:
                                                                                             
         { "status",       "s", "Shows the current state of the motor driver.", status       },  // 5
         { "position",     "p", "Shows the current position.",                  position     },  // 6
-        { "plus",         "+", "Moves a step forward.",                        plus         },  // 7
-        { "minus",        "-", "Moves a step backward.",                       minus        },  // 8
-        { "forward",      "f", "Moves a 0.1 mm distance forward.",             forward      },  // 9
-        { "backward",     "b", "Moves a 0.1 mm distance backward.",            backward     },  // 10
-        { "calibrate",    "c", "Run a calibration sequence.",                  calibrate    },  // 11
-        { "enable",       "e", "Enabling the output (after disable).",         enable       },  // 12
-        { "disable",      "d", "Stops the motor by disabling the output.",     disable      },  // 13
-        { "stop",         "x", "Stops the running motor (decelerating).",      stop         },  // 14
-        { "home",         "h", "Moves to home position (position = 0).",       home         },  // 15
-        { "gpio",         "g", "Shows the GPIO input and output pin values.",  gpio         },  // 16
+        { "away",         "a", "Retract in the opposite direction.",           moveAway     },  // 7
+        { "plus",         "+", "Moves a step forward.",                        plus         },  // 8
+        { "minus",        "-", "Moves a step backward.",                       minus        },  // 9
+        { "forward",      "f", "Moves a 0.1 mm distance forward.",             forward      },  // 10
+        { "backward",     "b", "Moves a 0.1 mm distance backward.",            backward     },  // 11
+        { "calibrate",    "c", "Run a calibration sequence.",                  calibrate    },  // 12
+        { "enable",       "e", "Enabling the output (after disable).",         enable       },  // 13
+        { "disable",      "d", "Stops the motor by disabling the output.",     disable      },  // 14
+        { "stop",         "x", "Stops the running motor (decelerating).",      stop         },  // 15
+        { "home",         "h", "Moves to home position (position = 0).",       home         },  // 16
+        { "gpio",         "g", "Shows the GPIO input and output pin values.",  gpio         },  // 17
 
-        { "yard",         "",  "Show yard track settings.",                    yard         },  // 17
-        { "pico",         "",  "Show Pico W pin layout.",                      pico         },  // 18
-        { "wifi",         "",  "Shows the WiFi information.",                  wifi         },  // 19
-        { "server",       "",  "Shows the server information.",                server       },  // 20
-        { "system",       "",  "Shows the system information.",                system       },  // 21
-        { "stepper",      "",  "Shows the stepper settings.",                  stepper      },  // 22
-        { "actuator",     "",  "Shows the actuator settings.",                 actuator     },  // 23
-        { "settings",     "",  "Shows all settings information.",              settings     },  // 24
-        { "appsettings",  "",  "Shows the appsettings file.",                  appsettings  },  // 25
-        { "reboot",       "",  "Reboots the RP2040.",                          reboot       },  // 26
-        { "reset",        "",  "Resets the current position to zero.",         reset        },  // 27
-        { "save",         "",  "Saves the updated application settings.",      save         },  // 28
-        { "load",         "",  "(Re)loads the application settings.",          load         },  // 29
+        { "yard",         "",  "Show yard track settings.",                    yard         },  // 18
+        { "pico",         "",  "Show Pico W pin layout.",                      pico         },  // 19
+        { "wifi",         "",  "Shows the WiFi information.",                  wifi         },  // 20
+        { "server",       "",  "Shows the server information.",                server       },  // 21
+        { "system",       "",  "Shows the system information.",                system       },  // 22
+        { "stepper",      "",  "Shows the stepper settings.",                  stepper      },  // 23
+        { "actuator",     "",  "Shows the actuator settings.",                 actuator     },  // 24
+        { "settings",     "",  "Shows all settings information.",              settings     },  // 25
+        { "appsettings",  "",  "Shows the appsettings file.",                  appsettings  },  // 26
+        { "reboot",       "",  "Reboots the RP2040.",                          reboot       },  // 27
+        { "reset",        "",  "Resets the current position to zero.",         reset        },  // 28
+        { "save",         "",  "Saves the updated application settings.",      save         },  // 29
+        { "load",         "",  "(Re)loads the application settings.",          load         },  // 30
 
-        { "smallstep",    "",  "Gets the small move distance (mm).",           smallstep    },  // 30
-        { "minstep",      "",  "Gets the min move distance (mm).",             minstep      },  // 31
-        { "retract",      "",  "Gets the retract distance (mm).",              retract      },  // 32
+        { "smallstep",    "",  "Gets the small move distance (mm).",           smallstep    },  // 31
+        { "minstep",      "",  "Gets the min move distance (mm).",             minstep      },  // 32
+        { "retract",      "",  "Gets the retract distance (mm).",              retract      },  // 33
 
-        { "rpm",          "",  "Gets the speed RPM.",                          rpm          },  // 33
-        { "speed",        "",  "Gets the speed (steps per second).",           speed        },  // 34
-        { "minspeed",     "",  "Gets the minimum speed (steps per second).",   minspeed     },  // 35
-        { "maxspeed",     "",  "Gets the maximum speed (steps per second).",   maxspeed     },  // 36
-        { "maxsteps",     "",  "Gets the ramp steps to maximum speed.",        maxsteps     },  // 37
-        { "microsteps",   "",  "Gets the microsteps settings.",                microsteps   },  // 38
+        { "rpm",          "",  "Gets the speed RPM.",                          rpm          },  // 34
+        { "speed",        "",  "Gets the speed (steps per second).",           speed        },  // 35
+        { "minspeed",     "",  "Gets the minimum speed (steps per second).",   minspeed     },  // 36
+        { "maxspeed",     "",  "Gets the maximum speed (steps per second).",   maxspeed     },  // 37
+        { "maxsteps",     "",  "Gets the ramp steps to maximum speed.",        maxsteps     },  // 38
+        { "microsteps",   "",  "Gets the microsteps settings.",                microsteps   },  // 39
     };
 
     int _findBaseCommandByShortcut(String shortcut);
@@ -238,8 +238,8 @@ private:
         { "step",       "s", "Moves the number of steps (relative).", moveRelative },           // 2
         { "track",      "t", "Moves to track number.",                moveToTrack  },           // 3
 
-        { "maxsteps",   "",  "Sets the ramp steps to maximum speed.", maxsteps     },           // 4
-        { "microsteps", "",  "Sets the microsteps.",                  microsteps   },           // 5
+        { "maxsteps",   "",  "Sets the ramp steps to maximum speed.", maxsteps     },           // 5
+        { "microsteps", "",  "Sets the microsteps.",                  microsteps   },           // 6
     };
 
     int _findLongCommandByShortcut(String shortcut);    // Returns the command index (or -1 if not found).

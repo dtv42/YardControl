@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>10-5-2023 6:48 AM</created>
-// <modified>15-5-2023 3:15 PM</modified>
+// <modified>19-5-2023 2:48 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 #include <ArduinoJson.h>
@@ -323,6 +323,63 @@ LinearActuator::Direction LinearActuator::getDirection()
 }
 
 /// <summary>
+/// Gets the retract distance in mm.
+/// </summary>
+/// <returns>The retract distance.</returns>
+float  LinearActuator::getRetract()
+{
+    return Settings.Actuator.Retract;
+}
+
+/// <summary>
+/// Sets the retract distance in mm.
+/// </summary>
+/// <param name="value">The retract distance [mm].</param>
+void   LinearActuator::setRetract(float value)
+{
+    Settings.Actuator.Retract = max(0, value);
+    if (_verbose) Telnet.println(String("Retract distance set to ") + value);
+}
+
+/// <summary>
+/// Gets the minimum step distance in mm.
+/// </summary>
+/// <returns>The minimum step distance.</returns>
+float  LinearActuator::getMinStep()
+{
+    return Settings.Actuator.MinStep;
+}
+
+/// <summary>
+/// Sets the minimum step distance in mm.
+/// </summary>
+/// <param name="value">The minimum step distance [mm].</param>
+void   LinearActuator::setMinStep(float value)
+{
+    Settings.Actuator.MinStep = max(0, value);
+    if (_verbose) Telnet.println(String("Minimum step distance set to ") + value);
+}
+
+/// <summary>
+/// Gets the small step distance in mm.
+/// </summary>
+/// <returns>The small step distance.</returns>
+float  LinearActuator::getSmallStep()
+{
+    return Settings.Actuator.SmallStep;
+}
+
+/// <summary>
+/// Sets the small step distance in mm.
+/// </summary>
+/// <param name="value">The small step distance [mm].</param>
+void   LinearActuator::setSmallStep(float value)
+{
+    Settings.Actuator.SmallStep = max(0, value);
+    if (_verbose) Telnet.println(String("Small step distance set to ") + value);
+}
+
+/// <summary>
 /// Gets the verbose flag.
 /// </summary>
 /// <returns>The flag value.</returns>
@@ -428,6 +485,10 @@ void LinearActuator::init()
 /// </summary>
 void LinearActuator::update()
 {
+    Settings.Actuator.Retract = getRetract();
+    Settings.Actuator.MinStep = getMinStep();
+    Settings.Actuator.SmallStep = getSmallStep();
+
     Settings.Stepper.MinSpeed = getMinSpeed();
     Settings.Stepper.MaxSpeed = getMaxSpeed();
     Settings.Stepper.MaxSteps = getMaxSteps();
@@ -448,9 +509,11 @@ void LinearActuator::enable()
 /// </summary>
 void LinearActuator::disable()
 {
+    // Clear the running flag.
     _running = false;
     digitalWrite(_PUL, LOW);
 
+    // Clear the enabled flag.
     _enabled = false;
     digitalWrite(_ENA, HIGH);
 
@@ -458,21 +521,29 @@ void LinearActuator::disable()
     _speed   = 0.0f;
     _steps   = 0;
     _start   = 0;
+
+    // Clear the stopped flag.
+    _stopped = false;
 }
 
 
 /// <summary>
-/// Stops the move.
+/// Stops the move immediately. Resets the target to the current position.
 /// </summary>
 void LinearActuator::stop()
 {
+    // Clear the running flag.
     _running = false;
+
     digitalWrite(_PUL, LOW);
 
     _target  = _position;
     _speed   = 0.0f;
     _steps   = 0;
     _start   = 0;
+
+    // Clear the stopped flag.
+    _stopped = false;
 }
 
 /// <summary>
@@ -513,14 +584,18 @@ void   LinearActuator::reset()
                             "    Position:    " + _position + "\r\n" +
                             "\r\n");
     }
+
+    // Clear the stopped flag.
+    _stopped = false;
 }
 
 /// <summary>
-/// Retracts a short distance (CW: 1, CCW: -1).
+/// Retracts a short distance in the opposite direction.
 /// </summary>
-void LinearActuator::retract(Direction value)
+void LinearActuator::moveAway()
 {
-    moveRelativeDistance(value * Settings.Actuator.Retract);
+    Direction direction = getDirection();
+    moveRelativeDistance((-1.0f) * Settings.Actuator.Retract * float(static_cast<int>(direction)));
 }
 
 /// <summary>
@@ -666,8 +741,10 @@ void   LinearActuator::moveAbsolute(long value)
         }
     }
 
-    // Get start time and set the running flag...
+    // Get start time and set the running flag and clear the stop flag...
+    _elapsed = 0;
     _start = millis();
+    _stopped = false;
     _running = true;
 }
 
@@ -725,7 +802,6 @@ void LinearActuator::switchOn(uint8_t pin)
     // The stop switch has been turned on.
     if (pin == Settings.Actuator.SwitchStop)
     {
-        _calibrated = false;
         stop();
     }
     // If the first limit switch has been hit retract (positive direction).
@@ -788,8 +864,9 @@ void LinearActuator::calibrate()
 }
 
 /// <summary>
-/// Timer callback - move a single step if not yet at target.
-/// The timer is triggered every 10 microseconds (100 kHz).
+/// Timer callback - move a single step if not yet at target. The timer is triggered every 10 microseconds (100 kHz).
+/// This ISR routine has to be as short as possible (less than 10 microseconds) in order to be called repeatedly.
+/// Note that two flags (_running and _stopped are used to indicate the movement status to the main program.
 /// </summary>
 void LinearActuator::onTimer()
 {
@@ -833,22 +910,17 @@ void LinearActuator::onTimer()
         }
         else
         {
-            // If the move has finished set start time to zero, reset move parameter and clear the running flag.
+            // If the move has finished set start time to zero, reset move parameter, 
+            // clear the running flag and set the stopped flag.
             if (_start > 0)
             {
                 _running = false;
-
-                // Print elapsed time (sec) when verbose output is enabled.
-                if (_verbose)
-                {
-                    auto elapsed = float(millis() - _start) / 1000.0;
-                    Telnet.println(String("Moving time: ") + elapsed + " sec (" + _steps + " steps)");
-                }
-
-                n = 0;
+                _stopped = true;
+                _elapsed = float(millis() - _start) / 1000.0;
                 intervals = 0;
                 _speed = 0.0f;
                 _start = 0;
+                n = 0;
             }
         }
 
@@ -860,6 +932,25 @@ void LinearActuator::onTimer()
         {
             count = 0;
         }
+    }
+}
+
+/// <summary>
+/// Print move info on Telnet. This is done when the ISR routine indicates that the move has stopped.
+/// </summary>
+void LinearActuator::info()
+{
+    // Print elapsed time (sec) when verbose output is enabled.
+    if (_stopped)
+    {
+        if (_verbose)
+        {
+            Telnet.println(String("Moving time: ") + _elapsed + " sec (" + _steps + " steps)");
+            Telnet.print(Settings.Telnet.Prompt);
+        }
+
+        // Reset the stopped flag.
+        _stopped = false;
     }
 }
 

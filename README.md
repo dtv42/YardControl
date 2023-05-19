@@ -548,40 +548,33 @@ The Raspberry Pi Pico W and the GPIO pins (output from 'pico' command).
                    [   GP15 ] [20] |_________| [21] [  GP16  ]
 ~~~
 #### Stepper Driver Control
+In order to drive the stepper motor with a certain speed (steps per second), the correct number of output pulses per second have to be generated.
+
+![Step](documents/Step.png)
+
 A global periodic timer running at 100 kHz is used to generate pulses for the stepper motor driver unit.
 The timer callback function is therefore called 100000 times a second, or every 10 microseconds.
 
 An internal step counter is used to keep track of the required steps to reach a specified target.
 A second internal counter is used to determine the delay between pulses (steps) depending on the specified speed.
+
 The pulsewidth is fixed at 10 microseconds (the output is set high at the first call, and set low at the second call).
 The second counter is increased until the number of required calls (number of intervals) is reached.
 
-~~~
-|   1  |   2  |   3  |   4  |        |   n  |       Number of intervals (n)
-| 10us | 10us | 10us | 10us |        | 10us |       10 us intervals
-|------|------|------|------|........|------|
-| PUL+
- ______
-|      |
-|      |_____________________........_______|       One output pulse (every n*10 us)
+The total time required for the number of steps needed to move a specified distance is the number of steps times the delay between the steps (pulses).
 
-|<---->|<--------------------........------>|       
-| 10us |           (n - 1)*10 us            |       Total time n*10 us
-~~~
+![Steps](documents/Steps.png)
 
-When the speed is specified in steps per second, the number of required 10 us intervals is dermined as follows:
-~~~
- _               _               _               _              
-| |_____________| |_____________| |___......____| |_____________
+Ramping (accelerating and decelerating) is done by changing the time between the steps (pulses) from a minimum speed to a maximum speed and back again.
 
-number of intervals = 100 kHz / (steps per second)
-~~~
+![Ramp](documents/Ramp.png)
+
 Since the number of intervals has to be an integer number, the set speed will be only approximately correct.
 However, the stepper driver is moving for the required number of steps with the set speed.
 The maximum speed is a delay of 10 us (2 intervals) resulting in a 20 us period or 50 kHz.
 
-For a typical stepper motor driver with 200 steps per revolution and a linear actuator with a lead screw providing 8 mm travel distance per revolution, this results in 400 steps per mm.
-When microstepping is used, the number of steps / mm is increased acordingly. The attainable speed for a stepper motor is in the range of 1000 rpm.
+For a typical stepper motor driver with 200 steps per revolution and a linear actuator with a lead screw providing 8 mm travel distance per revolution, this results in 40 steps per mm.
+When microstepping is used, the number of steps / mm is increased acordingly. The attainable speed for a stepper motor is typically ca. 1000 rpm.
 With higher speed, the torque is considerable decreased, and the motor has to ramp up the speed slowly.
 Assuming a maximum frequency of 50 kHz, the resulting maximum RPM is as follows:
 
@@ -589,63 +582,31 @@ Assuming a maximum frequency of 50 kHz, the resulting maximum RPM is as follows:
 8.00    mm per rotation
 200     steps per rotation
 100000  timer frequency (100 kHz)
-50000   max steps per second (2 cycles)
+25000   max steps per second (4 cycles)
 
 (steps/rotation) = microsteps*(steps/rotation)
+(steps/mm)       = (steps/rotation)/(distance/rotation)
 (max rpm)        = 60*(max steps/second)/(steps/rotation)
 (mm/sec)         = (distance/rotation)*(max rpm)/60
-(mm/min)         = (max rpm)/(distance/rotation)
-(steps/mm)       = (steps/rotation)/(distance/rotation)
 ~~~
-| microsteps  | steps/rotation |   max rpm   |   mm/sec  |  mm/min   |  steps/mm  |
-|-------------|----------------|-------------|-----------|---------- |------------|
-|      1	  |      200	   |  15000.0000 | 500.00000 | 7500.000  |     100    |
-|      2	  |      400	   |   7500.0000 | 250.00000 | 3750.000  |     200    |
-|      4	  |      800	   |   3750.0000 | 125.00000 | 1875.000  |     400    |
-|      5	  |      1000	   |   3000.0000 | 100.00000 | 1500.000  |     500    |
-|      8	  |      1600	   |   1875.0000 | 62.50000  | 937.5000  |     800    |
-|      10	  |      2000	   |   1500.0000 | 50.00000  | 750.0000  |    1000    |
-|      **16**	  |      **3200**	   |   **937.5000**  |   **31.2500** | **468.7500**  |    **1600**    |
-|      20	  |      4000	   |    750.0000 | 25.00000  | 375.0000  |    2000    |
-|      25	  |      5000	   |    600.0000 | 20.00000  | 300.0000  |    2500    |
-|      32	  |      6400	   |    468.7500 | 15.62500  | 234.3750  |    3200    |
-|      40	  |      8000	   |    375.0000 | 12.50000  | 187.5000  |    4000    |
-|      50	  |      10000	   |    300.0000 | 10.00000  | 150.0000  |    5000    |
-|      64	  |      12800	   |    234.3750 |  7.81250  | 117.1875  |    6400    |
-|      100	  |      20000	   |    150.0000 |  5.00000  | 75.00000  |   10000    |
-|      125	  |      25000	   |    120.0000 |  4.00000  | 60.00000  |   12500    |
-|      128	  |      25600	   |    117.1875 |  3.90625  | 58.59375  |   12800    |
+| microsteps  | steps/rotation |  steps/mm  |   max rpm   |   mm/sec  |
+|-------------|----------------|------------|-------------|-----------|
+|        1    |        200     |      25    |    7500.0   |  1000.0   | 
+|        2    |        400     |      50    |    3750.0   |   500.0   |
+|        4    |        800     |     100    |    1875.0   |   250.0   |
+|        5    |       1000     |     125    |    1500.0   |   200.0   |
+|        8    |       1600     |     200    |     937.5   |   125.0   |
+|       10    |       2000     |     250    |     750.0   |   100.0   |
+|       **16**    |       **3200**     |     **400**    |     **468.8**   |    **62.5**   |
+|       20    |       4000     |     500    |     375.0   |    50.0   |
+|       25    |       5000     |     625    |     300.0   |    40.0   |
+|       32    |       6400     |     800    |     234.4   |    31.3   |
+|       40    |       8000     |    1000    |     187.5   |    25.0   |
+|       50    |      10000     |    1250    |     150.0   |    20.0   |
+|       64    |      12800     |    1600    |     117.2   |    15.6   |
+|      100    |      20000     |    2500    |      75.0   |    10.0   |
+|      125    |      25000     |    3125    |      60.0   |     8.0   |
+|      128    |      25600     |    3200    |      58.6   |     7.8   |
 
-
-With 16 microsteps the speed and intervals can be calculated as:
-
-~~~
-rpm       = 60*(steps/sec)/((steps/rotation)*microsteps)
-(mm/sec)  = (distance/rotation)*rpm/60
-intervals = INT(timer frequency/(steps/sec))
-speed     = (timer frequency)/intervals
-~~~
-| steps/sec |    rpm    |   mm/sec  | intervals	| speed  |
-|-----------|-----------|-----------|-----------|--------|
-|    1	    |   0.01875	|  0.000625	| 100000	| 1      |
-|    10	    |   0.18750	|  0.006250	|  10000	| 10     |
-|    25	    |   0.46875	|  0.015625	|   4000	| 25     |
-|    50	    |   0.93750	|  0.031250	|   2000	| 50     |
-|    75	    |   1.40625	|  0.046875	|   1333	| 75     |
-|    100	|   1.87500	|  0.062500	|   1000	| 100    |
-|    250	|   4.68750	|  0.156250	|    400	| 250    |
-|    500	|   9.37500	|  0.312500	|    200	| 500    |
-|    750	|  14.06250	|  0.468750	|    133	| 752    |
-|    1000	|  18.75000	|  0.625000	|    100	| 1000   |
-|    2500	|  46.87500	|  1.562500	|     40	| 2500   |
-|    5000	|  93.75000	|  3.125000	|     20	| 5000   |
-|    7500	| 140.62500	|  4.687500	|     13	| 7692   |
-|    10000	| 187.50000	|  6.250000	|     10	| 10000  |
-|    25000	| 468.75000	| 15.625000 | 	   4	| 25000  |
-|    50000	| 937.50000	| 31.250000 | 	   2	| 50000  |
-
-
-The total number of (10 us) intervals is stored in an integer variable.
-The minimum speed is set to 1 steps per second, the maximum speed is 50000 steps/second.
-
-
+The typical speed used in this application is in the range of 1000 to 5000 steps/sec or 2.5 mm/sec to 12.5 mm/sec.
+Higher microstepping values could be used, but the maximum speed decreases accordingly.
