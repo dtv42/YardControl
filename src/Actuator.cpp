@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>10-5-2023 6:48 AM</created>
-// <modified>19-5-2023 2:48 PM</modified>
+// <modified>19-5-2023 9:18 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 #include <ArduinoJson.h>
@@ -532,18 +532,20 @@ void LinearActuator::disable()
 /// </summary>
 void LinearActuator::stop()
 {
-    // Clear the running flag.
-    _running = false;
+    // Get the elapsed time, clear the running flag and set the stopped flag.
+    if (_running)
+    {
+        _elapsed = float(millis() - _start) / 1000.0;
+        _running = false;
+        _stopped = true;
 
-    digitalWrite(_PUL, LOW);
+        digitalWrite(_PUL, LOW);
 
-    _target  = _position;
-    _speed   = 0.0f;
-    _steps   = 0;
-    _start   = 0;
-
-    // Clear the stopped flag.
-    _stopped = false;
+        _target = _position;
+        _speed = 0.0f;
+        _steps = 0;
+        _start = 0;
+    }
 }
 
 /// <summary>
@@ -742,6 +744,7 @@ void   LinearActuator::moveAbsolute(long value)
     }
 
     // Get start time and set the running flag and clear the stop flag...
+    _n = 0;
     _elapsed = 0;
     _start = millis();
     _stopped = false;
@@ -870,7 +873,6 @@ void LinearActuator::calibrate()
 /// </summary>
 void LinearActuator::onTimer()
 {
-    static long  n;         // Step counter.
     static long  count;     // Counter for delay between steps.
     static long  intervals; // Number of intervals between steps.
 
@@ -886,8 +888,8 @@ void LinearActuator::onTimer()
                 digitalWrite(_PUL, HIGH);
 
                 // Calculate speed from step count.
-                if (n <= _rampsteps) _speed = _minspeed + n * _deltaspeed;
-                else if (n >= (_steps - _rampsteps)) _speed = _minspeed + (_steps - n) * _deltaspeed;
+                if (_n <= _rampsteps) _speed = _minspeed + _n * _deltaspeed;
+                else if (_n >= (_steps - _rampsteps)) _speed = _minspeed + (_steps - _n) * _deltaspeed;
 
                 intervals = _getIntervalsFromSpeed(_speed);
             }
@@ -896,7 +898,7 @@ void LinearActuator::onTimer()
             if (count == 1)
             {
                 digitalWrite(_PUL, LOW);
-                ++n;
+                ++_n;
 
                 if (_position < _target)
                 {
@@ -920,7 +922,7 @@ void LinearActuator::onTimer()
                 intervals = 0;
                 _speed = 0.0f;
                 _start = 0;
-                n = 0;
+                _n = 0;
             }
         }
 

@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>19-5-2023 2:53 PM</modified>
+// <modified>19-5-2023 9:21 PM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -105,6 +105,7 @@ private:
     long          _position = 0;                    // Absolute stepper position (steps).
     long          _target   = 0;                    // Absolute target position (steps).
     long          _steps    = 0;                    // Number of total steps requested in move.
+    long          _n        = 0;                    // Step counter.
 
     unsigned long _start   = 0;                     // Time at start of move (millis).
     float         _elapsed = 0;                     // Elapsed time for last move (seconds).
