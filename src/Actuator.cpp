@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>10-5-2023 6:48 AM</created>
-// <modified>19-5-2023 9:18 PM</modified>
+// <modified>20-5-2023 7:34 AM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 #include <ArduinoJson.h>
@@ -485,13 +485,13 @@ void LinearActuator::init()
 /// </summary>
 void LinearActuator::update()
 {
-    Settings.Actuator.Retract = getRetract();
-    Settings.Actuator.MinStep = getMinStep();
+    Settings.Actuator.Retract   = getRetract();
+    Settings.Actuator.MinStep   = getMinStep();
     Settings.Actuator.SmallStep = getSmallStep();
 
-    Settings.Stepper.MinSpeed = getMinSpeed();
-    Settings.Stepper.MaxSpeed = getMaxSpeed();
-    Settings.Stepper.MaxSteps = getMaxSteps();
+    Settings.Stepper.MinSpeed   = getMinSpeed();
+    Settings.Stepper.MaxSpeed   = getMaxSpeed();
+    Settings.Stepper.MaxSteps   = getMaxSteps();
     Settings.Stepper.MicroSteps = getMicrosteps();
 }
 
@@ -521,6 +521,7 @@ void LinearActuator::disable()
     _speed   = 0.0f;
     _steps   = 0;
     _start   = 0;
+    _n = 0;
 
     // Clear the stopped flag.
     _stopped = false;
@@ -545,6 +546,7 @@ void LinearActuator::stop()
         _speed = 0.0f;
         _steps = 0;
         _start = 0;
+        _n = 0;
     }
 }
 
@@ -572,6 +574,7 @@ void   LinearActuator::reset()
         return;
     }
 
+    _n = 0;
     _speed = 0.0f;
     _steps = 0;
     _start = 0;
@@ -802,24 +805,18 @@ void LinearActuator::alarmOff(uint8_t pin)
 /// </summary>
 void LinearActuator::switchOn(uint8_t pin)
 {
-    // The stop switch has been turned on.
+    stop();
+
+    // The stop switch has been turned on (disable stepper motor).
     if (pin == Settings.Actuator.SwitchStop)
     {
-        stop();
+        disable();
     }
-    // If the first limit switch has been hit retract (positive direction).
-    else if (pin == Settings.Actuator.SwitchLimit1)
+    // If a limit switch has been hit, move away (retract).
+    else
     {
         _limit = true;
-        stop();
-        retract(Direction::CW);
-    }
-    // If the second limit switch has been hit retract (negative direction).
-    else if (pin == Settings.Actuator.SwitchLimit2)
-    {
-        _limit = true;
-        stop();
-        retract(Direction::CCW);
+        moveAway();
     }
 }
 
@@ -835,9 +832,8 @@ void LinearActuator::switchOff(uint8_t pin)
     else if (pin == Settings.Actuator.SwitchLimit1)
     {
         _limit = false;
-        moveAbsolute(_steps);
 
-        // If calibrating reset current position to new home position (zero).
+        // If calibrating, reset current position to new home position (zero).
         if (_calibrating)
         {
             reset();
@@ -847,7 +843,9 @@ void LinearActuator::switchOff(uint8_t pin)
     }
     else if (pin == Settings.Actuator.SwitchLimit2)
     {
-        // If calibrating stop calibrating (this should not happen).
+        _limit = false;
+
+        // If calibrating, stop calibrating (this should not happen).
         if (_calibrating)
         {
             _calibrated = false;
@@ -857,13 +855,13 @@ void LinearActuator::switchOff(uint8_t pin)
 }
 
 /// <summary>
-/// Start the calibration routine by moving a large negative position (actuator length).
+/// Start the calibration routine by moving in negative direction (actuator length).
 /// Eventually the first limit switch should be engaged near the home position.
 /// </summary>
 void LinearActuator::calibrate()
 {
-    moveRelativeDistance(-Settings.Actuator.Length);
     _calibrating = true;
+    moveRelativeDistance(-Settings.Actuator.Length);
 }
 
 /// <summary>

@@ -6,7 +6,7 @@
 //   Licensed under the MIT license. See the LICENSE file in the project root for more information.
 // </license>
 // <created>9-4-2023 7:45 PM</created>
-// <modified>19-5-2023 12:27 PM</modified>
+// <modified>20-5-2023 7:32 AM</modified>
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -59,10 +59,10 @@ void maxspeed();
 void maxsteps();
 void microsteps();
 
+void moveAway();
 void moveAbsolute(long value);
 void moveRelative(long value);
 void moveToTrack(long value);
-void moveAway();
 
 void moveAbsoluteDistance(float value);
 void moveRelativeDistance(float value);
