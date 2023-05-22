@@ -33,12 +33,6 @@
     <None Include="src\arduino folders read me.txt">
       <Filter>Misc Files</Filter>
     </None>
-    <None Include="scripts\licenseheader.json">
-      <Filter>Misc Files</Filter>
-    </None>
-    <None Include="scripts\version.json">
-      <Filter>Misc Files</Filter>
-    </None>
     <None Include="scripts\version.ps1">
       <Filter>Misc Files</Filter>
     </None>
@@ -46,9 +40,6 @@
       <Filter>Misc Files</Filter>
     </None>
     <None Include="README.md">
-      <Filter>Misc Files</Filter>
-    </None>
-    <None Include="YardControl.sln.licenseheader">
       <Filter>Misc Files</Filter>
     </None>
     <None Include="data\appsettings.json">
@@ -74,6 +65,12 @@
     </None>
     <None Include="data\www\css\custom-styles.css">
       <Filter>Data Files\www\css</Filter>
+    </None>
+    <None Include="scripts\GitVersion.yml">
+      <Filter>Misc Files</Filter>
+    </None>
+    <None Include="scripts\headers.ps1">
+      <Filter>Misc Files</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -174,6 +171,9 @@
     <Text Include="LICENSE.txt">
       <Filter>Misc Files</Filter>
     </Text>
+    <Text Include="board.txt">
+      <Filter>Misc Files</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <Image Include="data\www\favicon.ico">
@@ -197,14 +197,14 @@
     <Image Include="documents\DM542T.png">
       <Filter>Documents</Filter>
     </Image>
+    <Image Include="documents\Ramp.png">
+      <Filter>Documents</Filter>
+    </Image>
     <Image Include="documents\Step.png">
-      <Filter>Misc Files</Filter>
+      <Filter>Documents</Filter>
     </Image>
     <Image Include="documents\Steps.png">
-      <Filter>Misc Files</Filter>
-    </Image>
-    <Image Include="documents\Ramp.png">
-      <Filter>Misc Files</Filter>
+      <Filter>Documents</Filter>
     </Image>
   </ItemGroup>
 </Project>

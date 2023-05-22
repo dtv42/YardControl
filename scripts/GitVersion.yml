@@ -1,0 +1,4 @@
+next-version: 1.0.12
+mode: ContinuousDeployment
+update-build-number: true
+continuous-delivery-fallback-tag: beta

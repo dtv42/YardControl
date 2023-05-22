@@ -1,20 +1,20 @@
-# run license header manager on .h files, whenever they're saved.
+# run header script on .h files, whenever they're saved.
 [*.h]
-command = C:\Development\Projects\VS2022\LicenseHeaderManager\LicenseHeaderManager.Console\bin\Debug\LicenseHeaderManager.Console.exe
-arguments = -f {file} -l C:\Development\Projects\RP2040\Arduino\YardControl\YardControl.sln.licenseheader -c C:\Development\Projects\RP2040\Arduino\YardControl\scripts\licenseheader.json
-
-# run license header manager on .cpp files, whenever they're saved.
-[*.cpp]
-command = C:\Development\Projects\VS2022\LicenseHeaderManager\LicenseHeaderManager.Console\bin\Debug\LicenseHeaderManager.Console.exe
-arguments = -f {file} -l C:\Development\Projects\RP2040\Arduino\YardControl\YardControl.sln.licenseheader -c C:\Development\Projects\RP2040\Arduino\YardControl\scripts\licenseheader.json
-
-# run license header manager on .ino files, whenever they're saved.
-[*.ino]
-command = C:\Development\Projects\VS2022\LicenseHeaderManager\LicenseHeaderManager.Console\bin\Debug\LicenseHeaderManager.Console.exe
-arguments = -f {file} -l C:\Development\Projects\RP2040\Arduino\YardControl\YardControl.sln.licenseheader -c C:\Development\Projects\RP2040\Arduino\YardControl\scripts\licenseheader.json
+command = PowerShell 
+arguments = -file {solution_directory}\scripts\headers.ps1 -filename {file}
 always_run = true
 
-# run license header manager on .ps1 files, whenever they're saved.
-[*.ps1]
-command = C:\Development\Projects\VS2022\LicenseHeaderManager\LicenseHeaderManager.Console\bin\Debug\LicenseHeaderManager.Console.exe
-arguments = -f {file} -l C:\Development\Projects\RP2040\Arduino\YardControl\YardControl.sln.licenseheader -c C:\Development\Projects\RP2040\Arduino\YardControl\scripts\licenseheader.json
+[*.hpp]
+command = PowerShell 
+arguments = -file {solution_directory}\scripts\headers.ps1 -filename {file}
+always_run = true
+
+[*.cpp]
+command = PowerShell 
+arguments = -file {solution_directory}\scripts\headers.ps1 -filename {file}
+always_run = true
+
+[*.ino]
+command = PowerShell 
+arguments = -file {solution_directory}\scripts\headers.ps1 -filename {file}
+always_run = true

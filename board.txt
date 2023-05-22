@@ -1,0 +1,3 @@
+# Versioning build property overrides
+#
+recipe.hooks.prebuild.1.pattern=PowerShell {ProjectDir}\scripts\version.ps1

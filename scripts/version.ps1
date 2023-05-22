@@ -7,35 +7,47 @@
   Modified: 24-4-2023 11:56 AM
   Author: Peter Trimmel
 -------------------------------------------------------------------------------------------------------------------- #>
-$path = "..\\src\\version.h"
-$json = ".\\version.json"
-$cmd = "gitversion.exe /output file /outputfile " + $json
+Set-Location -ErrorAction Stop -LiteralPath $PSScriptRoot
 
-# Create version.json file
-cmd /c $cmd
-$version = Get-Content -Path $json | ConvertFrom-Json
+$crlf = "`r`n"
+$path = "..\\src\\Version.h"
 
-$"\r\n" = "`r`n"
+# Get current git version info.
+$version = [string](gitversion.exe) | ConvertFrom-Json
+
 $file = Get-Content -Path $path
-$lines = $file -split $"\r\n"
+$lines = $file -split $crlf
 $header = ''
 
-# Get only the file header (12 lines up to #pragma)
-for ($i=0; $i -lt 12; $i++)
-{
-    $header += $lines[$i] + $"\r\n"
-}
+# Copy the file header (lines starting with '//').
+$i = 0
+$continue = $true
 
-# Add the C++ code (static SOFTWARE_VERSION and LAST_MODIFIED_DATE)
-$code = $"\r\n" +
-        "#pragma once\r\n\r\n" +
-        "struct Auto\r\n" +
-        "{\r\n" +
-        "    static constexpr const char* const SOFTWARE_VERSION = `"V" + $($version.AssemblySemFileVer) + "-" + $($version.UncommittedChanges) + " " + $($version.CommitDate) + "`";\r\n" + 
-        "    static constexpr const char* const LAST_MODIFIED_DATE = __DATE__;\r\n" +
-        "};\r\n"
+do {
+    $line = $lines[$i]
+    if ($line.StartsWith("//")) {
+        $header += $lines[$i] + $crlf
+        $i += 1
+    }
+    else {
+        $continue = $false
+    }
+}
+while($continue)
+Write-Host $header
+
+# Add the C++ code (static SOFTWARE_VERSION, LAST_MODIFIED_DATE, and LAST_MODIFIED_TIME)
+$code = "#pragma once" + $crlf + $crlf +
+        "struct Auto" + $crlf +
+        "{" + $crlf +
+        "    static constexpr const char* const SOFTWARE_VERSION = `"V" + $($version.SemVer) + " " + $($version.CommitDate) + "`";" + $crlf +
+        "    static constexpr const char* const LAST_MODIFIED_DATE = __DATE__;" + $crlf +
+        "    static constexpr const char* const LAST_MODIFIED_TIME = __TIME__;" + $crlf +
+        "};" + $crlf
+
+Write-Host $code
 
 $content = $header + $code
 
-# Update the version.h file with the new software version.
+# Update the Version.h file with the new software version info.
 Out-File -FilePath $path -InputObject $content -Force -Encoding ASCII
