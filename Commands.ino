@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Commands.ino" company="DTV-Online">
 //   Copyright (c) 2023 Dr. Peter Trimmel. All rights reserved.
 // </copyright>
@@ -8,6 +8,9 @@
 // <created>21-4-2023 12:56 PM</created>
 // <modified>21-5-2023 9:05 AM</modified>
 // <author>Peter Trimmel</author>
+// <summary>
+//   All callbacks for the command processor can be found here. This file is merged with the other .ino files.
+// </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
 // Disable all traces when set to 0.
@@ -556,4 +559,7 @@ void reboot()
 }
 
 #pragma endregion
+
+
+
 

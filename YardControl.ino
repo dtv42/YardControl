@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="YardControl.ino" company="DTV-Online">
 //   Copyright (c) 2023 Dr. Peter Trimmel. All rights reserved.
 // </copyright>
@@ -8,6 +8,49 @@
 // <created>9-4-2023 7:44 PM</created>
 // <modified>21-5-2023 9:05 AM</modified>
 // <author>Peter Trimmel</author>
+// <summary>
+//   This is the main sketch for the fiddle yard controller.
+//   A minimal Arduino C/C++ program consists of only two functions:
+//
+//     setup() : This function is called once when a sketch starts after power - up or reset.
+//               It is used to initialize variables, input and output pin modes, and other libraries 
+//               needed in the sketch. It is analogous to the function main().
+// 
+//     loop()  : After setup() function exits (ends), the loop() function is executed repeatedly in 
+//               the main program. It controls the board until the board is powered off or is reset.
+//               It is analogous to a function while(1).
+//    
+//   This implementation is using a Raspberry Pi Pico W board using a RP2040, a 32-bit dual ARM Cortex-M0+ 
+//   microcontroller integrated circuit. The Arduino core available at https://github.com/earlephilhower/arduino-pico
+//   provides several features some of them are used here:
+//   
+//      - Generic Arduino USB Serial
+//      - WiFi (Pico W)
+//      - HTTP client and server (WebServer)
+//      - Filesystems (LittleFS)
+//      - digitalWrite/Read, temperature
+//      - Wire (I2C)
+//      - printf (i.e. debug) output over USB serial
+// 
+//   The following additional libraries are used:
+// 
+//      - ArduinoJson       https://github.com/bblanchon/ArduinoJson
+//      - ArduinoTrace      https://github.com/bblanchon/ArduinoTrace
+//      - Blinkenlight      https://github.com/tfeldmann/Arduino-Blinkenlight
+//      - InputDebounce     https://github.com/Mokolea/InputDebounce
+//      - TimerInterrupt    https://github.com/khoih-prog/TimerInterrupt_Generic
+//   
+//   The Telnet implementation from https://github.com/LennartHennigs/ESPTelnet is used (ported and modified).
+//   
+//   Note that the LittleFS filesystem uses a part of the available flash memory.
+//   
+//      Flash Size: 2MB  (Sketch: 1536KB, FS: 512KB)
+// 
+//   To download the data files (all files and directories in the data directory) a little utility PicoLittleFS
+//   (available at https://github.com/earlephilhower/arduino-pico-littlefs-plugin/releases) is used. This plugin
+//   for the Arduino IDE only works with the legacy IDE (1.8.19).
+// 
+// </summary>
 // --------------------------------------------------------------------------------------------------------------------
 #if !(defined(ARDUINO_RASPBERRY_PI_PICO_W))
 #error For RASPBERRY_PI_PICO_W only
@@ -392,3 +435,5 @@ void loop()
 }
 
 #pragma endregion
+
+

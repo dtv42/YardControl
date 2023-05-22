@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="HttpHelper.ino" company="DTV-Online">
 //   Copyright (c) 2023 Dr. Peter Trimmel. All rights reserved.
 // </copyright>
@@ -8,6 +8,9 @@
 // <created>24-4-2023 10:32 AM</created>
 // <modified>21-5-2023 9:05 AM</modified>
 // <author>Peter Trimmel</author>
+// <summary>
+//   All HTTP web server helpers can be found here. This file is merged with the other .ino files.
+// </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
 /// <summary>
@@ -364,4 +367,6 @@ void notFound()
     TRACE();
     sendFile("/www/about.html");
 }
+
+
 
