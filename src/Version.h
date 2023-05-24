@@ -32,7 +32,7 @@
 
 struct Auto
 {
-    static constexpr const char* const SOFTWARE_VERSION = "V1.0.12-beta.26 2023-05-22";
+    static constexpr const char* const SOFTWARE_VERSION = "V1.0.12-beta.27 2023-05-24";
     static constexpr const char* const LAST_MODIFIED_DATE = __DATE__;
     static constexpr const char* const LAST_MODIFIED_TIME = __TIME__;
 };
