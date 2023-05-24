@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CommandClass.cpp" company="DTV-Online">
 //   Copyright (c) 2023 Dr. Peter Trimmel. All rights reserved.
 // </copyright>
@@ -10,10 +10,6 @@
 // <author>Peter Trimmel</author>
 // --------------------------------------------------------------------------------------------------------------------
 
-// Disable all traces when set to 0.
-#define ARDUINOTRACE_ENABLE 0
-
-#include <ArduinoTrace.h>
 #include <StringSplitter.h>
 
 #include "Commands.h"
@@ -42,8 +38,6 @@ String CommandsClass::_padTo(String str, const size_t num, const char paddingCha
 /// <returns>The command index.</returns>
 int CommandsClass::_findBaseCommandByShortcut(String shortcut)
 {
-    TRACE(); DUMP(shortcut);
-
     int index = -1;
     shortcut.toLowerCase();
 
@@ -66,8 +60,6 @@ int CommandsClass::_findBaseCommandByShortcut(String shortcut)
 /// <returns>The command index.</returns>
 int CommandsClass::_findBaseCommandByName(String name)
 {
-    TRACE(); DUMP(name);
-
     int index = -1;
     name.toLowerCase();
 
@@ -89,8 +81,6 @@ int CommandsClass::_findBaseCommandByName(String name)
 /// <param name="index">The command index.</param>
 void CommandsClass::_processBaseCommand(int index)
 {
-    TRACE(); DUMP(index);
-
     BaseCommand cmd = _baseCommands[index];
     _lastCommand = cmd;
 
@@ -105,8 +95,6 @@ void CommandsClass::_processBaseCommand(int index)
 /// <returns>The command index.</returns>
 int CommandsClass::_findLongCommandByShortcut(String shortcut)
 {
-    TRACE(); DUMP(shortcut);
-
     int index = -1;
     shortcut.toLowerCase();
 
@@ -129,8 +117,6 @@ int CommandsClass::_findLongCommandByShortcut(String shortcut)
 /// <returns>The command index.</returns>
 int CommandsClass::_findLongCommandByName(String name)
 {
-    TRACE(); DUMP(name);
-
     int index = -1;
     name.toLowerCase();
 
@@ -153,8 +139,6 @@ int CommandsClass::_findLongCommandByName(String name)
 /// <param name="arg">The command argument.</param>
 void CommandsClass::_processLongCommand(int index, String arg)
 {
-    TRACE(); DUMP(index); DUMP(arg);
-
     if (!isInteger(arg))
     {
         error(String("Provided argument '") + arg + "' not a valid integer number");
@@ -176,8 +160,6 @@ void CommandsClass::_processLongCommand(int index, String arg)
 /// <returns>The command index.</returns>
 int CommandsClass::_findFloatCommandByShortcut(String shortcut)
 {
-    TRACE(); DUMP(shortcut);
-
     int index = -1;
     shortcut.toLowerCase();
 
@@ -200,8 +182,6 @@ int CommandsClass::_findFloatCommandByShortcut(String shortcut)
 /// <returns>The command index.</returns>
 int CommandsClass::_findFloatCommandByName(String name)
 {
-    TRACE(); DUMP(name);
-
     int index = -1;
     name.toLowerCase();
 
@@ -224,8 +204,6 @@ int CommandsClass::_findFloatCommandByName(String name)
 /// <param name="arg">The command argument.</param>
 void CommandsClass::_processFloatCommand(int index, String arg)
 {
-    TRACE(); DUMP(index); DUMP(arg);
-
     if (!isFloat(arg))
     {
         error(String("Provided argument '") + arg + "' not a valid float number");
@@ -247,8 +225,6 @@ void CommandsClass::_processFloatCommand(int index, String arg)
 /// <param name="command"></param>
 void CommandsClass::parse(String command)
 {
-    TRACE(); DUMP(command);
-
     // Check for empty input.
     if (command.length() == 0)
     {
@@ -457,7 +433,7 @@ String CommandsClass::getHelp()
         "The following commands with no argument are available:" + "\r\n" + "\r\n";
 
     // Generate the help string for the available base commands (with shortcut).
-    for (int i = 0; i < MAX_BASE_COMMANDS; ++i)
+    for (int i = 0; i < MAX_BASE_COMMANDS; i++)
     {
         BaseCommand command = _baseCommands[i];
 
@@ -471,7 +447,7 @@ String CommandsClass::getHelp()
     help += "\r\n";
 
     // Generate the help string for the available base commands (no shortcut).
-    for (int i = 0; i < MAX_BASE_COMMANDS; ++i)
+    for (int i = 0; i < MAX_BASE_COMMANDS; i++)
     {
         BaseCommand command = _baseCommands[i];
 
@@ -486,7 +462,7 @@ String CommandsClass::getHelp()
     help += String("The following commands require an argument:") + "\r\n" + "\r\n";
 
     // Generate the help string for the available integer commands (with shortcut).
-    for (int i = 0; i < MAX_LONG_COMMANDS; ++i)
+    for (int i = 0; i < MAX_LONG_COMMANDS; i++)
     {
         LongCommand command = _longCommands[i];
 
@@ -500,7 +476,7 @@ String CommandsClass::getHelp()
     help += "\r\n";
 
     // Generate the help string for the available number commands (with shortcut).
-    for (int i = 0; i < MAX_FLOAT_COMMANDS; ++i)
+    for (int i = 0; i < MAX_FLOAT_COMMANDS; i++)
     {
         FloatCommand command = _floatCommands[i];
 
@@ -514,7 +490,7 @@ String CommandsClass::getHelp()
     help += "\r\n";
 
     // Generate the help string for the available number commands (no shortcut).
-    for (int i = 0; i < MAX_LONG_COMMANDS; ++i)
+    for (int i = 0; i < MAX_LONG_COMMANDS; i++)
     {
         LongCommand command = _longCommands[i];
 
@@ -528,7 +504,7 @@ String CommandsClass::getHelp()
     help += "\r\n";
 
     // Generate the help string for the available number commands (no shortcut).
-    for (int i = 0; i < MAX_FLOAT_COMMANDS; ++i)
+    for (int i = 0; i < MAX_FLOAT_COMMANDS; i++)
     {
         FloatCommand command = _floatCommands[i];
 
@@ -613,3 +589,4 @@ boolean CommandsClass::isFloat(String number)
 
     return true;
 }
+

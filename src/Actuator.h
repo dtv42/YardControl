@@ -1,4 +1,4 @@
-ï»¿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Actuator.h" company="DTV-Online">
 //   Copyright (c) 2023 Dr. Peter Trimmel. All rights reserved.
 // </copyright>
@@ -21,7 +21,7 @@
 /// 
 /// A typical NEMA stepper motor has the following characteristics:
 /// 
-///     Step Angle : 1.8Â°(resulting in 200 steps per rotation).
+///     Step Angle : 1.8°(resulting in 200 steps per rotation).
 ///     Max.PRM : 600  (resulting in 2000 steps per second or 2kHz).
 /// 
 /// With higher frequency the usable torque is decreased considerably.
@@ -40,8 +40,8 @@
 /// Pulse, Direction and Enable Connection:
 /// 
 ///     - Optically isolated, high level 4.5 - 5V or 24V, low voltage 0 - 0.5V.
-///     - The width of PUL signal is at least 2.5Î¼s, duty cycle is recommended 50 %.
-///     - DIR signal requires advance PUL signal minimum 5 Î¼s in single pulse mode.
+///     - The width of PUL signal is at least 2.5µs, duty cycle is recommended 50 %.
+///     - DIR signal requires advance PUL signal minimum 5 µs in single pulse mode.
 ///     - ENA must be ahead of DIR by at least 200ms. Usually, ENA+ and ENA- are NC (not connected).
 /// 
 /// As a stepper motor driver allows microstepping (typically 16 microsteps) this leads to a frequency
@@ -68,7 +68,7 @@ public:
     };
 
 private:
-    StaticJsonDocument<256> _doc;                   // The Json document representing the status data.
+    StaticJsonDocument<384> _doc;                   // The Json document representing the status data.
 
     uint8_t _PUL;                                   // GPIO pin number for the pulse (PUL+) pin.
     uint8_t _DIR;                                   // GPIO pin number for the direction (DIR+) pin.
@@ -92,7 +92,7 @@ private:
     Direction _direction = Direction::CW;           // Stepper driver direction (CW: 1, CCW: -1).
 
     float         _distancePerRotation = 8.0f;      // Distance per full rotation (mm).
-    ushort        _stepsPerRotation    = 200;       // Steps per full rotation (360Â°).
+    ushort        _stepsPerRotation    = 200;       // Steps per full rotation (360°).
     ushort        _microsteps          = 1;         // Stepper driver microstep settings.
     float         _minspeed            = 2000.0f;   // The minimum stepper speed in steps per second.
     float         _maxspeed            = 5000.0f;   // The maximum stepper speed in steps per second.
@@ -110,46 +110,47 @@ private:
     unsigned long _start   = 0;                     // Time at start of move (millis).
     float         _elapsed = 0;                     // Elapsed time for last move (seconds).
 
-    void  _ccw();                                   // Turn off the direction pin.
-    void  _cw();                                    // Turn on the direction pin.
+    String _getTimeUTC();                           // Get the current time (UTC) as a string.
+    void   _ccw();                                  // Turn off the direction pin.
+    void   _cw();                                   // Turn on the direction pin.
 
-    float _getSpeedFromIntervals(uint intervals);   // Convert the intervals to speed.
-    uint  _getIntervalsFromSpeed(float speed);      // Convert the speed to intervals.
-
-    float _getSpeedFromRPM(float speed);            // Convert the RPM in speed (steps per second).
-    float _getRPMFromSpeed(float speed);            // Convert the speed (steps per second) in RPM.
-
-    long  _getStepsFromDistance(float value);       // Convert distance [mm] to steps.
-    float _getDistanceFromSteps(long value);        // Convert steps to distance [mm].
-
-    bool  _isValidMicrostep(ushort value);          // Returns true if microstep value is valid.
+    float  _getSpeedFromIntervals(uint intervals);  // Convert the intervals to speed.
+    uint   _getIntervalsFromSpeed(float speed);     // Convert the speed to intervals.
+           
+    float  _getSpeedFromRPM(float speed);           // Convert the RPM in speed (steps per second).
+    float  _getRPMFromSpeed(float speed);           // Convert the speed (steps per second) in RPM.
+           
+    long   _getStepsFromDistance(float vlue);       // Convert distance [mm] to steps.
+    float  _getDistanceFromSteps(long value);       // Convert steps to distance [mm].
+           
+    bool   _isValidMicrostep(ushort valu);          // Returns true if microstep value is valid.
 
 public : 
     float     getRPM();                             // Gets the current speed in RPM.
     float     getSpeed();                           // Gets the current speed in steps per second.
+    float     getElapsed();                         // Gets the current elapsed time in seconds.
+    float     getPercentage();                      // Gets the current percentage of the move.
     float     getMinSpeed();                        // Gets the minimum speed in steps per second.
-    void      setMinSpeed(float value);             // Sets the minimum speed in steps per second.
+    String    setMinSpeed(float value);             // Sets the minimum speed in steps per second.
     float     getMaxSpeed();                        // Gets the maximum speed in steps per second.
-    void      setMaxSpeed(float value);             // Sets the maximum speed in steps per second.
+    String    setMaxSpeed(float value);             // Sets the maximum speed in steps per second.
     long      getMaxSteps();                        // Gets the ramp steps to maximum speed.
-    void      setMaxSteps(long value);              // Sets the ramp steps to maximum speed.
+    String    setMaxSteps(long value);              // Sets the ramp steps to maximum speed.
     ushort    getMicrosteps();                      // Gets the microsteps for the stepper driver.
-    void      setMicrosteps(ushort value);          // Sets the microsteps for the stepper driver.
+    String    setMicrosteps(ushort value);          // Sets the microsteps for the stepper driver.
     long      getPosition();                        // Gets the current position in steps.
     long      getDelta();                           // Gets the remaining steps to the target position.
     long      getTarget();                          // Gets the target position in steps.
-    void      setTarget(long value);                // Sets the target position in steps.
+    String    setTarget(long value);                // Sets the target position in steps.
     float     getDistance();                        // Gets the current position in mm.
     Direction getDirection();                       // Gets the current direction.
     float     getRetract();                         // Gets the retract distance in mm.
-    void      setRetract(float value);              // Sets the retract distance in mm.
+    String    setRetract(float value);              // Sets the retract distance in mm.
     float     getMinStep();                         // Gets the minimum step distance in mm.
-    void      setMinStep(float value);              // Sets the minimum step distance in mm.
+    String    setMinStep(float value);              // Sets the minimum step distance in mm.
     float     getSmallStep();                       // Gets the small step distance in mm.
-    void      setSmallStep(float value);            // Sets the small step distance in mm.
+    String    setSmallStep(float value);            // Sets the small step distance in mm.
 
-    void setVerboseFlag(bool value);                // Set verbose output flag.
-    bool getVerboseFlag();                          // True if verbose output has been enabled.
     bool getEnabledFlag();                          // True if acceleration and deceleration have been enabled.
     bool getRunningFlag();                          // True if the stepper is running (position != target).
     bool getLimitFlag();                            // True if the stepper has hit a limit switch.
@@ -158,19 +159,22 @@ public :
     bool getCalibratedFlag();                       // True if calibration was successful.
 
     void init();                                    // Initialize the stepper instance.
-    void info();                                    // Print move info on Telnet.
     void update();                                  // Update stepper settings with current values.
     void enable();                                  // Enables the stepper outputs.
     void disable();                                 // Disables the stepper outputs.
     void stop();                                    // Stop moving (resetting target position, disable output).
-    void home();                                    // Move to position zero (home).
-    void reset();                                   // Reset the current position to zero.
 
-    void moveAway();                                // Retract a short distance in the opposite direction.
-    void moveAbsolute(long value);                  // Move to absolute position [steps].
-    void moveRelative(long value);                  // Move relative distance [steps].
-    void moveAbsoluteDistance(float value);         // Move to absolute position [mm].
-    void moveRelativeDistance(float value);         // Move relative distance [mm].
+    String home();                                  // Move to position zero (home).
+    String reset();                                 // Reset the current position to zero.
+    String calibrate();                             // Run the calibration routine.
+
+    String getMoveInfo();                           // Return move info.
+    String moveAway();                              // Retract a short distance in the opposite direction.
+    String moveTrack(uint8_t value);                // Move to specified track (0..9).
+    String moveAbsolute(long value);                // Move to absolute position [steps].
+    String moveRelative(long value);                // Move relative distance [steps].
+    String moveAbsoluteDistance(float value);       // Move to absolute position [mm].
+    String moveRelativeDistance(float value);       // Move relative distance [mm].
 
     void alarmOn(uint8_t pin);                      // Alarm callback routine (on event).
     void alarmOff(uint8_t pin);                     // Alarm callback routine (off event).
@@ -178,9 +182,12 @@ public :
     void switchOn(uint8_t pin);                     // Switch callback routine (on event).
     void switchOff(uint8_t pin);                    // Switch callback routine (off event).
 
-    void calibrate();                               // Run the calibration routine.
     void onTimer();                                 // Delay timer callback routine.
 
     String toJsonString();                          // Get a serialized JSON representation.
     String toString();                              // Get a string representation.
 };
+
+
+
+

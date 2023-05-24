@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ServerInfo.cpp" company="DTV-Online">
 //   Copyright (c) 2023 Dr. Peter Trimmel. All rights reserved.
 // </copyright>
@@ -45,9 +45,9 @@ ServerInfo::ServerInfo()
 	}
 
     Name   = String(WiFi.getHostname());
-    Port   = Settings.Http.Port;
-    Telnet = Settings.Telnet.Port;
-    Prompt = Settings.Telnet.Prompt;
+    Port   = Settings.Server.Http;
+    Telnet = Settings.Server.Telnet;
+    Prompt = Settings.Server.Prompt;
 }
 
 /// <summary>
@@ -82,3 +82,5 @@ String ServerInfo::toString()
                   "    Telnet:  " + Telnet  + "\r\n" +
 	              "    Prompt:  " + Prompt  + "\r\n";
 }
+
+

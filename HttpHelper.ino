@@ -19,8 +19,6 @@
 /// <param name="path">The path of the file.</param>
 void sendFile(String path)
 {
-    TRACE(); DUMP(path);
-
     String mime = "application/octet-stream";
 
     if (path.endsWith(".html"))
@@ -74,8 +72,6 @@ void sendFile(String path)
 /// <param name="content">The file content (string).</param>
 void receiveFile(String path, String content)
 {
-    TRACE(); DUMP(path); DUMP(content);
-
     File file = LittleFS.open(path, "w");
 
     if (!file)
@@ -102,8 +98,6 @@ void receiveFile(String path, String content)
 /// </summary>
 void getRoot()
 {
-    TRACE();
-
     if (HttpServer.method() != HTTP_GET)
     {
         HttpServer.send(405, "text/plain", "Method Not Allowed");
@@ -119,8 +113,6 @@ void getRoot()
 /// </summary>
 void getFile()
 {
-    TRACE();
-
     if (HttpServer.method() != HTTP_GET)
     {
         HttpServer.send(405, "text/plain", "Method Not Allowed");
@@ -136,8 +128,6 @@ void getFile()
 /// </summary>
 void getAppSettings()
 {
-    TRACE();
-
     sendFile(HttpServer.uri());
 }
 
@@ -146,8 +136,6 @@ void getAppSettings()
 /// </summary>
 void getInfo()
 {
-    TRACE();
-
     if (HttpServer.method() != HTTP_GET)
     {
         HttpServer.send(405, "text/plain", "Method Not Allowed");
@@ -199,8 +187,6 @@ void getInfo()
 /// </summary>
 void postBaseCommand()
 {
-    TRACE();
-
     if (HttpServer.method() != HTTP_POST)
     {
         HttpServer.send(405, "text/plain", "Method Not Allowed");
@@ -231,8 +217,6 @@ void postBaseCommand()
 /// </summary>
 void putIntegerCommand()
 {
-    TRACE();
-
     if (HttpServer.method() != HTTP_PUT)
     {
         HttpServer.send(405, "text/plain", "Method Not Allowed");
@@ -281,8 +265,6 @@ void putIntegerCommand()
 /// </summary>
 void putFloatCommand()
 {
-    TRACE();
-
     if (HttpServer.method() != HTTP_PUT)
     {
         HttpServer.send(405, "text/plain", "Method Not Allowed");
@@ -331,8 +313,6 @@ void putFloatCommand()
 /// </summary>
 void postSettings()
 {
-    TRACE();
-
     int n = HttpServer.args();
 
     if (n != 1)
@@ -351,10 +331,7 @@ void postSettings()
 /// </summary>
 void postReboot()
 {
-    TRACE();
-
-    // We don't want to wait for a telnet response - rebooting immediately.
-    Telnet.print("Rebooting...");
+    // We don't want to wait for a user response - rebooting immediately.
     Telnet.disconnectClient();
     rp2040.reboot();
 }
@@ -364,9 +341,9 @@ void postReboot()
 /// </summary>
 void notFound()
 {
-    TRACE();
     sendFile("/www/about.html");
 }
+
 
 
 

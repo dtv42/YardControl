@@ -369,23 +369,24 @@
         }
 
         // Various status data.
+        Timestamp = "???";
         Calibrating = false;
         Calibrated = false;
-        Verbose = false;
         Enabled = false;
         Running = false;
         Limit = false;
         Alarm = false;
         Online = false;
         Delta = 0;
-        Steps = 0;
+        Elapsed = 0.0;
+        Percentage = 0.0;
         Target = 0;
-        Direction = 1;
         Position = 0;
         Distance = 0.0;
-        Delay = 0;
+        Direction = 1;
         RPM = 0.0
         Speed = 0.0;
+        MinSpeed = 0.0;
         MaxSpeed = 0.0;
         MaxSteps = 0.0;
 
@@ -398,6 +399,7 @@
                     return response.json();
                 })
                 .then((json) => {
+                    Timestamp    = json.Timestamp;
                     Calibrated   = json.Calibrated; 
                     Calibrating  = json.Calibrating;
                     Verbose      = json.Enabled;    
@@ -406,12 +408,13 @@
                     Limit        = json.Limit;  
                     Alarm        = json.Alarm;
                     Delta        = json.Delta;
+                    Elapsed      = json.Elapsed;
+                    Percentage   = json.Percentage;
                     Steps        = json.Steps;
                     Target       = json.Target;
                     Direction    = json.Direction;
                     Position     = json.Position;
                     Distance     = json.Distance;
-                    Delay        = json.Delay;
                     RPM          = json.RPM;
                     Speed        = json.Speed;
                     MaxSpeed     = json.MaxSpeed;
@@ -478,7 +481,7 @@
             led3.style.color = Limited ? 'orange'      : 'darkgray';
             led4.style.color = Alarm   ? 'red'         : 'darkgray';
 
-            textTimestamp.innerText = new Date(Date.now()).toUTCString();
+            textTimestamp.innerText = Timestamp;
         }
 
         interval = setInterval(autoUpdate, 500);

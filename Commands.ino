@@ -13,9 +13,6 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-// Disable all traces when set to 0.
-#define ARDUINOTRACE_ENABLE 0
-
 #include "src/AppSettings.h"
 #include "src/TelnetServer.h"
 #include "src/Actuator.h"
@@ -35,7 +32,6 @@
 /// </summary>
 void json()
 {
-    TRACE();
     Commands.JsonOutput = !Commands.JsonOutput;
 }
 
@@ -44,16 +40,17 @@ void json()
 /// </summary>
 void quit()
 {
-    TRACE();
-
     if (Commands.WaitForResponse)
     {
-        Telnet.println("Bye...");
-        Telnet.disconnectClient();
+        if (Telnet.isConnected())
+        {
+            UserIO.show("Bye...");
+            Telnet.disconnectClient();
+        }
     }
     else
     {
-        Serial.print("Do You really want to quit (Y/N)? ");
+        UserIO.show("Do You really want to quit (Y/N)? ");
         Commands.WaitForResponse = true;
     }
 }
@@ -63,8 +60,7 @@ void quit()
 /// </summary>
 void help()
 {
-    TRACE();
-    Telnet.println(Commands.getHelp());
+    UserIO.show(Commands.getHelp());
 }
 
 /// <summary>
@@ -72,8 +68,7 @@ void help()
 /// </summary>
 void verbose()
 {
-    TRACE();
-    Actuator.setVerboseFlag(!Actuator.getVerboseFlag());
+    UserIO.toggleVerbose();
 }
 
 /// <summary>
@@ -82,17 +77,13 @@ void verbose()
 /// <param name="message">The error message to be displayed.</param>
 void error(String message)
 {
-    TRACE();
-    Telnet.println(message);
+    UserIO.println(message);
 }
 
 /// <summary>
 /// Does nothing. This is one of the required global functions.
 /// </summary>
-void nop()
-{
-    TRACE();
-}
+void nop() {}
 
 #pragma endregion
 
@@ -103,8 +94,7 @@ void nop()
 /// </summary>
 void status()
 {
-    TRACE();
-    Commands.JsonOutput ? Telnet.print(Actuator.toJsonString()) : Telnet.print(Actuator.toString());
+    Commands.JsonOutput ? UserIO.show(Actuator.toJsonString()) : UserIO.show(Actuator.toString());
 }
 
 /// <summary>
@@ -112,8 +102,7 @@ void status()
 /// </summary>
 void position()
 {
-    TRACE();
-    Telnet.println(String("position: ") + Actuator.getPosition());
+    UserIO.show(String("position: ") + Actuator.getPosition());
 }
 
 /// <summary>
@@ -121,8 +110,7 @@ void position()
 /// </summary>
 void plus()
 {
-    TRACE();
-    Actuator.moveRelativeDistance(Settings.Actuator.MinStep);
+    UserIO.println(Actuator.moveRelativeDistance(Settings.Actuator.MinStep));
 }
 
 /// <summary>
@@ -130,8 +118,7 @@ void plus()
 /// </summary>
 void minus()
 {
-    TRACE();
-    Actuator.moveRelativeDistance(-Settings.Actuator.MinStep);
+    UserIO.println(Actuator.moveRelativeDistance(-Settings.Actuator.MinStep));
 }
 
 /// <summary>
@@ -139,8 +126,7 @@ void minus()
 /// </summary>
 void forward()
 {
-    TRACE();
-    Actuator.moveRelativeDistance(Settings.Actuator.SmallStep);
+    UserIO.println(Actuator.moveRelativeDistance(Settings.Actuator.SmallStep));
 }
 
 /// <summary>
@@ -148,8 +134,7 @@ void forward()
 /// </summary>
 void backward()
 {
-    TRACE();
-    Actuator.moveRelativeDistance(-Settings.Actuator.SmallStep);
+    UserIO.println(Actuator.moveRelativeDistance(-Settings.Actuator.SmallStep));
 }
 
 /// <summary>
@@ -157,8 +142,7 @@ void backward()
 /// </summary>
 void calibrate()
 {
-    TRACE();
-    Actuator.calibrate();
+    UserIO.println(Actuator.calibrate());
 }
 
 /// <summary>
@@ -166,7 +150,6 @@ void calibrate()
 /// </summary>
 void enable()
 {
-    TRACE();
     Actuator.enable();
 }
 
@@ -175,7 +158,6 @@ void enable()
 /// </summary>
 void disable()
 {
-    TRACE();
     Actuator.disable();
 }
 
@@ -184,7 +166,6 @@ void disable()
 /// </summary>
 void stop()
 {
-    TRACE();
     Actuator.stop();
 }
 
@@ -193,8 +174,7 @@ void stop()
 /// </summary>
 void reset()
 {
-    TRACE();
-    Actuator.reset();
+    UserIO.println(Actuator.reset());
 }
 
 /// <summary>
@@ -203,9 +183,18 @@ void reset()
 /// </summary>
 void save()
 {
-    TRACE();
     Actuator.update();
-    Settings.save();
+
+    bool ok = Settings.save();
+
+    if (ok) 
+    {
+        UserIO.println("Current application settings saved.");
+    }
+    else
+    {
+        UserIO.println("Unable to save application settings.");
+    }
 }
 
 /// <summary>
@@ -214,9 +203,18 @@ void save()
 /// </summary>
 void load()
 {
-    TRACE();
-    Settings.load();
-    Actuator.init();
+    bool ok = Settings.load();
+
+    if (ok)
+    {
+        Actuator.init();
+
+        UserIO.println("Current application settings loaded.");
+    }
+    else
+    {
+        UserIO.println("Unable to load application settings.");
+    }
 }
 
 /// <summary>
@@ -224,8 +222,7 @@ void load()
 /// </summary>
 void home()
 {
-    TRACE();
-    Actuator.home();
+        UserIO.println(Actuator.home());
 }
 
 /// <summary>
@@ -233,8 +230,7 @@ void home()
 /// </summary>
 void gpio()
 {
-    TRACE();
-    Commands.JsonOutput ? Telnet.print(Pins.toJsonString()) : Telnet.print(Pins.toString());
+    Commands.JsonOutput ? UserIO.show(Pins.toJsonString()) : UserIO.show(Pins.toString());
 }
 
 /// <summary>
@@ -242,8 +238,7 @@ void gpio()
 /// </summary>
 void smallstep()
 {
-    TRACE();
-    Telnet.println(String(Actuator.getSmallStep()));
+    UserIO.show(String(Actuator.getSmallStep()));
 }
 
 /// <summary>
@@ -251,8 +246,7 @@ void smallstep()
 /// </summary>
 void minstep()
 {
-    TRACE();
-    Telnet.println(String(Actuator.getMinStep()));
+    UserIO.show(String(Actuator.getMinStep()));
 }
 
 /// <summary>
@@ -260,8 +254,7 @@ void minstep()
 /// </summary>
 void retract()
 {
-    TRACE();
-    Telnet.println(String(Actuator.getRetract()));
+    UserIO.show(String(Actuator.getRetract()));
 }
 
 /// <summary>
@@ -269,8 +262,7 @@ void retract()
 /// </summary>
 void rpm()
 {
-    TRACE();
-    Telnet.println(String(Actuator.getRPM()));
+    UserIO.show(String(Actuator.getRPM()));
 }
 
 /// <summary>
@@ -278,8 +270,7 @@ void rpm()
 /// </summary>
 void speed()
 {
-    TRACE();
-    Telnet.println(String(Actuator.getSpeed()));
+    UserIO.show(String(Actuator.getSpeed()));
 }
 
 /// <summary>
@@ -287,8 +278,7 @@ void speed()
 /// </summary>
 void minspeed()
 {
-    TRACE();
-    Telnet.println(String(Actuator.getMinSpeed()));
+    UserIO.show(String(Actuator.getMinSpeed()));
 }
 
 /// <summary>
@@ -296,8 +286,7 @@ void minspeed()
 /// </summary>
 void maxspeed()
 {
-    TRACE();
-    Telnet.println(String(Actuator.getMaxSpeed()));
+    UserIO.show(String(Actuator.getMaxSpeed()));
 }
 
 /// <summary>
@@ -305,8 +294,7 @@ void maxspeed()
 /// </summary>
 void maxsteps()
 {
-    TRACE();
-    Telnet.println(String(Actuator.getMaxSteps()));
+    UserIO.show(String(Actuator.getMaxSteps()));
 }
 
 /// <summary>
@@ -314,8 +302,7 @@ void maxsteps()
 /// </summary>
 void microsteps()
 {
-    TRACE();
-    Telnet.println(String(Actuator.getMicrosteps()));
+    UserIO.show(String(Actuator.getMicrosteps()));
 }
 
 // Number command functions (callbacks).
@@ -325,8 +312,7 @@ void microsteps()
 /// </summary>
 void moveAway()
 {
-    TRACE(); DUMP(value);
-    Actuator.moveAway();
+    UserIO.println(Actuator.moveAway());
 }
 
 /// <summary>
@@ -335,8 +321,7 @@ void moveAway()
 /// <param name="value">The position to be moved to.</param>
 void moveAbsoluteDistance(float value)
 {
-    TRACE(); DUMP(value);
-    Actuator.moveAbsoluteDistance(value);
+    UserIO.println(Actuator.moveAbsoluteDistance(value));
 }
 
 /// <summary>
@@ -345,8 +330,7 @@ void moveAbsoluteDistance(float value)
 /// <param name="value">The distance to be moved.</param>
 void moveRelativeDistance(float value)
 {
-    TRACE(); DUMP(value);
-    Actuator.moveRelativeDistance(value);
+    UserIO.println(Actuator.moveRelativeDistance(value));
 }
 
 /// <summary>
@@ -355,8 +339,7 @@ void moveRelativeDistance(float value)
 /// <param name="value">The position to be moved to.</param>
 void moveAbsolute(long value)
 {
-    TRACE(); DUMP(value);
-    Actuator.moveAbsolute(value);
+    UserIO.println(Actuator.moveAbsolute(value));
 }
 
 /// <summary>
@@ -365,8 +348,7 @@ void moveAbsolute(long value)
 /// <param name="value">The steps to be moved.</param>
 void moveRelative(long value)
 {
-    TRACE(); DUMP(value);
-    Actuator.moveRelative(value);
+    UserIO.println(Actuator.moveRelative(value));
 }
 
 /// <summary>
@@ -375,9 +357,7 @@ void moveRelative(long value)
 /// <param name="value">The track number.</param>
 void moveToTrack(long value)
 {
-    TRACE(); DUMP(value);
-    if (value >= 0 && value < Settings.Yard.Tracks.size())
-        Actuator.moveAbsolute(Settings.Yard.Tracks[value]);
+    UserIO.println(Actuator.moveTrack(value));
 }
 
 /// <summary>
@@ -386,8 +366,7 @@ void moveToTrack(long value)
 /// <param name="value">The new distance value.</param>
 void smallstep(float value)
 {
-    TRACE(); DUMP(value);
-    Actuator.setSmallStep(value);
+    UserIO.println(Actuator.setSmallStep(value));
 }
 
 /// <summary>
@@ -396,8 +375,7 @@ void smallstep(float value)
 /// <param name="value">The new distance value.</param>
 void minstep(float value)
 {
-    TRACE(); DUMP(value);
-    Actuator.setMinStep(value);
+    UserIO.println(Actuator.setMinStep(value));
 }
 
 /// <summary>
@@ -406,8 +384,7 @@ void minstep(float value)
 /// <param name="value">The new distance value.</param>
 void retract(float value)
 {
-    TRACE(); DUMP(value);
-    Actuator.setRetract(value);
+    UserIO.println(Actuator.setRetract(value));
 }
 
 /// <summary>
@@ -416,8 +393,7 @@ void retract(float value)
 /// <param name="value">The new speed value.</param>
 void minspeed(float value)
 {
-    TRACE(); DUMP(value);
-    Actuator.setMinSpeed(value);
+    UserIO.println(Actuator.setMinSpeed(value));
 }
 
 /// <summary>
@@ -426,8 +402,7 @@ void minspeed(float value)
 /// <param name="value">The new speed value.</param>
 void maxspeed(float value)
 {
-    TRACE(); DUMP(value);
-    Actuator.setMaxSpeed(value);
+    UserIO.println(Actuator.setMaxSpeed(value));
 }
 
 /// <summary>
@@ -436,8 +411,7 @@ void maxspeed(float value)
 /// <param name="value">The new ramp steps value.</param>
 void maxsteps(long value)
 {
-    TRACE(); DUMP(value);
-    Actuator.setMaxSteps(value);
+    UserIO.println(Actuator.setMaxSteps(value));
 }
 
 /// <summary>
@@ -446,8 +420,7 @@ void maxsteps(long value)
 /// <param name="value">The new microsteps value.</param>
 void microsteps(long value)
 {
-    TRACE(); DUMP(value);
-    Actuator.setMicrosteps(value);
+    UserIO.println(Actuator.setMicrosteps(value));
 }
 
 // Basic command functions (callbacks).
@@ -457,8 +430,7 @@ void microsteps(long value)
 /// </summary>
 void yard()
 {
-    TRACE();
-    Commands.JsonOutput ? Telnet.print(Settings.Yard.toJsonString()) : Telnet.print(Settings.Yard.toString());
+    Commands.JsonOutput ? UserIO.show(Settings.Yard.toJsonString()) : UserIO.show(Settings.Yard.toString());
 }
 
 /// <summary>
@@ -466,8 +438,7 @@ void yard()
 /// </summary>
 void pico()
 {
-    TRACE();
-    Telnet.print(PICO_W_GPIO);
+    UserIO.show(PICO_W_GPIO);
 }
 
 /// <summary>
@@ -475,9 +446,8 @@ void pico()
 /// </summary>
 void wifi()
 {
-    TRACE();
     WiFiInfo info;
-    Commands.JsonOutput ? Telnet.print(info.toJsonString()) : Telnet.print(info.toString());
+    Commands.JsonOutput ? UserIO.show(info.toJsonString()) : UserIO.show(info.toString());
 }
 
 /// <summary>
@@ -485,9 +455,8 @@ void wifi()
 /// </summary>
 void system()
 {
-    TRACE();
     SystemInfo info;
-    Commands.JsonOutput ? Telnet.print(info.toJsonString()) : Telnet.print(info.toString());
+    Commands.JsonOutput ? UserIO.show(info.toJsonString()) : UserIO.show(info.toString());
 }
 
 /// <summary>
@@ -495,9 +464,8 @@ void system()
 /// </summary>
 void server()
 {
-    TRACE();
     ServerInfo info;
-    Commands.JsonOutput ? Telnet.print(info.toJsonString()) : Telnet.print(info.toString());
+    Commands.JsonOutput ? UserIO.show(info.toJsonString()) : UserIO.show(info.toString());
 }
 
 /// <summary>
@@ -505,8 +473,7 @@ void server()
 /// </summary>
 void stepper()
 {
-    TRACE();
-    Commands.JsonOutput ? Telnet.print(Settings.Stepper.toJsonString()) : Telnet.print(Settings.Stepper.toString());
+    Commands.JsonOutput ? UserIO.show(Settings.Stepper.toJsonString()) : UserIO.show(Settings.Stepper.toString());
 }
 
 /// <summary>
@@ -514,8 +481,7 @@ void stepper()
 /// </summary>
 void actuator()
 {
-    TRACE();
-    Commands.JsonOutput ? Telnet.print(Settings.Actuator.toJsonString()) : Telnet.print(Settings.Actuator.toString());
+    Commands.JsonOutput ? UserIO.show(Settings.Actuator.toJsonString()) : UserIO.show(Settings.Actuator.toString());
 }
 
 /// <summary>
@@ -523,8 +489,7 @@ void actuator()
 /// </summary>
 void settings()
 {
-    TRACE();
-    Commands.JsonOutput ? Telnet.print(Settings.toJsonString()) : Telnet.print(Settings.toString());
+    Commands.JsonOutput ? UserIO.show(Settings.toJsonString()) : UserIO.show(Settings.toString());
 }
 
 /// <summary>
@@ -532,9 +497,8 @@ void settings()
 /// </summary>
 void appsettings()
 {
-    TRACE();
     File file = LittleFS.open(SETTINGS_FILE, "r");
-    Telnet.print(file.readString());
+    UserIO.show(file.readString());
     file.close();
 }
 
@@ -543,22 +507,25 @@ void appsettings()
 /// </summary>
 void reboot()
 {
-    TRACE();
-
     if (Commands.WaitForResponse)
-    {
-        Telnet.print("Rebooting...");
-        Telnet.disconnectClient();
+    {      
+        if (Telnet.isConnected())
+        {
+            UserIO.show("Rebooting...");
+            Telnet.disconnectClient();
+        }
+
         rp2040.reboot();
     }
     else
     {
-        Telnet.print("Do You really want to reboot (Y/N)? ");
+        UserIO.show("Do You really want to reboot (Y/N)? ");
         Commands.WaitForResponse = true;
     }
 }
 
 #pragma endregion
+
 
 
 

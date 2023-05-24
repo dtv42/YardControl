@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Wireless.h" company="DTV-Online">
 //   Copyright (c) 2023 Dr. Peter Trimmel. All rights reserved.
 // </copyright>
@@ -24,7 +24,9 @@ private:
     const int CONNECT_RETRIES = 20;
 
 public:
-    bool connectWiFi(void);
-    bool createAP(void);
-    void setClock(void);
+    bool   connectWiFi(void);
+    bool   createAP(void);
+    void   setClock(void);
+    String getTime(void);
 };
+

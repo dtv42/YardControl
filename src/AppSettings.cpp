@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="AppSettings.cpp" company="DTV-Online">
 //   Copyright (c) 2023 Dr. Peter Trimmel. All rights reserved.
 // </copyright>
@@ -47,8 +47,7 @@ void AppSettings::_update()
     _doc["Yard"]     = Yard.toJson();
     _doc["Actuator"] = Actuator.toJson();
     _doc["Stepper"]  = Stepper.toJson();
-    _doc["Http"]     = Http.toJson();
-    _doc["Telnet"]   = Telnet.toJson();
+    _doc["Server"]   = Server.toJson();
     _doc["WiFi"]     = WiFi.toJson();
     _doc["AP"]       = AP.toJson();
 }
@@ -278,11 +277,13 @@ String AppSettings::StepperSettings::toString()
 /// Update data fields from JSON representation.
 /// </summary>
 /// <param name="json">The JSON object containing the settings.</param>
-void AppSettings::HttpSettings::fromJson(JsonObject json)
+void AppSettings::ServerSettings::fromJson(JsonObject json)
 {
     if (json != nullptr)
     {
-        Port = json["Port"] | Port;
+        Http   = json["HttpPort"]   | Http;
+        Telnet = json["TelnetPort"] | Telnet;
+        Prompt = json["Prompt"]     | Prompt;
     }
 }
 
@@ -290,56 +291,11 @@ void AppSettings::HttpSettings::fromJson(JsonObject json)
 /// Creates a JSON object with the current settings.
 /// </summary>
 /// <returns>The new JsonObject (pointing to the static JSON document).</returns>
-JsonObject AppSettings::HttpSettings::toJson()
+JsonObject AppSettings::ServerSettings::toJson()
 {
     _doc.clear();
-    _doc["Port"] = Port;
-
-    return _doc.as<JsonObject>();
-}
-
-/// <summary>
-/// Returns a (pretty) string representation of the current settings.
-/// </summary>
-/// <returns>The serialized JSON document.</returns>
-String AppSettings::HttpSettings::toJsonString()
-{
-    String json;
-    serializeJsonPretty(toJson(), json);
-    return json;
-}
-
-/// <summary>
-/// Creates a printable string representation of the settings.
-/// </summary>
-/// <returns>The printable string.</returns>
-String AppSettings::HttpSettings::toString()
-{
-    return String("Http:") + "\r\n" +
-                  "    Port:   " + Port + "\r\n";
-}
-
-/// <summary>
-/// Update data fields from JSON representation.
-/// </summary>
-/// <param name="json">The JSON object containing the settings.</param>
-void AppSettings::TelnetSettings::fromJson(JsonObject json)
-{
-    if (json != nullptr)
-    {
-        Port   = json["Port"]   | Port;
-        Prompt = json["Prompt"] | Prompt;
-    }
-}
-
-/// <summary>
-/// Creates a JSON object with the current settings.
-/// </summary>
-/// <returns>The new JsonObject (pointing to the static JSON document).</returns>
-JsonObject AppSettings::TelnetSettings::toJson()
-{
-    _doc.clear();
-    _doc["Port"]   = Port;
+    _doc["Http"]   = Http;
+    _doc["Telnet"] = Telnet;
     _doc["Prompt"] = Prompt;
 
     return _doc.as<JsonObject>();
@@ -349,7 +305,7 @@ JsonObject AppSettings::TelnetSettings::toJson()
 /// Returns a (pretty) string representation of the current settings.
 /// </summary>
 /// <returns>The serialized JSON document.</returns>
-String AppSettings::TelnetSettings::toJsonString()
+String AppSettings::ServerSettings::toJsonString()
 {
     String json;
     serializeJsonPretty(toJson(), json);
@@ -360,10 +316,11 @@ String AppSettings::TelnetSettings::toJsonString()
 /// Creates a printable string representation of the settings.
 /// </summary>
 /// <returns>The printable string.</returns>
-String AppSettings::TelnetSettings::toString()
+String AppSettings::ServerSettings::toString()
 {
-    return String("Telnet:") + "\r\n" +
-                  "    Port:   " + Port + "\r\n" +
+    return String("Server:") + "\r\n" +
+                  "    Http:   " + Http   + "\r\n" +
+                  "    Telnet: " + Telnet + "\r\n" +
                   "    Prompt: " + Prompt + "\r\n";
 }
 
@@ -506,8 +463,7 @@ bool AppSettings::load()
         Yard.fromJson(_doc["Yard"]);
         Actuator.fromJson(_doc["Actuator"]);
         Stepper.fromJson(_doc["Stepper"]);
-        Http.fromJson(_doc["Http"]);
-        Telnet.fromJson(_doc["Telnet"]);
+        Server.fromJson(_doc["Server"]);
         WiFi.fromJson(_doc["WiFi"]);
         AP.fromJson(_doc["AP"]);
     }
@@ -560,8 +516,9 @@ String AppSettings::toString()
         _addTab(Yard.toString()) +
         _addTab(Actuator.toString()) +
         _addTab(Stepper.toString()) +
-        _addTab(Http.toString()) +
-        _addTab(Telnet.toString()) +
+        _addTab(Server.toString()) +
         _addTab(WiFi.toString()) +
         _addTab(AP.toString());
 }
+
+

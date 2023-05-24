@@ -14,7 +14,7 @@
 
 #pragma region Command Callbacks
 
-void nop();                     // The NOP command /just print the prompt.
+void nop();                     // The NOP command (do nothing).
 void json();                    // Toggles the output (print) mode.
 void quit();                    // Terminate the program.
 void help();                    // Displays the help message.

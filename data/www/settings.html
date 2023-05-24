@@ -202,28 +202,21 @@
                 </tbody>
             </table>
         </div>
-        <h3>Http Settings</h3>
+        <h3>Server Settings</h3>
         <div class="container ps-1">
             <table class="table table-striped" id="tableHttp">
                 <tbody>
                     <tr>
-                        <td class="col-2">Port:</td>
-                        <td><span id="httpPort"></span></td>
+                        <td class="col-2">Http&nbsp;Port:</td>
+                        <td><span id="serverHttp"></span></td>
                     </tr>
-                </tbody>
-            </table>
-        </div>
-        <h3>Telnet Settings</h3>
-        <div class="container ps-1">
-            <table class="table table-striped" id="tableTelnet">
-                <tbody>
                     <tr>
-                        <td class="col-2">Port:</td>
-                        <td><span id="telnetPort"></span></td>
+                        <td class="col-2">Telnet&nbsp;Port:</td>
+                        <td><span id="serverTelnet"></span></td>
                     </tr>
                     <tr>
                         <td class="col-2">Prompt:</td>
-                        <td><span id="telnetPrompt"></span></td>
+                        <td><span id="serverPrompt"></span></td>
                     </tr>
                 </tbody>
             </table>
@@ -368,10 +361,9 @@
         const stepperStepsPerRotation    = document.getElementById('stepperStepsPerRotation');
         const stepperDistancePerRotation = document.getElementById('stepperDistancePerRotation');
 
-        const httpPort = document.getElementById('httpPort');
-
-        const telnetPort   = document.getElementById('telnetPort');
-        const telnetPrompt = document.getElementById('telnetPrompt');
+        const serverHttp   = document.getElementById('serverHttp');
+        const serverTelnet = document.getElementById('serverTelnet');
+        const serverPrompt = document.getElementById('serverPrompt');
 
         const wifiDHCP     = document.getElementById('wifiDHCP');
         const wifiSSID     = document.getElementById('wifiSSID');
@@ -430,8 +422,9 @@
 
                     httpPort.textContent = json.Http.Port;
 
-                    telnetPort.textContent   = json.Telnet.Port;
-                    telnetPrompt.textContent = json.Telnet.Prompt;
+                    serverHttp.textContent   = json.Server.Http;
+                    serverTelnet.textContent = json.Server.Telnet;
+                    serverPrompt.textContent = json.Server.Prompt;
 
                     wifiDHCP.textContent     = json.WiFi.DHCP;
                     wifiSSID.textContent     = json.WiFi.SSID;

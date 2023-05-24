@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Wireless.cpp" company="DTV-Online">
 //   Copyright (c) 2023 Dr. Peter Trimmel. All rights reserved.
 // </copyright>
@@ -96,7 +96,7 @@ bool Wireless::connectWiFi(void)
         }
     }
 
-    for (int retries = 0; retries < CONNECT_RETRIES; ++retries)
+    for (int retries = 0; retries < CONNECT_RETRIES; retries++)
     {
         Serial.print(".");
         delay(CONNECT_DELAY);
@@ -145,10 +145,20 @@ void Wireless::setClock()
 {
     NTP.begin("pool.ntp.org", "time.nist.gov");
     NTP.waitSet();
+}
+
+/// <summary>
+/// Returns the current time (UTC) as a string.
+/// </summary>
+/// <returns>The current time.</returns>
+String Wireless::getTime()
+{
     time_t now = time(nullptr);
     struct tm timeinfo;
     gmtime_r(&now, &timeinfo);
-    Serial.print("Current UTC time: ");
     String time = String(asctime(&timeinfo));
-    Serial.println(time.substring(0, time.length() - 2));
+    return time.substring(0, time.length() - 1);
 }
+
+
+

@@ -1,4 +1,4 @@
-ï»¿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="AppSettings.h" company="DTV-Online">
 //   Copyright (c) 2023 Dr. Peter Trimmel. All rights reserved.
 // </copyright>
@@ -98,8 +98,8 @@ public:
         float    MaxSpeed            = 5000.0;  // The maximum stepper speed in steps per second.
         long     MaxSteps            = 2500.0;  // The ramp steps to maximum speed.
         uint8_t  MicroSteps          = 1;       // The multiplication factor for steps (microsteps).
-        uint16_t StepsPerRotation    = 200;     // The number of steps per rotation (360Â°).
-        float    DistancePerRotation = 1.0;     // The distance in mm per rotation (360Â°).
+        uint16_t StepsPerRotation    = 200;     // The number of steps per rotation (360°).
+        float    DistancePerRotation = 1.0;     // The distance in mm per rotation (360°).
 
         void fromJson(JsonObject json);         // Update from JSON representation.
         String toJsonString(); 	                // Get a serialized JSON representation.
@@ -107,27 +107,14 @@ public:
         String toString(); 	                    // Get a string representation.
     };
     
-    class HttpSettings
+    class ServerSettings
     {
     private:
-        StaticJsonDocument<16> _doc;            // The Json document representing the settings.
+        StaticJsonDocument<256> _doc;           // The Json document representing the settings.
 
     public:
-        uint16_t Port = 80;                     // The Http Server port number.
-
-        void fromJson(JsonObject json);         // Update from JSON representation.
-        String toJsonString(); 	                // Get a serialized JSON representation.
-        JsonObject toJson();                    // Get a JSON representation.
-        String toString();                      // Get a string representation.
-    };
-
-    class TelnetSettings
-    {
-    private:
-        StaticJsonDocument<48> _doc;            // The Json document representing the settings.
-
-    public:
-        uint16_t Port   = 23;                   // The Telnet Server port number.
+        uint16_t Http   = 80;                   // The Http Server port number.
+        uint16_t Telnet = 23;                   // The Telnet Server port number.
         String   Prompt = ">";                  // The command line input prompt.
 
         void fromJson(JsonObject json);         // Update from JSON representation.
@@ -176,8 +163,7 @@ public:
     YardSettings     Yard;                      // 
     ActuatorSettings Actuator;                  // 
     StepperSettings  Stepper;                   // 
-    HttpSettings     Http;                      // 
-    TelnetSettings   Telnet;                    // 
+    ServerSettings   Server;                    // 
     WiFiSettings     WiFi;                      // 
     APSettings       AP;                        // 
 
@@ -187,3 +173,6 @@ public:
     String toJsonString(); 	                    // Get a serialized JSON representation.
     String toString(); 		                    // Get a string representation.
 };
+
+
+

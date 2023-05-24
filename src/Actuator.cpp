@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Actuator.cpp" company="DTV-Online">
 //   Copyright (c) 2023 Dr. Peter Trimmel. All rights reserved.
 // </copyright>
@@ -14,14 +14,21 @@
 #include "Actuator.h"
 #include "Commands.h"
 #include "AppSettings.h"
-#include "TelnetServer.h"
 
 // Externals (globals) and callback routines.
 extern AppSettings Settings;
-extern TelnetServer Telnet;
 extern CommandsClass Commands;
 extern LinearActuator Actuator;
 extern bool TimerHandler(struct repeating_timer* t);
+
+String LinearActuator::_getTimeUTC()
+{
+    time_t now = time(nullptr);
+    struct tm timeinfo;
+    gmtime_r(&now, &timeinfo);
+    String time = String(asctime(&timeinfo));
+    return time.substring(0, time.length() - 1);
+}
 
 /// <summary>
 /// Set the stepper driver direction to counter clockwise.
@@ -153,6 +160,25 @@ float  LinearActuator::getSpeed()
     return _speed;
 }
 
+/// <summary>
+/// Gets the current elapsed time in seconds.
+/// </summary>
+/// <returns>The elapsed time.</returns>
+float  LinearActuator::getElapsed()
+{
+    if (_running) return float(millis() - _start) / 1000.0f;
+    return 0.0f;
+}
+
+/// <summary>
+/// Gets the current percentage of the move.
+/// </summary>
+/// <returns>The move percentage.</returns>
+float  LinearActuator::getPercentage()
+{
+    if (_steps > 0) return 100.0f * (1.0f - (float(abs(_target - _position)) / float(_steps)));
+    return 0.0f;
+}
 
 /// <summary>
 /// Gets the minimum speed.
@@ -167,16 +193,17 @@ float  LinearActuator::getMinSpeed()
 /// Sets the minimum speed in steps per second.
 /// </summary>
 /// <param name="value">The minimum speed [steps per second].</param>
-void   LinearActuator::setMinSpeed(float value)
+/// <returns>A command specific message.</returns>
+String LinearActuator::setMinSpeed(float value)
 {
     if (getRunningFlag())
     {
-        if (_verbose) Telnet.println("Still moving - ignoring set minimum speed request");
+        return String("Still moving - ignoring set minimum speed request");
     }
     else
     {
         _minspeed = max(MIN_SPEED, min(MAX_SPEED, value));
-        if (_verbose) Telnet.println(String("Minimum speed set to ") + _maxspeed);
+        return String("Minimum speed set to ") + _maxspeed;
     }
 }
 
@@ -193,16 +220,17 @@ float  LinearActuator::getMaxSpeed()
 /// Sets the maximum speed in steps per second.
 /// </summary>
 /// <param name="value">The maximum speed [steps per second].</param>
-void   LinearActuator::setMaxSpeed(float value)
+/// <returns>A command specific message.</returns>
+String LinearActuator::setMaxSpeed(float value)
 {
     if (getRunningFlag())
     {
-        if (_verbose) Telnet.println("Still moving - ignoring set maximum speed request");
+        return String("Still moving - ignoring set maximum speed request");
     }
     else
     {
         _maxspeed = max(MIN_SPEED, min(MAX_SPEED, value));
-        if (_verbose) Telnet.println(String("Maximum speed set to ") + _maxspeed);
+        return String("Maximum speed set to ") + _maxspeed;
     }
 }
 
@@ -219,16 +247,17 @@ long LinearActuator::getMaxSteps()
 /// Sets the ramp steps to maximum speed.
 /// </summary>
 /// <param name="value">The ramp steps.</param>
-void LinearActuator::setMaxSteps(long value)
+/// <returns>A command specific message.</returns>
+String LinearActuator::setMaxSteps(long value)
 {
     if (getRunningFlag())
     {
-        if (_verbose) Telnet.println("Still moving - ignoring set maximum steps request");
+        return String("Still moving - ignoring set maximum steps request");
     }
     else
     {
         _maxsteps = max(1, value);
-        if (_verbose) Telnet.println(String("Maximum steps set to ") + _maxsteps);
+        return String("Maximum steps set to ") + _maxsteps;
     }
 }
 
@@ -245,22 +274,23 @@ ushort  LinearActuator::getMicrosteps()
 /// Sets the microsteps.
 /// </summary>
 /// <param name="value">The microsteps.</param>
-void   LinearActuator::setMicrosteps(ushort value)
+/// <returns>A command specific message.</returns>
+String LinearActuator::setMicrosteps(ushort value)
 {
     if (getRunningFlag())
     {
-        if (_verbose) Telnet.println("Still moving - ignoring set microsteps request");
+        return String("Still moving - ignoring set microsteps request");
     }
     else
     {
         if (_isValidMicrostep(value))
         {
             _microsteps = max(1, value);
-            if (_verbose) Telnet.println(String("Microsteps set to ") + _microsteps);
+            return String("Microsteps set to ") + _microsteps;
         }
         else
         {
-            if (_verbose) Telnet.println(String("Invalid microsteps value: ") + _microsteps);
+            return String("Invalid microsteps value: ") + _microsteps;
         }
     }
 }
@@ -297,11 +327,12 @@ long   LinearActuator::getTarget()
 /// Sets the target in steps.
 /// </summary>
 /// <param name="value">The new target.</param>
-void   LinearActuator::setTarget(long value)
+/// <returns>A command specific message.</returns>
+String LinearActuator::setTarget(long value)
 {
     _target = value;
 
-    if (_verbose) Telnet.println(String("Target set to ") + _target);
+    return String("Target set to ") + _target;
 }
 
 /// <summary>
@@ -335,10 +366,11 @@ float  LinearActuator::getRetract()
 /// Sets the retract distance in mm.
 /// </summary>
 /// <param name="value">The retract distance [mm].</param>
-void   LinearActuator::setRetract(float value)
+/// <returns>A command specific message.</returns>
+String LinearActuator::setRetract(float value)
 {
     Settings.Actuator.Retract = max(0, value);
-    if (_verbose) Telnet.println(String("Retract distance set to ") + value);
+    return String("Retract distance set to ") + value;
 }
 
 /// <summary>
@@ -354,10 +386,11 @@ float  LinearActuator::getMinStep()
 /// Sets the minimum step distance in mm.
 /// </summary>
 /// <param name="value">The minimum step distance [mm].</param>
-void   LinearActuator::setMinStep(float value)
+/// <returns>A command specific message.</returns>
+String LinearActuator::setMinStep(float value)
 {
     Settings.Actuator.MinStep = max(0, value);
-    if (_verbose) Telnet.println(String("Minimum step distance set to ") + value);
+    return String("Minimum step distance set to ") + value;
 }
 
 /// <summary>
@@ -373,30 +406,11 @@ float  LinearActuator::getSmallStep()
 /// Sets the small step distance in mm.
 /// </summary>
 /// <param name="value">The small step distance [mm].</param>
-void   LinearActuator::setSmallStep(float value)
+/// <returns>A command specific message.</returns>
+String LinearActuator::setSmallStep(float value)
 {
     Settings.Actuator.SmallStep = max(0, value);
-    if (_verbose) Telnet.println(String("Small step distance set to ") + value);
-}
-
-/// <summary>
-/// Gets the verbose flag.
-/// </summary>
-/// <returns>The flag value.</returns>
-bool LinearActuator::getVerboseFlag()
-{
-    return _verbose;
-}
-
-/// <summary>
-/// Sets the verbose flag.
-/// </summary>
-/// <param name="value">The new flag value.</param>
-/// <returns></returns>
-void LinearActuator::setVerboseFlag(bool value)
-{
-    _verbose = value;
-    if (_verbose) Telnet.println("Verbose on"); else Telnet.println("Verbose off");
+    return String("Small step distance set to ") + value;
 }
 
 /// <summary>
@@ -536,7 +550,7 @@ void LinearActuator::stop()
     // Get the elapsed time, clear the running flag and set the stopped flag.
     if (_running)
     {
-        _elapsed = float(millis() - _start) / 1000.0;
+        _elapsed = float(millis() - _start) / 1000.0f;
         _running = false;
         _stopped = true;
 
@@ -553,25 +567,22 @@ void LinearActuator::stop()
 /// <summary>
 /// Sets the target to zero (home).
 /// </summary>
-void   LinearActuator::home()
+/// <returns>A command specific message.</returns>
+String LinearActuator::home()
 {
-    moveAbsolute(0);
+    return moveAbsolute(0);
 }
 
 /// <summary>
 /// Resets the move parameter, the target, and the position to zero.
 /// </summary>
-void   LinearActuator::reset()
+/// <returns>A command specific message.</returns>
+String LinearActuator::reset()
 {
     // Do not reset if still moving.
     if (getRunningFlag())
     {
-        if (_verbose)
-        {
-            Telnet.println("Still moving - ignoring reset request");
-        }
-
-        return;
+        return String("Still moving - ignoring reset request");
     }
 
     _n = 0;
@@ -581,26 +592,40 @@ void   LinearActuator::reset()
     _target   = 0;
     _position = 0;
 
-    if (_verbose)
-    {
-        Telnet.print(String("Reset:") + "\r\n" +
-                            "    Steps:       " + _steps    + "\r\n" +
-                            "    Target:      " + _target   + "\r\n" +
-                            "    Position:    " + _position + "\r\n" +
-                            "\r\n");
-    }
-
     // Clear the stopped flag.
     _stopped = false;
+
+    return String("Reset:") + "\r\n" +
+                  "    Steps:       " + _steps    + "\r\n" +
+                  "    Target:      " + _target   + "\r\n" +
+                  "    Position:    " + _position + "\r\n";
 }
 
 /// <summary>
 /// Retracts a short distance in the opposite direction.
 /// </summary>
-void LinearActuator::moveAway()
+/// <returns>A command specific message.</returns>
+String LinearActuator::moveAway()
 {
     Direction direction = getDirection();
-    moveRelativeDistance((-1.0f) * Settings.Actuator.Retract * float(static_cast<int>(direction)));
+    return moveRelativeDistance((-1.0f) * Settings.Actuator.Retract * float(static_cast<int>(direction)));
+}
+
+/// <summary>
+/// Move to specified track (0..9).
+/// </summary>
+/// <param name="value">The track number.</param>
+/// <returns>A command specific message.</returns>
+String LinearActuator::moveTrack(uint8_t value)
+{
+    if (value >= 0 && value < Settings.Yard.Tracks.size())
+    {
+        return Actuator.moveAbsolute(Settings.Yard.Tracks[value]);
+    }
+    else
+    {
+        return String("Track number out of range [0..") + (Settings.Yard.Tracks.size() - 1) + "]";
+    }
 }
 
 /// <summary>
@@ -608,17 +633,13 @@ void LinearActuator::moveAway()
 /// The counters are set to zero. Other move parameters are initialized.
 /// </summary>
 /// <param name="value">The number of steps.</param>
-void   LinearActuator::moveAbsolute(long value)
+/// <returns>A command specific message.</returns>
+String LinearActuator::moveAbsolute(long value)
 {
     // Do not move if still moving.
     if (getRunningFlag())
     {
-        if (_verbose)
-        {
-            Telnet.println("Still moving - ignoring move request");
-        }
-
-        return;
+        return String("Still moving - ignoring move request");
     }
 
     // Set target and number of steps.
@@ -658,12 +679,7 @@ void   LinearActuator::moveAbsolute(long value)
 
     if (_rampsteps < 4)
     {
-        if (_verbose)
-        {
-            Telnet.println("Requested move distance too small - ignoring move request");
-        }
-
-        return;
+        return String("Requested move distance too small - ignoring move request");
     }
 
     // Calculate the ramp time and maximum speed for the actual ramp.
@@ -705,80 +721,77 @@ void   LinearActuator::moveAbsolute(long value)
         }
     }
 
-    if (_verbose)
-    {
-        if (_rampsteps < _maxsteps)
-        {
-            Telnet.print(String("Move Info:") + "\r\n" +
-                "    Position (steps):  " + _position    + "\r\n" +
-                "    Target (steps):    " + _target      + "\r\n" +
-                "    Total Steps:       " + _steps       + "\r\n" +
-                "    Direction:         " + _direction   + "\r\n" +
-                "    Min. Speed:        " + _minspeed    + "\r\n" +
-                "    Max. Speed:        " + _maxspeed    + "\r\n" +
-                "    Delta Speed:       " + _deltaspeed  + "\r\n" +
-                "    Ramp Steps (max):  " + _maxsteps    + "\r\n" +
-                "    Ramp Steps:        " + _rampsteps   + "\r\n" +
-                "    Ramp Speed (max):  " + maxspeed     + "\r\n" +
-                "    Ramp Time (max):   " + maxtime      + "\r\n" +
-                "    Ramp Time:         " + ramptime     + "\r\n" +
-                "    Acceleration:      " + acceleration + "\r\n" +
-                "    Total Time:        " + totaltime    + "\r\n" +
-                "\r\n");
-        }
-        else
-        {
-            Telnet.print(String("Move Info:") + "\r\n" +
-                "    Position (steps):  " + _position    + "\r\n" +
-                "    Target (steps):    " + _target      + "\r\n" +
-                "    Total Steps:       " + _steps       + "\r\n" +
-                "    Direction:         " + _direction   + "\r\n" +
-                "    Min. Speed:        " + _minspeed    + "\r\n" +
-                "    Max. Speed:        " + _maxspeed    + "\r\n" +
-                "    Delta Speed:       " + _deltaspeed  + "\r\n" +
-                "    Ramp Steps (max):  " + _maxsteps    + "\r\n" +
-                "    Ramp Time (max):   " + maxtime      + "\r\n" +
-                "    Acceleration:      " + acceleration + "\r\n" +
-                "    Const Speed Steps: " + conststeps   + "\r\n" +
-                "    Const Speed Time:  " + consttime    + "\r\n" +
-                "    Total Time:        " + totaltime    + "\r\n" +
-                "\r\n");
-        }
-    }
-
     // Get start time and set the running flag and clear the stop flag...
     _n = 0;
-    _elapsed = 0;
+    _elapsed = 0.0f;
     _start = millis();
     _stopped = false;
     _running = true;
+
+    if (_rampsteps < _maxsteps)
+    {
+        return String("Move Info:") + "\r\n" +
+                      "    Position (steps):  " + _position    + "\r\n" +
+                      "    Target (steps):    " + _target      + "\r\n" +
+                      "    Total Steps:       " + _steps       + "\r\n" +
+                      "    Direction:         " + _direction   + "\r\n" +
+                      "    Min. Speed:        " + _minspeed    + "\r\n" +
+                      "    Max. Speed:        " + _maxspeed    + "\r\n" +
+                      "    Delta Speed:       " + _deltaspeed  + "\r\n" +
+                      "    Ramp Steps (max):  " + _maxsteps    + "\r\n" +
+                      "    Ramp Steps:        " + _rampsteps   + "\r\n" +
+                      "    Ramp Speed (max):  " + maxspeed     + "\r\n" +
+                      "    Ramp Time (max):   " + maxtime      + "\r\n" +
+                      "    Ramp Time:         " + ramptime     + "\r\n" +
+                      "    Acceleration:      " + acceleration + "\r\n" +
+                      "    Total Time:        " + totaltime    + "\r\n";
+    }
+    else
+    {
+        return String("Move Info:") + "\r\n" +
+                      "    Position (steps):  " + _position    + "\r\n" +
+                      "    Target (steps):    " + _target      + "\r\n" +
+                      "    Total Steps:       " + _steps       + "\r\n" +
+                      "    Direction:         " + _direction   + "\r\n" +
+                      "    Min. Speed:        " + _minspeed    + "\r\n" +
+                      "    Max. Speed:        " + _maxspeed    + "\r\n" +
+                      "    Delta Speed:       " + _deltaspeed  + "\r\n" +
+                      "    Ramp Steps (max):  " + _maxsteps    + "\r\n" +
+                      "    Ramp Time (max):   " + maxtime      + "\r\n" +
+                      "    Acceleration:      " + acceleration + "\r\n" +
+                      "    Const Speed Steps: " + conststeps   + "\r\n" +
+                      "    Const Speed Time:  " + consttime    + "\r\n" +
+                      "    Total Time:        " + totaltime    + "\r\n";
+    }
 }
 
 /// <summary>
 /// Sets the target relative to the current position.
 /// </summary>
 /// <param name="value">The number of steps.</param>
-void   LinearActuator::moveRelative(long value)
+/// <returns>A command specific message.</returns>
+String LinearActuator::moveRelative(long value)
 {
-    moveAbsolute(_position + value);
+    return moveAbsolute(_position + value);
 }
 
 /// <summary>
 /// Sets the target to the specified distance [mm].
 /// </summary>
 /// <param name="value">The distance [mm].</param>
-void   LinearActuator::moveAbsoluteDistance(float value)
+/// <returns>A command specific message.</returns>
+String LinearActuator::moveAbsoluteDistance(float value)
 {
-    moveAbsolute(_getStepsFromDistance(value));
+    return moveAbsolute(_getStepsFromDistance(value));
 }
 
 /// <summary>
 /// Sets the target relative to the current position.
 /// </summary>
 /// <param name="value">The distance [mm].</param>
-void   LinearActuator::moveRelativeDistance(float value)
+String LinearActuator::moveRelativeDistance(float value)
 {
-    moveRelative(_getStepsFromDistance(value));
+    return moveRelative(_getStepsFromDistance(value));
 }
 
 /// <summary>
@@ -858,10 +871,16 @@ void LinearActuator::switchOff(uint8_t pin)
 /// Start the calibration routine by moving in negative direction (actuator length).
 /// Eventually the first limit switch should be engaged near the home position.
 /// </summary>
-void LinearActuator::calibrate()
+String LinearActuator::calibrate()
 {
+    // Do not move if still moving.
+    if (getRunningFlag())
+    {
+        return String("Still moving - ignoring calibrate request");
+    }
+
     _calibrating = true;
-    moveRelativeDistance(-Settings.Actuator.Length);
+    return moveRelativeDistance(-Settings.Actuator.Length);
 }
 
 /// <summary>
@@ -916,7 +935,7 @@ void LinearActuator::onTimer()
             {
                 _running = false;
                 _stopped = true;
-                _elapsed = float(millis() - _start) / 1000.0;
+                _elapsed = float(millis() - _start) / 1000.0f;
                 intervals = 0;
                 _speed = 0.0f;
                 _start = 0;
@@ -936,21 +955,21 @@ void LinearActuator::onTimer()
 }
 
 /// <summary>
-/// Print move info on Telnet. This is done when the ISR routine indicates that the move has stopped.
+/// This returns a move info string when when the ISR routine indicates that the move has stopped.
 /// </summary>
-void LinearActuator::info()
+/// <returns>The move info message.</returns>
+String LinearActuator::getMoveInfo()
 {
-    // Print elapsed time (sec) when verbose output is enabled.
+    // Return elapsed time (sec).
     if (_stopped)
     {
-        if (_verbose)
-        {
-            Telnet.println(String("Moving time: ") + _elapsed + " sec (" + _steps + " steps)");
-            Telnet.print(Settings.Telnet.Prompt);
-        }
-
         // Reset the stopped flag.
         _stopped = false;
+        return String("Moving time: ") + _elapsed + " sec (" + _steps + " steps)";
+    }
+    else
+    {
+        return String();
     }
 }
 
@@ -963,14 +982,16 @@ String LinearActuator::toJsonString()
     String json;
 
     _doc.clear();
+    _doc["Timestamp"]   = _getTimeUTC();
     _doc["Calibrating"] = getCalibratingFlag();
     _doc["Calibrated"]  = getCalibratedFlag();
-    _doc["Verbose"]     = getVerboseFlag();
     _doc["Enabled"]     = getEnabledFlag();
     _doc["Running"]     = getRunningFlag();
     _doc["Limit"]       = getLimitFlag();
     _doc["Alarm"]       = getAlarmFlag();
     _doc["Delta"]       = getDelta();
+    _doc["Elapsed"]     = getElapsed();
+    _doc["Percentage"]  = getPercentage();
     _doc["Target"]      = getTarget();
     _doc["Position"]    = getPosition();
     _doc["Distance"]    = getDistance();
@@ -992,14 +1013,16 @@ String LinearActuator::toJsonString()
 String LinearActuator::toString()
 {
     return String("Actuator Status:") + "\r\n" +
+                  "    Timestamp:   " + _getTimeUTC()        + "\r\n" +
                   "    Calibrating: " + getCalibratingFlag() + "\r\n" +
                   "    Calibrated:  " + getCalibratedFlag()  + "\r\n" +
-                  "    Verbose:     " + getVerboseFlag()     + "\r\n" +
                   "    Enabled:     " + getEnabledFlag()     + "\r\n" +
                   "    Running:     " + getRunningFlag()     + "\r\n" +
                   "    Limit:       " + getLimitFlag()       + "\r\n" +
                   "    Alarm:       " + getAlarmFlag()       + "\r\n" +
                   "    Delta:       " + getDelta()           + "\r\n" +
+                  "    Elapsed:     " + getElapsed()         + "\r\n" +
+                  "    Percentage:  " + getPercentage()      + "\r\n" +
                   "    Target:      " + getTarget()          + "\r\n" +
                   "    Position:    " + getPosition()        + "\r\n" +
                   "    Distance:    " + getDistance()        + "\r\n" +
@@ -1008,6 +1031,17 @@ String LinearActuator::toString()
                   "    Speed:       " + getSpeed()           + "\r\n" +
                   "    MinSpeed:    " + getMinSpeed()        + "\r\n" +
                   "    MaxSpeed:    " + getMaxSpeed()        + "\r\n" +
-                  "    MaxSteps:    " + getMaxSteps()        + "\r\n" +
-                  "\r\n";
+                  "    MaxSteps:    " + getMaxSteps()        + "\r\n";
 }
+
+
+
+
+
+
+
+
+
+
+
+

@@ -25,6 +25,7 @@
 //   provides several features some of them are used here:
 //   
 //      - Generic Arduino USB Serial
+//      - SerialBT
 //      - WiFi (Pico W)
 //      - HTTP client and server (WebServer)
 //      - Filesystems (LittleFS)
@@ -35,7 +36,6 @@
 //   The following additional libraries are used:
 // 
 //      - ArduinoJson       https://github.com/bblanchon/ArduinoJson
-//      - ArduinoTrace      https://github.com/bblanchon/ArduinoTrace
 //      - Blinkenlight      https://github.com/tfeldmann/Arduino-Blinkenlight
 //      - InputDebounce     https://github.com/Mokolea/InputDebounce
 //      - TimerInterrupt    https://github.com/khoih-prog/TimerInterrupt_Generic
@@ -56,13 +56,9 @@
 #error For RASPBERRY_PI_PICO_W only
 #endif
 
-// Disable all traces when set to 0.
-#define ARDUINOTRACE_ENABLE 0
-
 #pragma region Includes
 
-#include <ArduinoTrace.h>
-
+#include <SerialBT.h>
 #include <LittleFS.h>
 #include <WebServer.h>
 #include <Blinkenlight.h>
@@ -79,6 +75,7 @@
 #include "src/Wireless.h"
 #include "src/Commands.h"
 #include "src/Actuator.h"
+#include "src/UserInterface.h"
 
 #pragma endregion
 
@@ -112,6 +109,9 @@ TelnetServer Telnet;
 // Create the (global) commands instance.
 CommandsClass Commands;
 
+// Create the (global) user IO instance.
+UserInterface UserIO;
+
 // Create the (global) stepper driver timer.
 RPI_PICO_Timer Timer(0);
 
@@ -136,13 +136,13 @@ bool TimerHandler(struct repeating_timer* t)
 /// <param name="ip">The IP address of the telnet client.</param>
 void onTelnetConnect(String ip)
 {
-    TRACE(); DUMP(ip);
+    Serial.println(String("Telnet client connected: ") + ip);
 
     Telnet.println(HEADER);
     Telnet.println(COPYRIGHT);
     Telnet.println();
     Telnet.println("Welcome " + Telnet.getIP() + "");
-    Telnet.print(Settings.Telnet.Prompt);
+    Telnet.print(Settings.Server.Prompt);
 }
 
 /// <summary>
@@ -151,7 +151,7 @@ void onTelnetConnect(String ip)
 /// <param name="ip">The IP address of the telnet client.</param>
 void onTelnetDisconnect(String ip)
 {
-    TRACE(); DUMP(ip);
+    Serial.println(String("Telnet client disconnected: ") + ip);
 }
 
 /// <summary>
@@ -160,7 +160,7 @@ void onTelnetDisconnect(String ip)
 /// <param name="ip">The IP address of the telnet client.</param>
 void onTelnetReconnect(String ip)
 {
-    TRACE(); DUMP(ip);
+    Serial.println(String("Telnet client reconnected: ") + ip);
 }
 
 /// <summary>
@@ -169,7 +169,7 @@ void onTelnetReconnect(String ip)
 /// <param name="ip">The IP address of the telnet client.</param>
 void onTelnetConnectionAttempt(String ip)
 {
-    TRACE(); DUMP(ip);
+    Serial.println(String("Telnet client connection attempt: ") + ip);
 }
 
 /// <summary>
@@ -179,7 +179,7 @@ void onTelnetConnectionAttempt(String ip)
 void onTelnetInput(String str)
 {
     Commands.parse(str);
-    Telnet.print(Settings.Telnet.Prompt);
+    Telnet.print(Settings.Server.Prompt);
 }
 
 #pragma endregion
@@ -204,6 +204,18 @@ void setup()
     Serial.println(HEADER);
     Serial.println(COPYRIGHT);
     Serial.println();
+
+#pragma endregion
+
+#pragma region Initialize SerialBT
+
+    SerialBT.begin();
+
+    if (SerialBT) {
+        SerialBT.println(HEADER);
+        SerialBT.println(COPYRIGHT);
+        SerialBT.print(">");
+    }
 
 #pragma endregion
 
@@ -297,12 +309,13 @@ void setup()
 
     if (wifiOK)
     {
-        // Set the clock using NTP.
-        wireless.setClock();
-
         // Show WiFi info.
         WiFiInfo wifiInfo;
         Serial.print(wifiInfo.toString());
+
+        // Set the clock using NTP.
+        wireless.setClock();
+        Serial.println(String("Current UTC time: ") + wireless.getTime());
     }
     else
     {
@@ -364,7 +377,7 @@ void setup()
 
     HttpServer.onNotFound(notFound);
 
-    HttpServer.begin(Settings.Http.Port);
+    HttpServer.begin(Settings.Server.Http);
 
 #pragma endregion
 
@@ -377,7 +390,7 @@ void setup()
     Telnet.onDisconnect(onTelnetDisconnect);
     Telnet.onInputReceived(onTelnetInput);
 
-    if (!Telnet.begin(Settings.Telnet.Port))
+    if (!Telnet.begin(Settings.Server.Telnet))
     {
         Serial.println("Setup failed!");
 
@@ -429,11 +442,21 @@ void loop()
 {
     Led.update();
     Inputs.run();
+    UserIO.run();
     Telnet.loop();
-    Actuator.info();
     HttpServer.handleClient();
 }
 
 #pragma endregion
+
+
+
+
+
+
+
+
+
+
 
 
